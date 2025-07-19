@@ -1,74 +1,63 @@
+Here is an upgraded and visually improved version of your README.md with fully **clickable links** to CHANGELOG.md, CONTRIBUTING.md, and DATASET.md, plus enhanced visual structure, formatting consistency, and additional visual cues for clarity.
+
 # 🕵️‍♂️ PhishDetector
 
-![PhishDetector Banner](https://img.icons8.com/ios-filled/100/000000/phishing.png)
+
+  
+
 
 > **A Machine Learning-powered web app to detect phishing websites from URLs and page features.**
 
----
+## ✨ Features
 
-## Features
-
-- ⚡ **Fast**: Real-time phishing detection via a Flask API
-- 🤖 **Smart**: Decision Tree model trained on real phishing and legitimate website data
-- 🔍 **Feature Extraction**: Analyzes both URL structure and HTML content
-- 📊 **Visuals**: Model evaluation, feature importance, and confusion matrix plots
-- 🛡️ **Customizable**: Easily adjust detection threshold for stricter or looser detection
-
----
+- ⚡ **Fast:** Real-time phishing detection via a Flask API
+- 🤖 **Smart:** Decision Tree model trained on real phishing and legitimate website data
+- 🔍 **Feature Extraction:** Analyzes both URL structure and HTML content
+- 📊 **Visuals:** Model evaluation, feature importance, and confusion matrix plots
+- 🛡️ **Customizable:** Detection threshold easily adjustable for stricter or looser inspection
 
 ## 🚀 Quickstart
 
-### 1. **Clone the Repository**
-
+**1. Clone the Repository**
 ```bash
 git clone https://github.com/yourusername/phishDetector.git
 cd phishDetector
 ```
 
-### 2. **Install Requirements**
-
+**2. Install Requirements**
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. **Train the Model (Optional)**
-
-If you want to retrain the model:
-
+**3. Train the Model (Optional)**
 ```bash
 python phishML.py
 ```
-
-This will generate:
+*Generates:*
 - `phish_detector_model.pkl`
 - `feature_list.pkl`
 - Evaluation plots in the project folder
 
-### 4. **Run the Flask App**
-
+**4. Run the Flask App**
 ```bash
 python app.py
 ```
-
-The app will be available at [http://127.0.0.1:5000](http://127.0.0.1:5000)
-
----
+The app will be available at: [http://127.0.0.1:5000](http://127.0.0.1:5000)
 
 ## 🖥️ How to Use
 
-### **Web UI**
+### Web UI
 
-1. Open your browser and go to [http://127.0.0.1:5000](http://127.0.0.1:5000)
+1. Open your browser at [http://127.0.0.1:5000](http://127.0.0.1:5000)
 2. Enter a website URL (e.g., `https://www.microsoft.com` or `http://paypal-login-verification.com`)
 3. Click **Check** or **Submit**
-4. See the prediction:  
-   - 🟢 **Legitimate**  
+4. View prediction:
+   - 🟢 **Legitimate**
    - 🔴 **Phishing**
 
-### **API Usage**
+### API Usage
 
 Send a POST request to `/predict` with JSON:
-
 ```json
 {
   "url": "https://suspicious-site.com"
@@ -76,7 +65,6 @@ Send a POST request to `/predict` with JSON:
 ```
 
 **Example using `curl`:**
-
 ```bash
 curl -X POST -H "Content-Type: application/json" \
      -d '{"url": "http://paypal-login-verification.com"}' \
@@ -91,38 +79,46 @@ curl -X POST -H "Content-Type: application/json" \
   "features": { ... }
 }
 ```
-- `prediction: 1` = Phishing
-- `prediction: 0` = Legitimate
-
----
+- `prediction: 1` = **Phishing**
+- `prediction: 0` = **Legitimate**
 
 ## ⚙️ Configuration
 
 - **Detection Threshold:**  
-  Change the `threshold` value in `app.py` to make detection stricter or looser.
+  Adjust the `threshold` value in `app.py` to make detection stricter or looser.
 
----
+## 📚 Documentation
+
+- [CHANGELOG.md](CHANGELOG.md)
+- [CONTRIBUTING.md](CONTRIBUTING.md)
+- [DATASET.md](DATASET.md)
 
 ## 📝 Notes
 
-- For best results, ensure your feature extraction matches the training data.
-- This app is for educational/demo purposes. For production, use HTTPS and a production WSGI server.
-
----
+- Match your feature extraction to the training data for optimal results.
+- *Educational/demo app only.* For production, use HTTPS and a production-grade WSGI server.
 
 ## 🧑‍💻 Contributing
 
-Pull requests and issues are welcome!
-
----
+- [Submit issues or pull requests!](CONTRIBUTING.md)
 
 ## 📄 License
 
-MIT License
+- MIT License
 
----
 
-<div align="center">
-  <img src="https://img.icons8.com/ios-filled/50/000000/phishing.png" width="40"/>
-  <br>
-  <b>Stay safe online!</b>
+  
+  
+  Stay safe online!
+
+
+[1] https://img.icons8.com/ios-filled/100/000000/phishing.png
+[2] https://github.com/phishdetect/phishdetect
+[3] https://github.com/itxtalal/phishdetector-fyp
+[4] https://github.com/moghimi/phishdetector
+[5] https://github.com/topics/phishing-detection
+[6] https://github.com/MaulikxLakhani/PhishDetect
+[7] https://github.com/phishdetect
+[8] https://github.com/asrith-reddy/Phishing-detector
+[9] https://github.com/Nirzak/PhishDetector
+[10] https://github.com/rachung304/PhishDetector
