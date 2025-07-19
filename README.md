@@ -6,7 +6,7 @@
 
 ---
 
-## 🖤 Features
+## Features
 
 - ⚡ **Fast**: Real-time phishing detection via a Flask API
 - 🤖 **Smart**: Decision Tree model trained on real phishing and legitimate website data
