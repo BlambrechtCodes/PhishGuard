@@ -1,81 +1,128 @@
-# Phishing Email Detector
+# 🕵️‍♂️ PhishDetector
 
-A smart, Python-powered project by **Brendan Lambrecht** and **Zach Ydunate** for identifying phishing emails using machine learning. The goal of this repository is to help individuals and organizations protect their inboxes from malicious email attacks by flagging and classifying suspicious messages.
+![PhishDetector Banner](https://img.icons8.com/ios-filled/100/000000/phishing.png)
 
-## 📝 Description
+> **A Machine Learning-powered web app to detect phishing websites from URLs and page features.**
 
-**Phishing Email Detector** is a software tool designed to detect and classify phishing emails with high accuracy. Leveraging state-of-the-art machine learning techniques and natural language processing (NLP), this project analyzes the content and metadata of emails to distinguish between legitimate and potentially harmful messages.
+---
 
-- **Easy to Use**: Simple command-line interface for scanning emails locally.
-- **Customizable**: Train and evaluate your own models with your dataset.
-- **Educational**: Designed for students and developers interested in cybersecurity, AI, and NLP.
+## 🖤 Features
 
-## 🚀 Features
+- ⚡ **Fast**: Real-time phishing detection via a Flask API
+- 🤖 **Smart**: Decision Tree model trained on real phishing and legitimate website data
+- 🔍 **Feature Extraction**: Analyzes both URL structure and HTML content
+- 📊 **Visuals**: Model evaluation, feature importance, and confusion matrix plots
+- 🛡️ **Customizable**: Easily adjust detection threshold for stricter or looser detection
 
-- Detects phishing and legitimate emails with machine learning models
-- Preprocessing and feature extraction from email content and headers
-- Supports multiple algorithms (Logistic Regression, Random Forest, etc.)
-- Clear output with detailed report for each scanned email
-- Easily extendable with new features or classifiers
+---
 
-## ⚙️ Installation
+## 🚀 Quickstart
+
+### 1. **Clone the Repository**
 
 ```bash
-git clone https://github.com/your-username/phishing-email-detector.git
-cd phishing-email-detector
+git clone https://github.com/yourusername/phishDetector.git
+cd phishDetector
+```
+
+### 2. **Install Requirements**
+
+```bash
 pip install -r requirements.txt
 ```
 
-## 🛠️ Usage
+### 3. **Train the Model (Optional)**
 
-1. **Scan Email File**
+If you want to retrain the model:
 
-   ```bash
-   python detector.py --file your_email.eml
-   ```
+```bash
+python phishML.py
+```
 
-2. **Batch Scan Directory**
+This will generate:
+- `phish_detector_model.pkl`
+- `feature_list.pkl`
+- Evaluation plots in the project folder
 
-   ```bash
-   python detector.py --dir email_directory/
-   ```
+### 4. **Run the Flask App**
 
-3. **Train Model**
+```bash
+python app.py
+```
 
-   ```bash
-   python train.py --dataset path/to/dataset.csv
-   ```
+The app will be available at [http://127.0.0.1:5000](http://127.0.0.1:5000)
 
-## 📊 Dataset
+---
 
-The project supports any CSV-formatted dataset with columns for email text and labels (`phishing`, `legitimate`). Sample datasets and data preparation scripts are included in the repository.
+## 🖥️ How to Use
 
-## 🧑‍💻 Model Training
+### **Web UI**
 
-You can train your own model with our scripts:
+1. Open your browser and go to [http://127.0.0.1:5000](http://127.0.0.1:5000)
+2. Enter a website URL (e.g., `https://www.microsoft.com` or `http://paypal-login-verification.com`)
+3. Click **Check** or **Submit**
+4. See the prediction:  
+   - 🟢 **Legitimate**  
+   - 🔴 **Phishing**
 
-- Preprocessing and vectorization using NLP
-- Training with several classifiers
-- Evaluation and accuracy metrics
-- Model saving and loading for future use
+### **API Usage**
 
-Modify `config.yaml` to experiment with different parameters.
+Send a POST request to `/predict` with JSON:
 
-## 🤝 Contributing
+```json
+{
+  "url": "https://suspicious-site.com"
+}
+```
 
-Contributions are welcome! Open an issue or submit a pull request.
+**Example using `curl`:**
 
-- Fork and clone this repository
-- Create a new branch for your feature or bugfix
-- Submit a detailed pull request
+```bash
+curl -X POST -H "Content-Type: application/json" \
+     -d '{"url": "http://paypal-login-verification.com"}' \
+     http://127.0.0.1:5000/predict
+```
 
-## 📃 License
+**Response:**
+```json
+{
+  "prediction": 1,
+  "probability": 0.87,
+  "features": { ... }
+}
+```
+- `prediction: 1` = Phishing
+- `prediction: 0` = Legitimate
 
-This project is licensed under the MIT License.
+---
 
-## 📧 Contact
+## ⚙️ Configuration
 
-**Brendan Lambrecht** & **Zach Ydunate**  
-For questions, suggestions, or collaborations:  
-Blambrecht04@gmail.com
-`Zach Contact Info Here`
+- **Detection Threshold:**  
+  Change the `threshold` value in `app.py` to make detection stricter or looser.
+
+---
+
+## 📝 Notes
+
+- For best results, ensure your feature extraction matches the training data.
+- This app is for educational/demo purposes. For production, use HTTPS and a production WSGI server.
+
+---
+
+## 🧑‍💻 Contributing
+
+Pull requests and issues are welcome!
+
+---
+
+## 📄 License
+
+MIT License
+
+---
+
+<div align="center">
+  <img src="https://img.icons8.com/ios-filled/50/000000/phishing.png" width="40"/>
+  <br>
+  <b>Stay safe online!</b>
