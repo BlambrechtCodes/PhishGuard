@@ -1,16 +1,16 @@
-# Imports | To perform operations on dataset
+# To perform operations on dataset
 import pandas as pd
 import numpy as np
 # Machine learning model
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
-
-# Visualization | For Data Analysis and Understanding
+# Visualization
 from sklearn import metrics
 from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.tree import export_graphviz
+
 from ucimlrepo import fetch_ucirepo 
   
 # fetch dataset 
