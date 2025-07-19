@@ -3,6 +3,8 @@ import joblib
 import pandas as pd
 from flask_cors import CORS
 from urllib.parse import urlparse
+import requests
+from bs4 import BeautifulSoup
 
 app = Flask(__name__)
 CORS(app)
@@ -15,20 +17,12 @@ def extract_features(url):
     parsed = urlparse(url if url.startswith('http') else 'http://' + url)
     features = {}
 
-    # Basic features you can extract from the URL
+    # URL-based features
     features['URLLength'] = len(url)
     features['DomainLength'] = len(parsed.netloc)
     features['IsDomainIP'] = 1 if parsed.netloc.replace('.', '').isdigit() else 0
-
-    # The rest of the features are set to 0 or a sensible default
-    features['CharContinuationRate'] = 0
-    features['TLDLegitimateProb'] = 0
-    features['URLCharProb'] = 0
     features['TLDLength'] = len(parsed.netloc.split('.')[-1]) if '.' in parsed.netloc else 0
     features['NoOfSubDomain'] = parsed.netloc.count('.') - 1 if '.' in parsed.netloc else 0
-    features['HasObfuscation'] = 0
-    features['NoOfObfuscatedChar'] = 0
-    features['ObfuscationRatio'] = 0
     features['NoOfLettersInURL'] = sum(c.isalpha() for c in url)
     features['LetterRatioInURL'] = features['NoOfLettersInURL'] / len(url) if len(url) > 0 else 0
     features['NoOfDegitsInURL'] = sum(c.isdigit() for c in url)
@@ -37,35 +31,51 @@ def extract_features(url):
     features['NoOfQMarkInURL'] = url.count('?')
     features['NoOfAmpersandInURL'] = url.count('&')
     features['NoOfOtherSpecialCharsInURL'] = sum(not c.isalnum() for c in url)
-    features['LineOfCode'] = 0
-    features['LargestLineLength'] = 0
+
+    # Defaults for features that require HTML
     features['HasTitle'] = 0
     features['HasFavicon'] = 0
-    features['Robots'] = 0
-    features['NoOfURLRedirect'] = 0
-    features['NoOfSelfRedirect'] = 0
-    features['NoOfPopup'] = 0
-    features['NoOfiFrame'] = 0
-    features['HasExternalFormSubmit'] = 0
     features['HasPasswordField'] = 0
-    features['Bank'] = 0
-    features['Pay'] = 0
-    features['Crypto'] = 0
+    features['HasExternalFormSubmit'] = 0
     features['NoOfImage'] = 0
     features['NoOfCSS'] = 0
     features['NoOfJS'] = 0
-    features['NoOfSelfRef'] = 0
-    features['NoOfEmptyRef'] = 0
-    features['NoOfExternalRef'] = 0
 
-    # Remove 'label' if present
-    if 'label' in features:
-        del features['label']
+    # Try to fetch the page and parse HTML-based features
+    try:
+        resp = requests.get(url, timeout=5)
+        html = resp.text
+        soup = BeautifulSoup(html, 'html.parser')
 
-    # Ensure all features in feature_list (except 'label') are present
+        # Title
+        features['HasTitle'] = 1 if soup.title and soup.title.string else 0
+
+        # Favicon
+        features['HasFavicon'] = 1 if soup.find('link', rel=lambda x: x and 'icon' in x.lower()) else 0
+
+        # Password field
+        features['HasPasswordField'] = 1 if soup.find('input', {'type': 'password'}) else 0
+
+        # External form submit
+        forms = soup.find_all('form')
+        features['HasExternalFormSubmit'] = 0
+        for form in forms:
+            action = form.get('action', '')
+            if action and not action.startswith('/') and parsed.netloc not in action:
+                features['HasExternalFormSubmit'] = 1
+                break
+
+        # Images, CSS, JS counts
+        features['NoOfImage'] = len(soup.find_all('img'))
+        features['NoOfCSS'] = len(soup.find_all('link', rel='stylesheet'))
+        features['NoOfJS'] = len(soup.find_all('script'))
+
+    except Exception as e:
+        # If fetch fails, leave HTML-based features as default (0)
+        pass
+
+    # Fill in any missing features with 0
     for f in feature_list:
-        if f == 'label':
-            continue
         if f not in features:
             features[f] = 0
 
@@ -76,9 +86,12 @@ def predict():
     data = request.get_json()
     url = data.get('url', '')
     features = extract_features(url)
-    X = pd.DataFrame([features])
-    pred = int(model.predict(X)[0])
-    return jsonify({'prediction': pred})
+    # Ensure DataFrame columns match feature_list exactly
+    X = pd.DataFrame([[features[f] for f in feature_list]], columns=feature_list)
+    proba = model.predict_proba(X)[0][1]  # Probability of phishing
+    threshold = 0.3  # Lower = stricter
+    pred = int(proba > threshold)
+    return jsonify({'prediction': pred, 'probability': proba, 'features': features})
 
 @app.route('/')
 def index():

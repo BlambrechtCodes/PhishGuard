@@ -133,6 +133,17 @@
       font-size: 0.95rem;
       letter-spacing: 0.5px;
     }
+    #analysis {
+      background: #222;
+      color: #0ff;
+      padding: 1em;
+      border-radius: 8px;
+      overflow-x: auto;
+      max-width: 100%;
+      margin-top: 1em;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
     @media (max-width: 500px) {
       .container { padding: 1.2rem 0.5rem; }
       h1 { font-size: 1.3rem; }
@@ -149,6 +160,7 @@
     </form>
     <div class="loader" id="loader"></div>
     <div class="result" id="result"></div>
+    <pre id="analysis"></pre>
     <div class="footer">
       &copy; 2025 PhishDetector &mdash; Smart URL Security
     </div>
@@ -158,12 +170,15 @@
     const input = document.getElementById('url-input');
     const result = document.getElementById('result');
     const loader = document.getElementById('loader');
+    const analysis = document.getElementById('analysis');
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       result.className = 'result';
       result.textContent = '';
       loader.classList.add('visible');
+      analysis.style.opacity = 0;
+      analysis.textContent = '';
 
       // --- Replace this with your backend API endpoint ---
       const apiUrl = '/predict'; // e.g. Flask/FastAPI endpoint
@@ -186,6 +201,11 @@
         } else {
           result.textContent = 'Could not determine. Please try again.';
           result.classList.add('visible');
+        }
+        // Show feature analysis
+        if (data.features) {
+          analysis.textContent = JSON.stringify(data.features, null, 2);
+          analysis.style.opacity = 1;
         }
       } catch (err) {
         loader.classList.remove('visible');
