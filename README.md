@@ -10,17 +10,6 @@ A smart, Python-powered project by **Brendan Lambrecht** and **Zach Ydunate** fo
 - **Customizable**: Train and evaluate your own models with your dataset.
 - **Educational**: Designed for students and developers interested in cybersecurity, AI, and NLP.
 
-## 📂 Table of Contents
-
-- [Features](#features)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Dataset](#dataset)
-- [Model Training](#model-training)
-- [Contributing](#contributing)
-- [License](#license)
-- [Contact](#contact)
-
 ## 🚀 Features
 
 - Detects phishing and legitimate emails with machine learning models
