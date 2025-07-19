@@ -1,5 +1,3 @@
-Here is an upgraded and visually improved version of your README.md with fully **clickable links** to CHANGELOG.md, CONTRIBUTING.md, and DATASET.md, plus enhanced visual structure, formatting consistency, and additional visual cues for clarity.
-
 # 🕵️‍♂️ PhishDetector
 
 
