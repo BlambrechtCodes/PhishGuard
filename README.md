@@ -77,6 +77,5 @@ This project is licensed under the MIT License.
 
 **Brendan Lambrecht** & **Zach Ydunate**  
 For questions, suggestions, or collaborations:  
-`[Your Contact Emails Here]`
-
-> Empowering email security through open source and machine learning!
+Blambrecht04@gmail.com
+`Zach Contact Info Here`
