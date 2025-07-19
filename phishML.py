@@ -11,4 +11,10 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.tree import export_graphviz
 
+# Reading and Splitting the Dataset
+df = pd.read_csv('.../dataset.csv')
+dot_file = '.../tree.dot'
+confusion_matrix_file = '.../confusion_matrix.png'
 
+# Printing the Results of the Read Operation
+print(df.head())
