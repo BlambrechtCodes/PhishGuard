@@ -21,7 +21,7 @@ from urllib.parse import urlparse
 import warnings
 warnings.filterwarnings('ignore')
 
-print("TensorFlow version:", tf.__version__)
+print(tf.__version__)
 print("\n=== Enhanced Phishing Detector with TensorFlow ===")
 
 class PhishingDetector:
