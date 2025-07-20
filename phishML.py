@@ -1,4 +1,10 @@
-# To perform operations on dataset
+# This script is designed to train a phishing URL detection model using a dataset of URLs.
+#! It is OUTDATED and should not be used for production purposes.
+# The code performs data quality checks, feature selection, model training, evaluation, and visualization.
+# It also includes functionality to save the model and results, and to make predictions on new data
+# This code works with the Application "app,py" in the same directory.
+
+#To perform operations on dataset
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split, cross_val_score
