@@ -155,9 +155,10 @@ class PhishingDetector:
         
         # Handle class imbalance with SMOTE and undersampling
         print("\n=== Handling Class Imbalance ===")
-        over = SMOTE(sampling_strategy=0.5, random_state=42)
-        under = RandomUnderSampler(sampling_strategy=0.8, random_state=42)
-        steps = [('o', over), ('u', under)]
+        # Inside cross_validate() method:
+        over = SMOTE(sampling_strategy=0.8, random_state=42)  # Changed from 0.5 → 0.8
+        under = RandomUnderSampler(sampling_strategy=1.0, random_state=42)  # Changed from 0.8 → 1.0
+        steps = [('o', SMOTE(random_state=42))]  # Only SMOTE, no undersampling
         pipeline = ImbPipeline(steps=steps)
         X_train_res, y_train_res = pipeline.fit_resample(X_train, y_train)
         
@@ -374,7 +375,7 @@ class PhishingDetector:
             # Handle class imbalance
             over = SMOTE(sampling_strategy=0.5, random_state=42)
             under = RandomUnderSampler(sampling_strategy=0.8, random_state=42)
-            steps = [('o', over), ('u', under)]
+            steps = [('o', SMOTE(random_state=42))]  # Only SMOTE, no undersampling
             pipeline = ImbPipeline(steps=steps)
             X_train_res, y_train_res = pipeline.fit_resample(X_train, y_train)
             
