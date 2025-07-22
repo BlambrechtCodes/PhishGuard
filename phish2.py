@@ -1,3 +1,8 @@
+# Enhanced Phishing Detector with TensorFlow Neural Network
+# This script is designed to train a phishing URL detection model using a dataset of URLs.
+#! This is an WORSE version of the original phish1.py.
+#! This code DOES NOT WORK with the Application "app.py" in the same directory.
+
 import pandas as pd
 import numpy as np
 import tensorflow as tf
