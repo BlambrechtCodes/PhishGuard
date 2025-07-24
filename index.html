@@ -2,215 +2,746 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>PhishDetector - Smart Phishing URL Checker</title>
+  <title>PhishAlert - Advanced Threat Detection System</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary: #1e90ff;
-      --bg: #181a1b;
-      --card: #23272a;
-      --text: #f5f6fa;
-      --success: #27ae60;
-      --danger: #e74c3c;
-      --transition: 0.4s cubic-bezier(.4,0,.2,1);
+      --cyber-blue: #00d4ff;
+      --electric-blue: #0099ff;
+      --deep-blue: #003d66;
+      --matrix-green: #00ff41;
+      --warning-orange: #ff6b35;
+      --danger-red: #ff073a;
+      --bg-primary: #0a0e1a;
+      --bg-secondary: #1a1f2e;
+      --bg-tertiary: #252b3d;
+      --bg-card: #2a3142;
+      --text-primary: #ffffff;
+      --text-secondary: #b8c5d6;
+      --text-accent: #00d4ff;
+      --text-muted: #6b7280;
+      --border-primary: #3d4758;
+      --border-accent: #00d4ff33;
+      --shadow-cyber: rgba(0, 212, 255, 0.15);
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+      background: 
+        radial-gradient(circle at 20% 80%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(0, 153, 255, 0.1) 0%, transparent 50%),
+        linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+      color: var(--text-primary);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       margin: 0;
       min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      padding: 2rem 1rem;
+      line-height: 1.6;
     }
-    .container {
-      background: var(--card);
-      border-radius: 18px;
-      box-shadow: 0 8px 32px rgba(30,144,255,0.12);
-      padding: 2.5rem 2rem 2rem 2rem;
-      width: 350px;
-      max-width: 90vw;
+
+    .main-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    .features-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-primary);
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .analyzer-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-primary);
+      border-radius: 16px;
+      padding: 2.5rem;
+      box-shadow: 
+        0 20px 25px -5px rgba(0, 0, 0, 0.2),
+        0 0 0 1px var(--shadow-cyber);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .analyzer-panel::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--cyber-blue), var(--electric-blue), var(--cyber-blue));
+      animation: scan 3s linear infinite;
+    }
+
+    @keyframes scan {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    .header {
       text-align: center;
-      transition: box-shadow var(--transition);
-    }
-    .container:hover {
-      box-shadow: 0 12px 48px rgba(30,144,255,0.22);
-    }
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 0.5rem;
-      letter-spacing: 1px;
-      color: var(--primary);
-      font-weight: 700;
-    }
-    p {
-      color: #b2bec3;
       margin-bottom: 2rem;
-      font-size: 1rem;
+      position: relative;
     }
-    input[type="text"] {
-      width: 90%;
-      padding: 0.8rem;
-      border-radius: 8px;
-      border: none;
-      outline: none;
-      font-size: 1rem;
-      margin-bottom: 1.2rem;
-      background: #222;
-      color: var(--text);
-      transition: box-shadow var(--transition);
-      box-shadow: 0 2px 8px rgba(30,144,255,0.08);
-    }
-    input[type="text"]:focus {
-      box-shadow: 0 0 0 2px var(--primary);
-    }
-    button {
-      width: 100%;
-      padding: 0.9rem;
-      border: none;
-      border-radius: 8px;
-      background: linear-gradient(90deg, var(--primary), #00b894);
-      color: #fff;
-      font-size: 1.1rem;
-      font-weight: 600;
-      cursor: pointer;
+
+    .system-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(0, 212, 255, 0.1);
+      border: 1px solid var(--border-accent);
+      color: var(--text-accent);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
       letter-spacing: 1px;
-      transition: background var(--transition), transform var(--transition);
-      margin-bottom: 1.2rem;
+      margin-bottom: 1rem;
     }
-    button:hover {
-      background: linear-gradient(90deg, #00b894, var(--primary));
-      transform: translateY(-2px) scale(1.03);
-    }
-    .result {
-      opacity: 0;
-      transform: translateY(20px);
-      pointer-events: none;
-      transition: opacity var(--transition), transform var(--transition);
-      margin-top: 1.2rem;
-      padding: 1.2rem 0.5rem;
-      border-radius: 10px;
-      font-size: 1.15rem;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-    }
-    .result.visible {
-      opacity: 1;
-      transform: translateY(0);
-      pointer-events: auto;
-    }
-    .result.legit {
-      background: linear-gradient(90deg, #00b894 60%, #1e90ff 100%);
-      color: #fff;
-      box-shadow: 0 2px 12px rgba(39,174,96,0.15);
-    }
-    .result.phishing {
-      background: linear-gradient(90deg, #e74c3c 60%, #fdcb6e 100%);
-      color: #fff;
-      box-shadow: 0 2px 12px rgba(231,76,60,0.15);
-    }
-    .loader {
-      border: 4px solid #222;
-      border-top: 4px solid var(--primary);
+
+    .status-indicator {
+      width: 8px;
+      height: 8px;
+      background: var(--matrix-green);
       border-radius: 50%;
-      width: 32px;
-      height: 32px;
-      animation: spin 1s linear infinite;
-      margin: 1.2rem auto;
-      display: none;
+      animation: pulse 2s infinite;
     }
-    .loader.visible {
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin: 0 0 0.5rem 0;
+      background: linear-gradient(135deg, var(--cyber-blue), var(--electric-blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.02em;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .subtitle {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      margin: 0 0 1.5rem 0;
+      font-weight: 400;
+    }
+
+    .input-section {
+      margin-bottom: 2rem;
+    }
+
+    .input-label {
+      display: block;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 1rem 1.25rem 1rem 3rem;
+      border: 2px solid var(--border-primary);
+      border-radius: 8px;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      font-size: 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      transition: var(--transition);
+      outline: none;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--cyber-blue);
+      box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-accent);
+      font-size: 1rem;
+    }
+
+    .analyze-btn {
+      width: 100%;
+      padding: 1rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--cyber-blue), var(--electric-blue));
+      color: var(--bg-primary);
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-top: 1rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .analyze-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px var(--shadow-cyber);
+    }
+
+    .analyze-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .scanner {
+      display: none;
+      text-align: center;
+      margin: 2rem 0;
+    }
+
+    .scanner.active {
       display: block;
     }
+
+    .scan-animation {
+      width: 60px;
+      height: 60px;
+      border: 3px solid var(--border-primary);
+      border-top: 3px solid var(--cyber-blue);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    .scan-status {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.875rem;
+      color: var(--text-accent);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
     @keyframes spin {
-      0% { transform: rotate(0deg);}
-      100% { transform: rotate(360deg);}
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
-    .footer {
-      margin-top: 2rem;
-      color: #636e72;
-      font-size: 0.95rem;
-      letter-spacing: 0.5px;
-    }
-    #analysis {
-      background: #222;
-      color: #0ff;
-      padding: 1em;
-      border-radius: 8px;
-      overflow-x: auto;
-      max-width: 100%;
-      margin-top: 1em;
+
+    .result-panel {
       opacity: 0;
-      transition: opacity 0.4s;
+      transform: translateY(20px);
+      transition: var(--transition);
+      margin-top: 2rem;
+      padding: 1.5rem;
+      border-radius: 8px;
+      border-left: 4px solid;
     }
-    @media (max-width: 500px) {
-      .container { padding: 1.2rem 0.5rem; }
-      h1 { font-size: 1.3rem; }
+
+    .result-panel.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .result-panel.safe {
+      background: rgba(0, 255, 65, 0.1);
+      border-left-color: var(--matrix-green);
+      color: var(--matrix-green);
+    }
+
+    .result-panel.threat {
+      background: rgba(255, 7, 58, 0.1);
+      border-left-color: var(--danger-red);
+      color: var(--danger-red);
+    }
+
+    .result-panel.warning {
+      background: rgba(255, 107, 53, 0.1);
+      border-left-color: var(--warning-orange);
+      color: var(--warning-orange);
+    }
+
+    .result-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .result-details {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .features-header {
+      margin-bottom: 2rem;
+    }
+
+    .features-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .features-subtitle {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+
+    .feature-category {
+      margin-bottom: 2rem;
+    }
+
+    .category-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-accent);
+      margin-bottom: 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .feature-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid rgba(61, 71, 88, 0.3);
+    }
+
+    .feature-item:last-child {
+      border-bottom: none;
+    }
+
+    .feature-icon {
+      color: var(--matrix-green);
+      font-size: 0.875rem;
+      margin-top: 0.125rem;
+      flex-shrink: 0;
+    }
+
+    .feature-content {
+      flex: 1;
+    }
+
+    .feature-name {
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+      font-size: 0.875rem;
+    }
+
+    .feature-desc {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .analysis-output {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-primary);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-top: 2rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--text-accent);
+      overflow-x: auto;
+      opacity: 0;
+      transition: var(--transition);
+      white-space: pre-wrap;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .analysis-output.visible {
+      opacity: 1;
+    }
+
+    .analysis-header {
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border-primary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    @media (max-width: 1024px) {
+      .main-container {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+      
+      .features-panel {
+        order: 2;
+      }
+      
+      .analyzer-panel {
+        order: 1;
+      }
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 1rem;
+      }
+      
+      .analyzer-panel,
+      .features-panel {
+        padding: 1.5rem;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>PhishDetector</h1>
-    <p>Enter a website URL to check if it's <span style="color:#00b894">legitimate</span> or <span style="color:#e74c3c">phishing</span>.</p>
-    <form id="phish-form" autocomplete="off">
-      <input type="text" id="url-input" placeholder="e.g. google.com" required>
-      <button type="submit">Predict</button>
-    </form>
-    <div class="loader" id="loader"></div>
-    <div class="result" id="result"></div>
-    <pre id="analysis"></pre>
-    <div class="footer">
-      &copy; 2025 PhishDetector &mdash; Smart URL Security
+  <div class="main-container">
+    <div class="analyzer-panel">
+      <div class="header">
+        <div class="system-badge">
+          <div class="status-indicator"></div>
+          <span>System Online</span>
+        </div>
+        <h1>PhishAlert</h1>
+        <p class="subtitle">Advanced Machine Learning Threat Detection System</p>
+      </div>
+
+      <div class="input-section">
+        <form id="threat-analyzer" autocomplete="off">
+          <label class="input-label" for="url-input">Target URL Analysis</label>
+          <div class="input-wrapper">
+            <div class="input-icon">🔗</div>
+            <input 
+              type="text" 
+              id="url-input" 
+              placeholder="https://example.com or domain.com"
+              required
+            >
+          </div>
+          <button type="submit" class="analyze-btn" id="analyze-btn">
+            Initialize Scan
+          </button>
+        </form>
+      </div>
+
+      <div class="scanner" id="scanner">
+        <div class="scan-animation"></div>
+        <div class="scan-status" id="scan-status">Analyzing threat vectors...</div>
+      </div>
+
+      <div class="result-panel" id="result-panel"></div>
+
+      <div class="analysis-output" id="analysis-output">
+        <div class="analysis-header">Threat Analysis Report</div>
+        <div id="analysis-content"></div>
+      </div>
+    </div>
+
+    <div class="features-panel">
+      <div class="features-header">
+        <h2 class="features-title">System Capabilities</h2>
+        <p class="features-subtitle">Advanced cybersecurity features powered by machine learning</p>
+      </div>
+
+      <div class="feature-category">
+        <h3 class="category-title">
+          <span>🛡️</span>
+          <span>Detection Engine</span>
+        </h3>
+        <ul class="feature-list">
+          <li class="feature-item">
+            <span class="feature-icon">✓</span>
+            <div class="feature-content">
+              <div class="feature-name">Real-time URL Analysis</div>
+              <div class="feature-desc">Instant threat assessment using advanced ML algorithms</div>
+            </div>
+          </li>
+          <li class="feature-item">
+            <span class="feature-icon">✓</span>
+            <div class="feature-content">
+              <div class="feature-name">Domain Reputation Scoring</div>
+              <div class="feature-desc">Comprehensive domain trust evaluation and history analysis</div>
+            </div>
+          </li>
+          <li class="feature-item">
+            <span class="feature-icon">✓</span>
+            <div class="feature-content">
+              <div class="feature-name">SSL Certificate Validation</div>
+              <div class="feature-desc">Automated certificate chain verification and security assessment</div>
+            </div>
+          </li>
+          <li class="feature-item">
+            <span class="feature-icon">✓</span>
+            <div class="feature-content">
+              <div class="feature-name">Content Pattern Recognition</div>
+              <div class="feature-desc">Deep learning analysis of webpage content and structure</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="feature-category">
+        <h3 class="category-title">
+          <span>🔍</span>
+          <span>Analysis Features</span>
+        </h3>
+        <ul class="feature-list">
+          <li class="feature-item">
+            <span class="feature-icon">✓</span>
+            <div class="feature-content">
+              <div class="feature-name">Behavioral Analysis</div>
+              <div class="feature-desc">Suspicious redirect patterns and JavaScript behavior detection</div>
+            </div>
+          </li>
+          <li class="feature-item">
+            <span class="feature-icon">✓</span>
+            <div class="feature-content">
+              <div class="feature-name">Blacklist Cross-Reference</div>
+              <div class="feature-desc">Multi-source threat intelligence database integration</div>
+            </div>
+          </li>
+          <li class="feature-item">
+            <span class="feature-icon">✓</span>
+            <div class="feature-content">
+              <div class="feature-name">Lexical Analysis</div>
+              <div class="feature-desc">URL structure and character pattern anomaly detection</div>
+            </div>
+          </li>
+          <li class="feature-item">
+            <span class="feature-icon">✓</span>
+            <div class="feature-content">
+              <div class="feature-name">Network Fingerprinting</div>
+              <div class="feature-desc">Infrastructure analysis and hosting provider assessment</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="feature-category">
+        <h3 class="category-title">
+          <span>⚡</span>
+          <span>Performance</span>
+        </h3>
+        <ul class="feature-list">
+          <li class="feature-item">
+            <span class="feature-icon">✓</span>
+            <div class="feature-content">
+              <div class="feature-name">High-Speed Processing</div>
+              <div class="feature-desc">Optimized processing pipeline for rapid threat assessment</div>
+            </div>
+          </li>
+          <li class="feature-item">
+            <span class="feature-icon">✓</span>
+            <div class="feature-content">
+              <div class="feature-name">Machine Learning Accuracy</div>
+              <div class="feature-desc">Continuously trained models with minimal false positives</div>
+            </div>
+          </li>
+          <li class="feature-item">
+            <span class="feature-icon">✓</span>
+            <div class="feature-content">
+              <div class="feature-name">Scalable Architecture</div>
+              <div class="feature-desc">Cloud-native infrastructure supporting high-volume analysis</div>
+            </div>
+          </li>
+          <li class="feature-item">
+            <span class="feature-icon">✓</span>
+            <div class="feature-content">
+              <div class="feature-name">Real-time Updates</div>
+              <div class="feature-desc">Continuous model updates with latest threat intelligence</div>
+            </div>
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
+
   <script>
-    const form = document.getElementById('phish-form');
+    const form = document.getElementById('threat-analyzer');
     const input = document.getElementById('url-input');
-    const result = document.getElementById('result');
-    const loader = document.getElementById('loader');
-    const analysis = document.getElementById('analysis');
+    const scanner = document.getElementById('scanner');
+    const scanStatus = document.getElementById('scan-status');
+    const resultPanel = document.getElementById('result-panel');
+    const analysisOutput = document.getElementById('analysis-output');
+    const analysisContent = document.getElementById('analysis-content');
+    const analyzeBtn = document.getElementById('analyze-btn');
+
+    const scanMessages = [
+      'Initializing threat detection...',
+      'Analyzing URL structure...',
+      'Checking domain reputation...',
+      'Validating SSL certificates...',
+      'Scanning for malicious patterns...',
+      'Cross-referencing threat databases...',
+      'Finalizing security assessment...'
+    ];
+
+    let scanMessageIndex = 0;
+    let scanInterval;
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      result.className = 'result';
-      result.textContent = '';
-      loader.classList.add('visible');
-      analysis.style.opacity = 0;
-      analysis.textContent = '';
+      
+      // Reset UI
+      resultPanel.className = 'result-panel';
+      analysisOutput.className = 'analysis-output';
+      
+      // Start scanning animation
+      scanner.classList.add('active');
+      analyzeBtn.disabled = true;
+      analyzeBtn.textContent = 'Scanning...';
+      
+      // Cycle through scan messages
+      scanMessageIndex = 0;
+      scanStatus.textContent = scanMessages[0];
+      scanInterval = setInterval(() => {
+        scanMessageIndex = (scanMessageIndex + 1) % scanMessages.length;
+        scanStatus.textContent = scanMessages[scanMessageIndex];
+      }, 800);
 
-      // --- Replace this with your backend API endpoint ---
-      const apiUrl = '/predict'; // e.g. Flask/FastAPI endpoint
+      // TODO: Replace with your ML model API endpoint
+      const apiUrl = '/api/analyze'; // Update this to your backend endpoint
 
-      // Send the URL to the backend for prediction
       try {
         const response = await fetch(apiUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url: input.value })
+          body: JSON.stringify({ url: input.value.trim() })
         });
+
         const data = await response.json();
-        loader.classList.remove('visible');
-        if (data.prediction === 1) {
-          result.textContent = '⚠️ This site is likely PHISHING!';
-          result.classList.add('visible', 'phishing');
-        } else if (data.prediction === 0) {
-          result.textContent = '✅ This site appears LEGITIMATE.';
-          result.classList.add('visible', 'legit');
+        
+        // Stop scanning
+        clearInterval(scanInterval);
+        scanner.classList.remove('active');
+        analyzeBtn.disabled = false;
+        analyzeBtn.textContent = 'Initialize Scan';
+
+        // Display results based on your ML model output
+        // Adjust these conditions based on your model's response format
+        if (data.prediction === 1 || data.is_phishing === true) {
+          resultPanel.innerHTML = `
+            <div class="result-header">
+              <span>⚠️</span>
+              <span>Threat Detected</span>
+            </div>
+            <div class="result-details">
+              High-risk phishing attempt identified. This URL exhibits malicious patterns and should be avoided.
+            </div>
+          `;
+          resultPanel.classList.add('visible', 'threat');
+        } else if (data.prediction === 0 || data.is_phishing === false) {
+          resultPanel.innerHTML = `
+            <div class="result-header">
+              <span>✅</span>
+              <span>Secure</span>
+            </div>
+            <div class="result-details">
+              URL analysis complete. No threats detected. This appears to be a legitimate website.
+            </div>
+          `;
+          resultPanel.classList.add('visible', 'safe');
         } else {
-          result.textContent = 'Could not determine. Please try again.';
-          result.classList.add('visible');
+          resultPanel.innerHTML = `
+            <div class="result-header">
+              <span>❓</span>
+              <span>Inconclusive</span>
+            </div>
+            <div class="result-details">
+              Unable to complete threat assessment. Please verify the URL format and try again.
+            </div>
+          `;
+          resultPanel.classList.add('visible', 'warning');
         }
-        // Show feature analysis
-        if (data.features) {
-          analysis.textContent = JSON.stringify(data.features, null, 2);
-          analysis.style.opacity = 1;
+
+        // Display technical analysis (customize based on your model's feature output)
+        if (data.features || data.analysis) {
+          const analysisData = {
+            timestamp: new Date().toISOString(),
+            target_url: input.value.trim(),
+            model_confidence: data.confidence || 'N/A',
+            analysis_time: data.processing_time || 'N/A',
+            features_analyzed: data.features ? Object.keys(data.features).length : 'N/A',
+            detailed_analysis: data.features || data.analysis || data
+          };
+          
+          analysisContent.textContent = JSON.stringify(analysisData, null, 2);
+          analysisOutput.classList.add('visible');
         }
-      } catch (err) {
-        loader.classList.remove('visible');
-        result.textContent = 'Error connecting to prediction service.';
-        result.classList.add('visible');
+
+      } catch (error) {
+        console.error('Analysis error:', error);
+        
+        clearInterval(scanInterval);
+        scanner.classList.remove('active');
+        analyzeBtn.disabled = false;
+        analyzeBtn.textContent = 'Initialize Scan';
+        
+        resultPanel.innerHTML = `
+          <div class="result-header">
+            <span>🔧</span>
+            <span>System Error</span>
+          </div>
+          <div class="result-details">
+            Threat detection service temporarily unavailable. Please try again later.
+          </div>
+        `;
+        resultPanel.classList.add('visible', 'warning');
+      }
+    });
+
+    // Enhanced input formatting
+    input.addEventListener('input', (e) => {
+      const value = e.target.value.trim();
+      // Basic URL validation - customize as needed for your implementation
+      if (value && !value.startsWith('http://') && !value.startsWith('https://') && value.includes('.')) {
+        // Keep as-is, your backend can handle protocol addition
       }
     });
   </script>
