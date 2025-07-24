@@ -18,6 +18,14 @@ class PhishingDetector:
         self.app = Flask(__name__)
         CORS(self.app)
         
+            # Load your machine learning model
+        try:
+            self.model = joblib.load('phish_detector_model.pkl')  # Replace with your model path
+            self.model_loaded = True
+        except Exception as e:
+            print(f"Failed to load model: {e}")
+            self.model_loaded = False
+        
         # Suspicious keywords commonly found in phishing URLs
         self.SUSPICIOUS_KEYWORDS = [
             "secure", "account", "update", "confirm", "verify", "login", "signin", "bank",
@@ -47,6 +55,8 @@ class PhishingDetector:
     def setup_flask_routes(self):
         """Setup Flask API routes"""
         @self.app.route('/api/predict', methods=['POST'])
+        @self.app.route('/api/predict', methods=['POST'])
+    
         def predict():
             try:
                 data = request.get_json()
@@ -74,7 +84,8 @@ class PhishingDetector:
                     'features': analysis_result['features'],
                     'url_breakdown': url_breakdown,
                     'url': url,
-                    'analysis_timestamp': analysis_result['timestamp']
+                    'analysis_timestamp': analysis_result['timestamp'],
+                    'model_used': self.model_loaded  # Indicates if ML model was used
                 })
                 
             except Exception as e:
@@ -424,7 +435,7 @@ class PhishingDetector:
         except:
             raise ValueError("Invalid URL format")
         
-        # Extract basic features
+        # Extract features (same as before)
         features = {
             'url_length': len(full_url),
             'domain_length': len(domain),
@@ -438,72 +449,31 @@ class PhishingDetector:
             'has_valid_cert': parsed.scheme == 'https'
         }
         
-        # Extract content features using requests and BeautifulSoup
+        # Extract content features
         content_features = self.extract_content_features(normalized_url)
         features.update(content_features)
         
-        # Calculate risk score
-        risk_score = 0
-        warnings = []
-        
-        # URL length analysis
-        if features['url_length'] > 100:
-            risk_score += 15
-            warnings.append("URL is unusually long")
-        
-        # Domain analysis
-        if features['has_ip_address']:
-            risk_score += 25
-            warnings.append("URL uses IP address instead of domain name")
-        
-        if features['subdomain_count'] > 3:
-            risk_score += 20
-            warnings.append("URL has excessive subdomains")
-        
-        # Security analysis
-        if not features['has_https']:
-            risk_score += 15
-            warnings.append("URL does not use HTTPS encryption")
-        
-        # Content analysis
-        if features['form_count'] > 3:
-            risk_score += 10
-            warnings.append("Page contains multiple forms")
-        
-        if features['external_links_count'] > features['internal_links_count'] * 2:
-            risk_score += 10
-            warnings.append("Page has many external links")
-        
-        if not features['has_title']:
-            risk_score += 5
-            warnings.append("Page lacks a proper title")
-        
-        # Suspicious content
-        if features['suspicious_keywords'] > 2:
-            risk_score += 20
-            warnings.append("URL contains multiple suspicious keywords")
-        
-        if features['has_url_shortener']:
-            risk_score += 10
-            warnings.append("URL uses a URL shortening service")
-        
-        # Special characters
-        if features['special_char_count'] > 10:
-            risk_score += 15
-            warnings.append("URL contains many special characters")
-        
-        # Domain reputation
-        if any(tld in domain for tld in self.SUSPICIOUS_TLDS):
-            risk_score += 25
-            warnings.append("URL uses a suspicious top-level domain")
-        
-        # Phishing patterns
-        if '-' in domain and features['suspicious_keywords'] > 0:
-            risk_score += 15
-            warnings.append("Domain contains hyphens with suspicious keywords")
+        # If model is loaded, use it for prediction
+        if self.model_loaded:
+            try:
+                # Convert features to DataFrame in the correct order expected by the model
+                feature_df = pd.DataFrame([features])
+                
+                # Make prediction (adjust according to your model's requirements)
+                prediction = self.model.predict(feature_df)[0]
+                probability = self.model.predict_proba(feature_df)[0][1]  # Probability of being phishing
+                
+                is_phishing = bool(prediction)
+                risk_score = int(probability * 100)
+            except Exception as e:
+                print(f"Model prediction failed: {e}")
+                # Fall back to rule-based if model fails
+                is_phishing, risk_score = self.rule_based_analysis(features)
+        else:
+            # Use rule-based analysis if model isn't loaded
+            is_phishing, risk_score = self.rule_based_analysis(features)
         
         # Determine risk level
-        risk_score = min(risk_score, 100)
         if risk_score < 30:
             risk_level = "LOW"
         elif risk_score < 60:
@@ -513,14 +483,58 @@ class PhishingDetector:
         
         return {
             'url': input_url,
-            'is_phishing': risk_score >= 50,
+            'is_phishing': is_phishing,
             'risk_score': risk_score,
             'risk_level': risk_level,
             'features': features,
-            'warnings': warnings,
+            'warnings': self.generate_warnings(features, risk_score),
             'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
     
+    def rule_based_analysis(self, features):
+        """Fallback rule-based analysis if model isn't available"""
+        risk_score = 0
+        
+        # Your existing rule-based scoring logic
+        if features['url_length'] > 100:
+            risk_score += 15
+        
+        if features['has_ip_address']:
+            risk_score += 25
+        
+        if features['subdomain_count'] > 3:
+            risk_score += 20
+        
+        if not features['has_https']:
+            risk_score += 15
+        
+        # Add more rules as needed...
+        
+        risk_score = min(risk_score, 100)
+        is_phishing = risk_score >= 50
+        
+        return is_phishing, risk_score
+
+    def generate_warnings(self, features, risk_score):
+        """Generate warnings based on features"""
+        warnings = []
+        
+        if features['url_length'] > 100:
+            warnings.append("URL is unusually long")
+        
+        if features['has_ip_address']:
+            warnings.append("URL uses IP address instead of domain name")
+        
+        if features['subdomain_count'] > 3:
+            warnings.append("URL has excessive subdomains")
+        
+        if not features['has_https']:
+            warnings.append("URL does not use HTTPS encryption")
+        
+        # Add more warning conditions as needed...
+        
+        return warnings
+
     def is_ip_address(self, domain):
         """Check if domain is an IP address"""
         ipv4_pattern = r'^(\d{1,3}\.){3}\d{1,3}$'
