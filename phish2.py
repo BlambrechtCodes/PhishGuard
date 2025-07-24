@@ -1,3 +1,8 @@
+# Enhanced Phishing Detector with TensorFlow Neural Network
+# This script is designed to train a phishing URL detection model using a dataset of URLs.
+#! This is an WORSE version of the original phish1.py.
+#! This code DOES NOT WORK with the Application "app.py" in the same directory.
+
 import pandas as pd
 import numpy as np
 import tensorflow as tf
@@ -155,9 +160,10 @@ class PhishingDetector:
         
         # Handle class imbalance with SMOTE and undersampling
         print("\n=== Handling Class Imbalance ===")
-        over = SMOTE(sampling_strategy=0.5, random_state=42)
-        under = RandomUnderSampler(sampling_strategy=0.8, random_state=42)
-        steps = [('o', over), ('u', under)]
+        # Inside cross_validate() method:
+        over = SMOTE(sampling_strategy=0.8, random_state=42)  # Changed from 0.5 → 0.8
+        under = RandomUnderSampler(sampling_strategy=1.0, random_state=42)  # Changed from 0.8 → 1.0
+        steps = [('o', SMOTE(random_state=42))]  # Only SMOTE, no undersampling
         pipeline = ImbPipeline(steps=steps)
         X_train_res, y_train_res = pipeline.fit_resample(X_train, y_train)
         
@@ -374,7 +380,7 @@ class PhishingDetector:
             # Handle class imbalance
             over = SMOTE(sampling_strategy=0.5, random_state=42)
             under = RandomUnderSampler(sampling_strategy=0.8, random_state=42)
-            steps = [('o', over), ('u', under)]
+            steps = [('o', SMOTE(random_state=42))]  # Only SMOTE, no undersampling
             pipeline = ImbPipeline(steps=steps)
             X_train_res, y_train_res = pipeline.fit_resample(X_train, y_train)
             
