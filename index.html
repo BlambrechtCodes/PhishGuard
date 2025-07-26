@@ -379,19 +379,16 @@
       line-height: 1.4;
     }
 
+    /* NEW: Enhanced Threat Analysis Report */
     .analysis-output {
       background: var(--bg-secondary);
       border: 1px solid var(--border-primary);
       border-radius: 8px;
-      padding: 1.5rem;
       margin-top: 2rem;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.75rem;
-      color: var(--text-accent);
-      overflow-x: auto;
+      overflow: hidden;
       opacity: 0;
       transition: var(--transition);
-      white-space: pre-wrap;
       max-height: 300px;
       overflow-y: auto;
     }
@@ -400,13 +397,223 @@
       opacity: 1;
     }
 
+    .analysis-output.expanded {
+      max-height: 600px;
+    }
+
     .analysis-header {
-      color: var(--text-secondary);
-      margin-bottom: 1rem;
-      padding-bottom: 0.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.5rem;
+      background: var(--bg-tertiary);
       border-bottom: 1px solid var(--border-primary);
+    }
+
+    .header-title {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-weight: 600;
+      color: var(--text-accent);
       text-transform: uppercase;
       letter-spacing: 1px;
+      font-size: 0.875rem;
+    }
+
+    .header-icon {
+      color: var(--cyber-blue);
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .copy-btn, .expand-btn {
+      background: transparent;
+      border: 1px solid var(--border-primary);
+      border-radius: 4px;
+      padding: 0.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .copy-btn:hover, .expand-btn:hover {
+      background: rgba(0, 212, 255, 0.1);
+      border-color: var(--cyber-blue);
+    }
+
+    .copy-btn svg, .expand-btn svg {
+      display: block;
+    }
+
+    .report-metadata {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border-primary);
+      background: rgba(0, 212, 255, 0.03);
+    }
+
+    .metadata-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .metadata-label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .metadata-value {
+      font-size: 0.8rem;
+      color: var(--text-primary);
+      word-break: break-all;
+    }
+
+    .report-content {
+      padding: 1.5rem;
+      font-size: 0.75rem;
+      color: var(--text-accent);
+      white-space: pre-wrap;
+      line-height: 1.6;
+    }
+
+    .report-footer {
+      padding: 0.75rem 1.5rem;
+      border-top: 1px solid var(--border-primary);
+      background: var(--bg-tertiary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .report-footer svg {
+      flex-shrink: 0;
+    }
+
+    /* Syntax highlighting for JSON */
+    .token.key {
+      color: var(--cyber-blue);
+    }
+    .token.string {
+      color: var(--matrix-green);
+    }
+    .token.number {
+      color: var(--electric-blue);
+    }
+    .token.boolean {
+      color: var(--warning-orange);
+    }
+    .token.null {
+      color: var(--danger-red);
+    }
+
+    /* Prediction Details Section */
+    .prediction-details {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .details-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .details-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .confidence-meter {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .confidence-value {
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .confidence-bar {
+      height: 6px;
+      border-radius: 3px;
+      background: var(--bg-tertiary);
+      flex-grow: 1;
+      overflow: hidden;
+    }
+
+    .confidence-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.5s ease-out;
+    }
+
+    .confidence-fill.safe {
+      background: var(--matrix-green);
+    }
+
+    .confidence-fill.threat {
+      background: var(--danger-red);
+    }
+
+    .confidence-fill.warning {
+      background: var(--warning-orange);
+    }
+
+    .feature-indicators {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .feature-indicator {
+      background: var(--bg-tertiary);
+      border-radius: 6px;
+      padding: 0.75rem;
+      font-size: 0.75rem;
+    }
+
+    .feature-name {
+      color: var(--text-secondary);
+      margin-bottom: 0.25rem;
+      font-weight: 500;
+    }
+
+    .feature-value {
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .feature-value.safe {
+      color: var(--matrix-green);
+    }
+
+    .feature-value.threat {
+      color: var(--danger-red);
+    }
+
+    .feature-value.neutral {
+      color: var(--text-secondary);
     }
 
     @media (max-width: 1024px) {
@@ -436,6 +643,14 @@
       
       h1 {
         font-size: 2rem;
+      }
+
+      .feature-indicators {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .report-metadata {
+        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -478,8 +693,52 @@
       <div class="result-panel" id="result-panel"></div>
 
       <div class="analysis-output" id="analysis-output">
-        <div class="analysis-header">Threat Analysis Report</div>
-        <div id="analysis-content"></div>
+        <div class="analysis-header">
+          <div class="header-title">
+            <svg class="header-icon" viewBox="0 0 24 24" width="20" height="20">
+              <path fill="currentColor" d="M12,2L1,21H23M12,6L19.5,19H4.5M11,10V14H13V10M11,16V18H13V16"/>
+            </svg>
+            <span>Threat Analysis Report</span>
+          </div>
+          <div class="header-actions">
+            <button class="copy-btn" id="copy-report" title="Copy Report">
+              <svg viewBox="0 0 24 24" width="16" height="16">
+                <path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/>
+              </svg>
+            </button>
+            <button class="expand-btn" id="expand-report" title="Expand/Collapse">
+              <svg viewBox="0 0 24 24" width="16" height="16">
+                <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        
+        <div class="report-metadata">
+          <div class="metadata-item">
+            <span class="metadata-label">Analysis Time:</span>
+            <span class="metadata-value" id="report-time"></span>
+          </div>
+          <div class="metadata-item">
+            <span class="metadata-label">Target URL:</span>
+            <span class="metadata-value" id="report-url"></span>
+          </div>
+          <div class="metadata-item">
+            <span class="metadata-label">Features Analyzed:</span>
+            <span class="metadata-value" id="report-features"></span>
+          </div>
+        </div>
+        
+        <div class="report-content" id="analysis-content"></div>
+        
+        <div class="report-footer">
+          <div class="footer-item">
+            <svg viewBox="0 0 24 24" width="14" height="14">
+              <path fill="var(--text-muted)" d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M11,7H13V9H11V7M11,11H13V17H11V11Z"/>
+            </svg>
+            <span>Report generated by PhishAlert ML Engine</span>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -611,6 +870,11 @@
     const analysisOutput = document.getElementById('analysis-output');
     const analysisContent = document.getElementById('analysis-content');
     const analyzeBtn = document.getElementById('analyze-btn');
+    const copyBtn = document.getElementById('copy-report');
+    const expandBtn = document.getElementById('expand-report');
+    const reportTime = document.getElementById('report-time');
+    const reportUrl = document.getElementById('report-url');
+    const reportFeatures = document.getElementById('report-features');
 
     const scanMessages = [
       'Initializing threat detection...',
@@ -624,6 +888,16 @@
 
     let scanMessageIndex = 0;
     let scanInterval;
+
+    // Sample feature data for demonstration
+    const sampleFeatures = {
+      "domain_age": {"value": "2 years", "risk": "low"},
+      "ssl_grade": {"value": "A+", "risk": "low"},
+      "redirect_count": {"value": "3", "risk": "high"},
+      "ip_reputation": {"value": "Suspicious", "risk": "medium"},
+      "similar_domains": {"value": "5 detected", "risk": "high"},
+      "content_similarity": {"value": "92% match", "risk": "high"}
+    };
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -645,95 +919,161 @@
         scanStatus.textContent = scanMessages[scanMessageIndex];
       }, 800);
 
-      // TODO: Replace with your ML model API endpoint
-      const apiUrl = '/api/predict'; // Update this to your backend endpoint
-
-      try {
-        const response = await fetch(apiUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url: input.value.trim() })
-        });
-
-        const data = await response.json();
-        
+      // Simulate API call with timeout for demo purposes
+      setTimeout(() => {
         // Stop scanning
         clearInterval(scanInterval);
         scanner.classList.remove('active');
         analyzeBtn.disabled = false;
         analyzeBtn.textContent = 'Initialize Scan';
 
-        // Display results based on your ML model output
-        // Adjust these conditions based on your model's response format
-        if (data.prediction === 1 || data.is_phishing === true) {
-          resultPanel.innerHTML = `
+        // For demo purposes, we'll randomly generate a result
+        const randomResult = Math.random();
+        let prediction, confidence, detailsHtml, featuresHtml = '';
+        
+        if (randomResult > 0.7) {
+          // Threat detected
+          prediction = 'threat';
+          confidence = (Math.random() * 30 + 70).toFixed(1); // 70-100%
+          
+          detailsHtml = `
             <div class="result-header">
               <span>⚠️</span>
               <span>Threat Detected</span>
             </div>
             <div class="result-details">
-              High-risk phishing attempt identified. This URL exhibits malicious patterns and should be avoided.
+              High-risk phishing attempt identified with ${confidence}% confidence. 
+              This URL exhibits multiple malicious patterns and should be avoided.
+            </div>
+            <div class="prediction-details">
+              <div class="details-header">
+                <div class="details-title">Prediction Details</div>
+                <div class="confidence-meter">
+                  <span class="confidence-value">${confidence}%</span>
+                  <div class="confidence-bar">
+                    <div class="confidence-fill threat" style="width: ${confidence}%"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="feature-indicators" id="feature-indicators"></div>
             </div>
           `;
-          resultPanel.classList.add('visible', 'threat');
-        } else if (data.prediction === 0 || data.is_phishing === false) {
-          resultPanel.innerHTML = `
+        } else if (randomResult > 0.3) {
+          // Safe
+          prediction = 'safe';
+          confidence = (Math.random() * 30 + 70).toFixed(1); // 70-100%
+          
+          detailsHtml = `
             <div class="result-header">
               <span>✅</span>
               <span>Secure</span>
             </div>
             <div class="result-details">
-              URL analysis complete. No threats detected. This appears to be a legitimate website.
+              URL analysis complete with ${confidence}% confidence. 
+              No threats detected. This appears to be a legitimate website.
+            </div>
+            <div class="prediction-details">
+              <div class="details-header">
+                <div class="details-title">Prediction Details</div>
+                <div class="confidence-meter">
+                  <span class="confidence-value">${confidence}%</span>
+                  <div class="confidence-bar">
+                    <div class="confidence-fill safe" style="width: ${confidence}%"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="feature-indicators" id="feature-indicators"></div>
             </div>
           `;
-          resultPanel.classList.add('visible', 'safe');
         } else {
-          resultPanel.innerHTML = `
+          // Warning/inconclusive
+          prediction = 'warning';
+          confidence = (Math.random() * 40 + 30).toFixed(1); // 30-70%
+          
+          detailsHtml = `
             <div class="result-header">
               <span>❓</span>
               <span>Inconclusive</span>
             </div>
             <div class="result-details">
-              Unable to complete threat assessment. Please verify the URL format and try again.
+              Unable to complete definitive threat assessment (${confidence}% confidence). 
+              Some suspicious elements detected. Proceed with caution.
+            </div>
+            <div class="prediction-details">
+              <div class="details-header">
+                <div class="details-title">Prediction Details</div>
+                <div class="confidence-meter">
+                  <span class="confidence-value">${confidence}%</span>
+                  <div class="confidence-bar">
+                    <div class="confidence-fill warning" style="width: ${confidence}%"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="feature-indicators" id="feature-indicators"></div>
             </div>
           `;
-          resultPanel.classList.add('visible', 'warning');
         }
 
-        // Display technical analysis (customize based on your model's feature output)
-        if (data.features || data.analysis) {
-          const analysisData = {
-            timestamp: new Date().toISOString(),
-            target_url: input.value.trim(),
-            model_confidence: data.confidence || 'N/A',
-            analysis_time: data.processing_time || 'N/A',
-            features_analyzed: data.features ? Object.keys(data.features).length : 'N/A',
-            detailed_analysis: data.features || data.analysis || data
-          };
+        // Set the main result panel
+        resultPanel.innerHTML = detailsHtml;
+        resultPanel.classList.add('visible', prediction);
+
+        // Generate feature indicators
+        const featureIndicators = document.getElementById('feature-indicators');
+        for (const [feature, data] of Object.entries(sampleFeatures)) {
+          const featureName = feature.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+          const riskClass = data.risk === 'high' ? 'threat' : 
+                          data.risk === 'medium' ? 'warning' : 'safe';
           
-          analysisContent.textContent = JSON.stringify(analysisData, null, 2);
-          analysisOutput.classList.add('visible');
+          featuresHtml += `
+            <div class="feature-indicator">
+              <div class="feature-name">${featureName}</div>
+              <div class="feature-value ${riskClass}">${data.value}</div>
+            </div>
+          `;
         }
+        featureIndicators.innerHTML = featuresHtml;
 
-      } catch (error) {
-        console.error('Analysis error:', error);
+        // Display technical analysis
+        const analysisData = {
+          timestamp: new Date().toISOString(),
+          target_url: input.value.trim(),
+          prediction: prediction,
+          confidence: confidence + '%',
+          analysis_time: (Math.random() * 2 + 1).toFixed(2) + 's',
+          features_analyzed: Object.keys(sampleFeatures).length,
+          detailed_analysis: sampleFeatures
+        };
         
-        clearInterval(scanInterval);
-        scanner.classList.remove('active');
-        analyzeBtn.disabled = false;
-        analyzeBtn.textContent = 'Initialize Scan';
+        // Update report metadata
+        reportTime.textContent = new Date().toLocaleString();
+        reportUrl.textContent = input.value.trim();
+        reportFeatures.textContent = Object.keys(sampleFeatures).length;
         
-        resultPanel.innerHTML = `
-          <div class="result-header">
-            <span>🔧</span>
-            <span>System Error</span>
-          </div>
-          <div class="result-details">
-            Threat detection service temporarily unavailable. Please try again later.
-          </div>
-        `;
-        resultPanel.classList.add('visible', 'warning');
-      }
+        analysisContent.textContent = JSON.stringify(analysisData, null, 2);
+        analysisOutput.classList.add('visible');
+
+      }, 2000); // Simulate 2 second API delay
+    });
+
+    // Copy report functionality
+    copyBtn.addEventListener('click', () => {
+      const reportContent = analysisContent.textContent;
+      navigator.clipboard.writeText(reportContent).then(() => {
+        const originalTitle = copyBtn.getAttribute('title');
+        copyBtn.setAttribute('title', 'Copied!');
+        setTimeout(() => {
+          copyBtn.setAttribute('title', originalTitle);
+        }, 2000);
+      });
+    });
+
+    // Expand/collapse report functionality
+    expandBtn.addEventListener('click', () => {
+      analysisOutput.classList.toggle('expanded');
+      expandBtn.querySelector('svg').style.transform = analysisOutput.classList.contains('expanded') 
+        ? 'rotate(180deg)' 
+        : 'rotate(0deg)';
     });
 
     // Enhanced input formatting
