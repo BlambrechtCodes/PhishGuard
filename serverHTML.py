@@ -121,6 +121,10 @@ def url_character_prob(url):
     unusual_chars = ['@', '~', '%', '!', '*']
     return 1 - (sum(url.count(c) for c in unusual_chars) / len(url)) if url else 0.5
 
+
+###! VERY IMPORTANT CONTENT BELOW IS THE PREDICTION ENDPOINT !!!!
+
+###! THIS IS THE PREDICTION ENDPOINT ###
 @app.route('/api/predict', methods=['POST'])
 def predict():
     try:
