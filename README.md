@@ -29,18 +29,19 @@ pip install -r requirements.txt
 
 **3. Train the Model (Optional)**
 ```bash
-python phishML.py
+python phish1_MAIN.py
 ```
 *Generates:*
 - `phish_detector_model.pkl`
 - `feature_list.pkl`
 - Evaluation plots in the project folder
+- Etc.
 
 **4. Run the Flask App**
 ```bash
-python app.py
+python serverHTML.py
 ```
-The app will be available at: [http://127.0.0.1:5000](http://127.0.0.1:5000)
+The app will be available at this address: [http://127.0.0.1:4200](http://127.0.0.1:4200)
 
 ## 🖥️ How to Use
 
