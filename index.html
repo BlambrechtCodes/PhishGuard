@@ -911,7 +911,6 @@
       analyzeBtn.disabled = true;
       analyzeBtn.textContent = 'Scanning...';
       
-      // Cycle through scan messages
       scanMessageIndex = 0;
       scanStatus.textContent = scanMessages[0];
       scanInterval = setInterval(() => {
@@ -919,100 +918,50 @@
         scanStatus.textContent = scanMessages[scanMessageIndex];
       }, 800);
 
-      // Simulate API call with timeout for demo purposes
-      setTimeout(() => {
+      try {
+        const response = await fetch('http://localhost:5000/api/predict', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: input.value.trim() })
+        });
+        const result = await response.json();
+
         // Stop scanning
         clearInterval(scanInterval);
         scanner.classList.remove('active');
         analyzeBtn.disabled = false;
         analyzeBtn.textContent = 'Initialize Scan';
 
-        // For demo purposes, we'll randomly generate a result
-        const randomResult = Math.random();
-        let prediction, confidence, detailsHtml, featuresHtml = '';
-        
-        if (randomResult > 0.7) {
-          // Threat detected
-          prediction = 'threat';
-          confidence = (Math.random() * 30 + 70).toFixed(1); // 70-100%
-          
-          detailsHtml = `
-            <div class="result-header">
-              <span>⚠️</span>
-              <span>Threat Detected</span>
-            </div>
-            <div class="result-details">
-              High-risk phishing attempt identified with ${confidence}% confidence. 
-              This URL exhibits multiple malicious patterns and should be avoided.
-            </div>
-            <div class="prediction-details">
-              <div class="details-header">
-                <div class="details-title">Prediction Details</div>
-                <div class="confidence-meter">
-                  <span class="confidence-value">${confidence}%</span>
-                  <div class="confidence-bar">
-                    <div class="confidence-fill threat" style="width: ${confidence}%"></div>
-                  </div>
+        // Use result.prediction, result.risk_score, result.features, result.warnings, etc.
+        // Build your resultPanel and analysisOutput using real data
+        // Example:
+        let prediction = result.prediction === 1 ? 'threat' : 'safe';
+        let confidence = (result.probability * 100).toFixed(1);
+
+        let detailsHtml = `
+          <div class="result-header">
+            <span>${prediction === 'threat' ? '⚠️' : '✅'}</span>
+            <span>${prediction === 'threat' ? 'Threat Detected' : 'Secure'}</span>
+          </div>
+          <div class="result-details">
+            ${prediction === 'threat' ? 
+              `High-risk phishing attempt identified with ${confidence}% confidence. This URL exhibits multiple malicious patterns and should be avoided.` :
+              `URL analysis complete with ${confidence}% confidence. No threats detected. This appears to be a legitimate website.`}
+          </div>
+          <div class="prediction-details">
+            <div class="details-header">
+              <div class="details-title">Prediction Details</div>
+              <div class="confidence-meter">
+                <span class="confidence-value">${confidence}%</span>
+                <div class="confidence-bar">
+                  <div class="confidence-fill ${prediction}"
+                       style="width: ${confidence}%"></div>
                 </div>
               </div>
-              <div class="feature-indicators" id="feature-indicators"></div>
             </div>
-          `;
-        } else if (randomResult > 0.3) {
-          // Safe
-          prediction = 'safe';
-          confidence = (Math.random() * 30 + 70).toFixed(1); // 70-100%
-          
-          detailsHtml = `
-            <div class="result-header">
-              <span>✅</span>
-              <span>Secure</span>
-            </div>
-            <div class="result-details">
-              URL analysis complete with ${confidence}% confidence. 
-              No threats detected. This appears to be a legitimate website.
-            </div>
-            <div class="prediction-details">
-              <div class="details-header">
-                <div class="details-title">Prediction Details</div>
-                <div class="confidence-meter">
-                  <span class="confidence-value">${confidence}%</span>
-                  <div class="confidence-bar">
-                    <div class="confidence-fill safe" style="width: ${confidence}%"></div>
-                  </div>
-                </div>
-              </div>
-              <div class="feature-indicators" id="feature-indicators"></div>
-            </div>
-          `;
-        } else {
-          // Warning/inconclusive
-          prediction = 'warning';
-          confidence = (Math.random() * 40 + 30).toFixed(1); // 30-70%
-          
-          detailsHtml = `
-            <div class="result-header">
-              <span>❓</span>
-              <span>Inconclusive</span>
-            </div>
-            <div class="result-details">
-              Unable to complete definitive threat assessment (${confidence}% confidence). 
-              Some suspicious elements detected. Proceed with caution.
-            </div>
-            <div class="prediction-details">
-              <div class="details-header">
-                <div class="details-title">Prediction Details</div>
-                <div class="confidence-meter">
-                  <span class="confidence-value">${confidence}%</span>
-                  <div class="confidence-bar">
-                    <div class="confidence-fill warning" style="width: ${confidence}%"></div>
-                  </div>
-                </div>
-              </div>
-              <div class="feature-indicators" id="feature-indicators"></div>
-            </div>
-          `;
-        }
+            <div class="feature-indicators" id="feature-indicators"></div>
+          </div>
+        `;
 
         // Set the main result panel
         resultPanel.innerHTML = detailsHtml;
@@ -1020,7 +969,8 @@
 
         // Generate feature indicators
         const featureIndicators = document.getElementById('feature-indicators');
-        for (const [feature, data] of Object.entries(sampleFeatures)) {
+        let featuresHtml = '';
+        for (const [feature, data] of Object.entries(result.features)) {
           const featureName = feature.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
           const riskClass = data.risk === 'high' ? 'threat' : 
                           data.risk === 'medium' ? 'warning' : 'safe';
@@ -1053,7 +1003,16 @@
         analysisContent.textContent = JSON.stringify(analysisData, null, 2);
         analysisOutput.classList.add('visible');
 
-      }, 2000); // Simulate 2 second API delay
+      } catch (error) {
+        // Show error message
+        resultPanel.innerHTML = `<div class="result-header"><span>❌</span><span>Error</span></div>
+          <div class="result-details">Could not analyze URL. Please try again.</div>`;
+        resultPanel.classList.add('visible', 'warning');
+        clearInterval(scanInterval);
+        scanner.classList.remove('active');
+        analyzeBtn.disabled = false;
+        analyzeBtn.textContent = 'Initialize Scan';
+      }
     });
 
     // Copy report functionality
