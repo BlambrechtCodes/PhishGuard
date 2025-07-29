@@ -156,19 +156,33 @@ def predict():
         else:
             risk_level = "HIGH"
         
+        # Generate warnings based on features
+        warnings = []
+        if features['IsDomainIP']:
+            warnings.append("URL uses an IP address instead of a domain name.")
+        if not features['HasHTTPS']:
+            warnings.append("URL does not use HTTPS encryption.")
+        if features['TLDLegitimateProb'] < 0.5:
+            warnings.append("Suspicious top-level domain detected.")
+        if features['Bank']:
+            warnings.append("Bank-related keywords detected in URL.")
+        if features['Crypto']:
+            warnings.append("Cryptocurrency-related keywords detected in URL.")
+        # Add more rules as needed
+
         return jsonify({
             'url': url,
             'is_phishing': bool(prediction),
             'risk_score': risk_score,
             'risk_level': risk_level,
             'probability': probability,
+            'features': features,           # <-- Added: full feature breakdown
+            'warnings': warnings,           # <-- Added: warnings list
             'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         })
         
     except Exception as e:
         return jsonify({'error': f'Analysis failed: {str(e)}'}), 500
-
-# ... (keep the rest of your server code the same)
 
 @app.route('/api/health', methods=['GET'])
 def health():
