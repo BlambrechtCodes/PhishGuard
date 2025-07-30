@@ -7,6 +7,11 @@ import requests
 from bs4 import BeautifulSoup
 import re
 from datetime import datetime
+from warnings import simplefilter
+
+# Suppress warnings from libraries like scikit-learn
+# This is useful to avoid cluttering the output with non-critical warnings
+simplefilter("ignore", category=UserWarning)
 
 app = Flask(__name__)
 CORS(app)
@@ -198,4 +203,4 @@ def index():
     return send_from_directory('.', 'index.html')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=4200, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)

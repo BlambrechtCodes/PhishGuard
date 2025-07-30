@@ -1,0 +1,7 @@
+# To test the ML model for Comparison to ServerHTML:
+# 1. Replace the URL example with any link to test.
+# 2. Run the following command in terminal. 
+
+curl -X POST http://localhost:5000/api/predict \
+  -H "Content-Type: application/json" \
+  -d '{"url":"https://google.com"}'

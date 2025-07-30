@@ -920,9 +920,9 @@
 
       try {
         const response = await fetch('http://localhost:5000/api/predict', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url: input.value.trim() })
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url: input.value.trim() })
         });
         const result = await response.json();
 
@@ -932,21 +932,32 @@
         analyzeBtn.disabled = false;
         analyzeBtn.textContent = 'Initialize Scan';
 
-        // Use result.prediction, result.risk_score, result.features, result.warnings, etc.
-        // Build your resultPanel and analysisOutput using real data
-        // Example:
-        let prediction = result.prediction === 1 ? 'threat' : 'safe';
-        let confidence = (result.probability * 100).toFixed(1);
+        // Use the actual API response instead of sample data
+        let predictionClass = result.is_phishing ? 'threat' : 'safe';
+        
+        // Calculate confidence as legitimacy percentage (100% - phishing probability)
+        const legitimacyConfidence = (1 - result.probability) * 100;
+        
+        // Format the confidence display
+        let confidence;
+        if (legitimacyConfidence >= 99.999) {
+            confidence = legitimacyConfidence.toFixed(5); // Shows 99.99977
+        } else if (legitimacyConfidence >= 99.9) {
+            confidence = legitimacyConfidence.toFixed(3); // Shows 99.997
+        } else {
+            confidence = legitimacyConfidence.toFixed(1); // Shows 99.9
+        }
 
         let detailsHtml = `
           <div class="result-header">
-            <span>${prediction === 'threat' ? '⚠️' : '✅'}</span>
-            <span>${prediction === 'threat' ? 'Threat Detected' : 'Secure'}</span>
+            <span>${result.is_phishing ? '⚠️' : '✅'}</span>
+            <span>${result.is_phishing ? 'Threat Detected' : 'Secure'}</span>
           </div>
           <div class="result-details">
-            ${prediction === 'threat' ? 
-              `High-risk phishing attempt identified with ${confidence}% confidence. This URL exhibits multiple malicious patterns and should be avoided.` :
-              `URL analysis complete with ${confidence}% confidence. No threats detected. This appears to be a legitimate website.`}
+            ${result.is_phishing ? 
+              `High-risk phishing attempt identified (confidence: ${confidence}${result.probability < 0.01 ? '' : '%'})` :
+              `URL analysis complete (confidence: ${confidence}${result.probability < 0.01 ? '' : '%'}). No threats detected.`}
+            ${result.warnings.length ? `<br><br><strong>Warnings:</strong> ${result.warnings.join(', ')}` : ''}
           </div>
           <div class="prediction-details">
             <div class="details-header">
@@ -954,8 +965,8 @@
               <div class="confidence-meter">
                 <span class="confidence-value">${confidence}%</span>
                 <div class="confidence-bar">
-                  <div class="confidence-fill ${prediction}"
-                       style="width: ${confidence}%"></div>
+                  <div class="confidence-fill ${predictionClass}"
+                      style="width: ${confidence}%"></div>
                 </div>
               </div>
             </div>
@@ -965,48 +976,56 @@
 
         // Set the main result panel
         resultPanel.innerHTML = detailsHtml;
-        resultPanel.classList.add('visible', prediction);
+        resultPanel.classList.add('visible', predictionClass);
 
-        // Generate feature indicators
+        // Generate feature indicators from actual features
         const featureIndicators = document.getElementById('feature-indicators');
         let featuresHtml = '';
-        for (const [feature, data] of Object.entries(result.features)) {
-          const featureName = feature.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-          const riskClass = data.risk === 'high' ? 'threat' : 
-                          data.risk === 'medium' ? 'warning' : 'safe';
+        
+        // Select the most important features to display
+        const importantFeatures = {
+          'HasHTTPS': 'HTTPS',
+          'IsDomainIP': 'Uses IP Address',
+          'TLDLegitimateProb': 'TLD Legitimacy',
+          'NoOfSubDomain': 'Subdomains',
+          'URLLength': 'URL Length',
+          'HasHTMLTag': 'Has HTML'
+        };
+        
+        for (const [feature, displayName] of Object.entries(importantFeatures)) {
+          const value = result.features[feature];
+          let riskClass = 'neutral';
+          
+          // Custom logic to determine risk class for each feature
+          if (feature === 'HasHTTPS' && value === 0) riskClass = 'threat';
+          if (feature === 'IsDomainIP' && value === 1) riskClass = 'threat';
+          if (feature === 'TLDLegitimateProb' && value < 0.5) riskClass = 'threat';
+          if (feature === 'NoOfSubDomain' && value > 2) riskClass = 'warning';
+          if (feature === 'URLLength' && value > 75) riskClass = 'warning';
           
           featuresHtml += `
             <div class="feature-indicator">
-              <div class="feature-name">${featureName}</div>
-              <div class="feature-value ${riskClass}">${data.value}</div>
+              <div class="feature-name">${displayName}</div>
+              <div class="feature-value ${riskClass}">${value}</div>
             </div>
           `;
         }
+        
         featureIndicators.innerHTML = featuresHtml;
 
         // Display technical analysis
-        const analysisData = {
-          timestamp: new Date().toISOString(),
-          target_url: input.value.trim(),
-          prediction: prediction,
-          confidence: confidence + '%',
-          analysis_time: (Math.random() * 2 + 1).toFixed(2) + 's',
-          features_analyzed: Object.keys(sampleFeatures).length,
-          detailed_analysis: sampleFeatures
-        };
+        reportTime.textContent = result.timestamp;
+        reportUrl.textContent = result.url;
+        reportFeatures.textContent = Object.keys(result.features).length;
         
-        // Update report metadata
-        reportTime.textContent = new Date().toLocaleString();
-        reportUrl.textContent = input.value.trim();
-        reportFeatures.textContent = Object.keys(sampleFeatures).length;
-        
-        analysisContent.textContent = JSON.stringify(analysisData, null, 2);
+        // Format the JSON nicely for display
+        analysisContent.textContent = JSON.stringify(result, null, 2);
         analysisOutput.classList.add('visible');
 
       } catch (error) {
         // Show error message
         resultPanel.innerHTML = `<div class="result-header"><span>❌</span><span>Error</span></div>
-          <div class="result-details">Could not analyze URL. Please try again.</div>`;
+          <div class="result-details">Could not analyze URL. Please try again.<br>${error.message}</div>`;
         resultPanel.classList.add('visible', 'warning');
         clearInterval(scanInterval);
         scanner.classList.remove('active');
