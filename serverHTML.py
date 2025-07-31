@@ -154,9 +154,9 @@ def predict():
         
         # Determine risk level
         risk_score = int(probability * 100)
-        if risk_score < 30:
+        if risk_score < 20:
             risk_level = "LOW"
-        elif risk_score < 60:
+        elif risk_score < 45:
             risk_level = "MEDIUM"
         else:
             risk_level = "HIGH"
