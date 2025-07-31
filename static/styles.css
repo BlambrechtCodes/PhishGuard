@@ -488,7 +488,7 @@ input[type="text"]:focus {
     opacity 0.55s cubic-bezier(0.4, 0, 0.2, 1),
     max-height 0.55s cubic-bezier(0.4, 0, 0.2, 1),
     box-shadow 0.5s ease;
-  max-height: 0;
+  max-height: 100;
   max-width: 100%;
   will-change: opacity, max-height, box-shadow;
   box-shadow: none;
@@ -498,7 +498,7 @@ input[type="text"]:focus {
 
 .analysis-output.visible {
   opacity: 1;
-  max-height: 350px;
+  max-height: 100px;
   box-shadow: 0 8px 35px rgba(0, 212, 255, 0.5);
 }
 
