@@ -233,3 +233,72 @@
 2025-07-31 15:24:40,849 [INFO] Feature extraction completed in 0.551s
 2025-07-31 15:24:40,905 [INFO] Prediction completed in 0.607s
 2025-07-31 15:24:40,906 [INFO] 127.0.0.1 - - [31/Jul/2025 15:24:40] "POST /api/predict HTTP/1.1" 200 -
+2025-07-31 15:55:58,691 [INFO] ===== Starting PhishDetector Application =====
+2025-07-31 15:55:58,691 [INFO] Loading TensorFlow model and Decision Tree...
+2025-07-31 15:55:58,692 [DEBUG] Creating converter from 3 to 5
+2025-07-31 15:55:58,813 [WARNING] Compiled the loaded model, but the compiled metrics have yet to be built. `model.compile_metrics` will be empty until you train or evaluate the model.
+2025-07-31 15:55:59,048 [INFO] Models loaded successfully with 47 features
+2025-07-31 15:55:59,049 [INFO] Starting Flask application on http://127.0.0.1:5000
+2025-07-31 15:55:59,069 [WARNING]  * Debugger is active!
+2025-07-31 15:55:59,076 [INFO]  * Debugger PIN: 109-386-709
+2025-07-31 15:55:59,090 [INFO] 127.0.0.1 - - [31/Jul/2025 15:55:59] "GET / HTTP/1.1" 200 -
+2025-07-31 15:56:01,789 [INFO] 127.0.0.1 - - [31/Jul/2025 15:56:01] "OPTIONS /api/predict HTTP/1.1" 200 -
+2025-07-31 15:56:01,793 [INFO] ===== New Prediction Request =====
+2025-07-31 15:56:01,793 [DEBUG] URL missing scheme, prepending https:// to google.com
+2025-07-31 15:56:01,793 [INFO] Analyzing URL: https://google.com
+2025-07-31 15:56:01,793 [DEBUG] Normalized URL: https://google.com
+2025-07-31 15:56:01,794 [DEBUG] Attempting to acquire lock 6136250576 on /Users/brendanlambrecht/.cache/python-tldextract/3.9.18.final__micromamba__383ab1__tldextract-5.3.0/publicsuffix.org-tlds/de84b5ca2167d4c83e38fb162f2e8738.tldextract.json.lock
+2025-07-31 15:56:01,794 [DEBUG] Lock 6136250576 acquired on /Users/brendanlambrecht/.cache/python-tldextract/3.9.18.final__micromamba__383ab1__tldextract-5.3.0/publicsuffix.org-tlds/de84b5ca2167d4c83e38fb162f2e8738.tldextract.json.lock
+2025-07-31 15:56:01,797 [DEBUG] Attempting to release lock 6136250576 on /Users/brendanlambrecht/.cache/python-tldextract/3.9.18.final__micromamba__383ab1__tldextract-5.3.0/publicsuffix.org-tlds/de84b5ca2167d4c83e38fb162f2e8738.tldextract.json.lock
+2025-07-31 15:56:01,798 [DEBUG] Lock 6136250576 released on /Users/brendanlambrecht/.cache/python-tldextract/3.9.18.final__micromamba__383ab1__tldextract-5.3.0/publicsuffix.org-tlds/de84b5ca2167d4c83e38fb162f2e8738.tldextract.json.lock
+2025-07-31 15:56:01,844 [DEBUG] Starting new HTTPS connection (1): google.com:443
+2025-07-31 15:56:01,950 [DEBUG] https://google.com:443 "GET / HTTP/1.1" 301 220
+2025-07-31 15:56:01,954 [DEBUG] Starting new HTTPS connection (1): www.google.com:443
+2025-07-31 15:56:02,111 [DEBUG] https://www.google.com:443 "GET / HTTP/1.1" 200 None
+2025-07-31 15:56:02,163 [DEBUG] HTML fetched and parsed in 0.34 seconds
+2025-07-31 15:56:02,172 [DEBUG] Starting new HTTPS connection (1): google.com:443
+2025-07-31 15:56:02,340 [DEBUG] https://google.com:443 "GET /robots.txt HTTP/1.1" 301 230
+2025-07-31 15:56:02,346 [DEBUG] Starting new HTTPS connection (1): www.google.com:443
+2025-07-31 15:56:02,446 [DEBUG] https://www.google.com:443 "GET /robots.txt HTTP/1.1" 200 1631
+2025-07-31 15:56:02,449 [INFO] HTML analysis completed successfully
+2025-07-31 15:56:02,450 [INFO] Feature extraction completed in 0.657s
+2025-07-31 15:56:02,538 [INFO] Prediction completed in 0.745s
+2025-07-31 15:56:02,538 [INFO] 127.0.0.1 - - [31/Jul/2025 15:56:02] "POST /api/predict HTTP/1.1" 200 -
+2025-07-31 15:57:38,867 [INFO] ===== Starting PhishDetector Application =====
+2025-07-31 15:57:38,867 [INFO] Loading TensorFlow model and Decision Tree...
+2025-07-31 15:57:39,197 [INFO] Starting Flask application on http://127.0.0.1:5000
+2025-07-31 15:57:39,224 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.57:5000
+2025-07-31 15:57:39,224 [INFO] [33mPress CTRL+C to quit[0m
+2025-07-31 15:57:39,225 [INFO]  * Restarting with stat
+2025-07-31 15:57:42,142 [INFO] ===== Starting PhishDetector Application =====
+2025-07-31 15:57:42,142 [INFO] Loading TensorFlow model and Decision Tree...
+2025-07-31 15:57:42,431 [INFO] Starting Flask application on http://127.0.0.1:5000
+2025-07-31 15:57:42,447 [WARNING]  * Debugger is active!
+2025-07-31 15:57:42,456 [INFO]  * Debugger PIN: 109-386-709
+2025-07-31 15:57:42,753 [INFO] 127.0.0.1 - - [31/Jul/2025 15:57:42] "GET / HTTP/1.1" 200 -
+2025-07-31 15:57:45,728 [INFO] 127.0.0.1 - - [31/Jul/2025 15:57:45] "OPTIONS /api/predict HTTP/1.1" 200 -
+2025-07-31 15:57:45,733 [INFO] ===== New Prediction Request =====
+2025-07-31 15:57:45,734 [DEBUG] URL missing scheme, prepending https:// to google.com
+2025-07-31 15:57:45,734 [INFO] Analyzing URL: https://google.com
+2025-07-31 15:57:45,734 [ERROR] Prediction failed: name 'tf_model' is not defined
+2025-07-31 15:57:45,739 [ERROR] Traceback (most recent call last):
+  File "/Users/brendanlambrecht/CodingProjects/My_Personal_Projects/phishGuard/serverHTML.py", line 326, in predict
+    if not (model_loaded and tf_model and dt_model and scaler):
+NameError: name 'tf_model' is not defined
+
+2025-07-31 15:57:45,740 [INFO] 127.0.0.1 - - [31/Jul/2025 15:57:45] "[35m[1mPOST /api/predict HTTP/1.1[0m" 500 -
+2025-07-31 15:58:20,884 [INFO]  * Detected change in '/Users/brendanlambrecht/CodingProjects/My_Personal_Projects/phishGuard/serverHTML.py', reloading
+2025-07-31 15:58:21,314 [INFO]  * Restarting with stat
+2025-07-31 15:58:24,979 [INFO] ===== Starting PhishDetector Application =====
+2025-07-31 15:58:24,979 [INFO] Loading TensorFlow model and Decision Tree...
+2025-07-31 15:58:24,980 [DEBUG] Creating converter from 3 to 5
+2025-07-31 15:58:25,105 [WARNING] Compiled the loaded model, but the compiled metrics have yet to be built. `model.compile_metrics` will be empty until you train or evaluate the model.
+2025-07-31 15:58:25,345 [INFO] Models loaded successfully with 47 features
+2025-07-31 15:58:25,345 [INFO] Starting Flask application on http://127.0.0.1:5000
+2025-07-31 15:58:25,366 [WARNING]  * Debugger is active!
+2025-07-31 15:58:25,376 [INFO]  * Debugger PIN: 109-386-709
+2025-07-31 16:02:42,590 [INFO]  * Detected change in '/Users/brendanlambrecht/CodingProjects/My_Personal_Projects/phishGuard/serverHTML.py', reloading
+2025-07-31 16:02:43,020 [INFO]  * Restarting with stat

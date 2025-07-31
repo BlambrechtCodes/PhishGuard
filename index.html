@@ -1,689 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>PhishAlert - Advanced Threat Detection System</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --cyber-blue: #00d4ff;
-      --electric-blue: #0099ff;
-      --deep-blue: #003d66;
-      --matrix-green: #00ff41;
-      --warning-orange: #ff6b35;
-      --danger-red: #ff073a;
-      --bg-primary: #0a0e1a;
-      --bg-secondary: #1a1f2e;
-      --bg-tertiary: #252b3d;
-      --bg-card: #2a3142;
-      --text-primary: #ffffff;
-      --text-secondary: #b8c5d6;
-      --text-accent: #00d4ff;
-      --text-muted: #6b7280;
-      --border-primary: #3d4758;
-      --border-accent: #00d4ff33;
-      --shadow-cyber: rgba(0, 212, 255, 0.15);
-      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      background: 
-        radial-gradient(circle at 20% 80%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(0, 153, 255, 0.1) 0%, transparent 50%),
-        linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
-      color: var(--text-primary);
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      margin: 0;
-      min-height: 100vh;
-      padding: 2rem 1rem;
-      line-height: 1.6;
-    }
-
-    .main-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 1fr 400px;
-      gap: 2rem;
-      align-items: start;
-    }
-
-    .features-panel {
-      background: var(--bg-card);
-      border: 1px solid var(--border-primary);
-      border-radius: 16px;
-      padding: 2rem;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    }
-
-    .analyzer-panel {
-      background: var(--bg-card);
-      border: 1px solid var(--border-primary);
-      border-radius: 16px;
-      padding: 2.5rem;
-      box-shadow: 
-        0 20px 25px -5px rgba(0, 0, 0, 0.2),
-        0 0 0 1px var(--shadow-cyber);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .analyzer-panel::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, var(--cyber-blue), var(--electric-blue), var(--cyber-blue));
-      animation: scan 3s linear infinite;
-    }
-
-    @keyframes scan {
-      0% { transform: translateX(-100%); }
-      100% { transform: translateX(100%); }
-    }
-
-    .header {
-      text-align: center;
-      margin-bottom: 2rem;
-      position: relative;
-    }
-
-    .system-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: rgba(0, 212, 255, 0.1);
-      border: 1px solid var(--border-accent);
-      color: var(--text-accent);
-      padding: 0.5rem 1rem;
-      border-radius: 20px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.75rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 1rem;
-    }
-
-    .status-indicator {
-      width: 8px;
-      height: 8px;
-      background: var(--matrix-green);
-      border-radius: 50%;
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
-
-    h1 {
-      font-size: 2.5rem;
-      font-weight: 700;
-      margin: 0 0 0.5rem 0;
-      background: linear-gradient(135deg, var(--cyber-blue), var(--electric-blue));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      letter-spacing: -0.02em;
-      font-family: 'JetBrains Mono', monospace;
-    }
-
-    .subtitle {
-      color: var(--text-secondary);
-      font-size: 1rem;
-      margin: 0 0 1.5rem 0;
-      font-weight: 400;
-    }
-
-    .input-section {
-      margin-bottom: 2rem;
-    }
-
-    .input-label {
-      display: block;
-      color: var(--text-secondary);
-      font-size: 0.875rem;
-      font-weight: 500;
-      margin-bottom: 0.5rem;
-      font-family: 'JetBrains Mono', monospace;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .input-wrapper {
-      position: relative;
-    }
-
-    input[type="text"] {
-      width: 100%;
-      padding: 1rem 1.25rem 1rem 3rem;
-      border: 2px solid var(--border-primary);
-      border-radius: 8px;
-      background: var(--bg-secondary);
-      color: var(--text-primary);
-      font-size: 1rem;
-      font-family: 'JetBrains Mono', monospace;
-      transition: var(--transition);
-      outline: none;
-    }
-
-    input[type="text"]:focus {
-      border-color: var(--cyber-blue);
-      box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
-    }
-
-    .input-icon {
-      position: absolute;
-      left: 1rem;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-accent);
-      font-size: 1rem;
-    }
-
-    .analyze-btn {
-      width: 100%;
-      padding: 1rem 1.5rem;
-      border: none;
-      border-radius: 8px;
-      background: linear-gradient(135deg, var(--cyber-blue), var(--electric-blue));
-      color: var(--bg-primary);
-      font-size: 1rem;
-      font-weight: 600;
-      font-family: 'JetBrains Mono', monospace;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      cursor: pointer;
-      transition: var(--transition);
-      margin-top: 1rem;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .analyze-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px var(--shadow-cyber);
-    }
-
-    .analyze-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .scanner {
-      display: none;
-      text-align: center;
-      margin: 2rem 0;
-    }
-
-    .scanner.active {
-      display: block;
-    }
-
-    .scan-animation {
-      width: 60px;
-      height: 60px;
-      border: 3px solid var(--border-primary);
-      border-top: 3px solid var(--cyber-blue);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 1rem;
-    }
-
-    .scan-status {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.875rem;
-      color: var(--text-accent);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .result-panel {
-      opacity: 0;
-      transform: translateY(20px);
-      transition: var(--transition);
-      margin-top: 2rem;
-      padding: 1.5rem;
-      border-radius: 8px;
-      border-left: 4px solid;
-    }
-
-    .result-panel.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .result-panel.safe {
-      background: rgba(0, 255, 65, 0.1);
-      border-left-color: var(--matrix-green);
-      color: var(--matrix-green);
-    }
-
-    .result-panel.threat {
-      background: rgba(255, 7, 58, 0.1);
-      border-left-color: var(--danger-red);
-      color: var(--danger-red);
-    }
-
-    .result-panel.warning {
-      background: rgba(255, 107, 53, 0.1);
-      border-left-color: var(--warning-orange);
-      color: var(--warning-orange);
-    }
-
-    .result-header {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      margin-bottom: 0.5rem;
-      font-family: 'JetBrains Mono', monospace;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .result-details {
-      font-size: 0.875rem;
-      color: var(--text-secondary);
-      line-height: 1.5;
-    }
-
-    .features-header {
-      margin-bottom: 2rem;
-    }
-
-    .features-title {
-      font-size: 1.5rem;
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 0.5rem;
-      font-family: 'JetBrains Mono', monospace;
-    }
-
-    .features-subtitle {
-      color: var(--text-muted);
-      font-size: 0.875rem;
-    }
-
-    .feature-category {
-      margin-bottom: 2rem;
-    }
-
-    .category-title {
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--text-accent);
-      margin-bottom: 1rem;
-      font-family: 'JetBrains Mono', monospace;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .feature-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    .feature-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 0.75rem;
-      padding: 0.75rem 0;
-      border-bottom: 1px solid rgba(61, 71, 88, 0.3);
-    }
-
-    .feature-item:last-child {
-      border-bottom: none;
-    }
-
-    .feature-icon {
-      color: var(--matrix-green);
-      font-size: 0.875rem;
-      margin-top: 0.125rem;
-      flex-shrink: 0;
-    }
-
-    .feature-content {
-      flex: 1;
-    }
-
-    .feature-name {
-      font-weight: 500;
-      color: var(--text-primary);
-      margin-bottom: 0.25rem;
-      font-size: 0.875rem;
-    }
-
-    .feature-desc {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      line-height: 1.4;
-    }
-
-    /* Enhanced Threat Analysis Report */
-    .analysis-output {
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-primary);
-      border-radius: 8px;
-      margin-top: 2rem;
-      font-family: 'JetBrains Mono', monospace;
-      overflow: hidden;
-      opacity: 0;
-      transition: var(--transition);
-      max-height: 300px;
-      overflow-y: auto;
-    }
-
-    .analysis-output.visible {
-      opacity: 1;
-    }
-
-    .analysis-output.expanded {
-      max-height: 600px;
-    }
-
-    .analysis-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem 1.5rem;
-      background: var(--bg-tertiary);
-      border-bottom: 1px solid var(--border-primary);
-    }
-
-    .header-title {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      font-weight: 600;
-      color: var(--text-accent);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      font-size: 0.875rem;
-    }
-
-    .header-icon {
-      color: var(--cyber-blue);
-    }
-
-    .header-actions {
-      display: flex;
-      gap: 0.5rem;
-    }
-
-    .copy-btn, .expand-btn {
-      background: transparent;
-      border: 1px solid var(--border-primary);
-      border-radius: 4px;
-      padding: 0.25rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-
-    .copy-btn:hover, .expand-btn:hover {
-      background: rgba(0, 212, 255, 0.1);
-      border-color: var(--cyber-blue);
-    }
-
-    .copy-btn svg, .expand-btn svg {
-      display: block;
-    }
-
-    .report-metadata {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
-      padding: 1.25rem 1.5rem;
-      border-bottom: 1px solid var(--border-primary);
-      background: rgba(0, 212, 255, 0.03);
-    }
-
-    .metadata-item {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-    }
-
-    .metadata-label {
-      font-size: 0.7rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .metadata-value {
-      font-size: 0.8rem;
-      color: var(--text-primary);
-      word-break: break-all;
-    }
-
-    .report-content {
-      padding: 1.5rem;
-      font-size: 0.75rem;
-      color: var(--text-accent);
-      white-space: pre-wrap;
-      line-height: 1.6;
-    }
-
-    .report-footer {
-      padding: 0.75rem 1.5rem;
-      border-top: 1px solid var(--border-primary);
-      background: var(--bg-tertiary);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.7rem;
-      color: var(--text-muted);
-    }
-
-    .report-footer svg {
-      flex-shrink: 0;
-    }
-
-    /* Prediction Details Section */
-    .prediction-details {
-      margin-top: 1.5rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .details-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-    }
-
-    .details-title {
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: var(--text-secondary);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      font-family: 'JetBrains Mono', monospace;
-    }
-
-    .confidence-meter {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      min-width: 200px;
-    }
-
-    .confidence-value {
-      font-weight: 700;
-      font-family: 'JetBrains Mono', monospace;
-      min-width: 60px;
-      text-align: right;
-    }
-
-    .confidence-bar {
-      height: 6px;
-      width: 100px;
-      border-radius: 3px;
-      background: var(--bg-tertiary);
-      overflow: hidden;
-    }
-
-    .confidence-fill {
-      height: 100%;
-      border-radius: 3px;
-      transition: width 0.5s ease-out;
-    }
-
-    .confidence-fill.safe {
-      background: var(--matrix-green);
-    }
-
-    .confidence-fill.threat {
-      background: var(--danger-red);
-    }
-
-    .confidence-fill.warning {
-      background: var(--warning-orange);
-    }
-
-    .model-comparison {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 0.75rem;
-      margin: 1rem 0;
-      padding: 1rem;
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 6px;
-    }
-
-    .model-result {
-      text-align: center;
-      padding: 0.5rem;
-      background: var(--bg-tertiary);
-      border-radius: 4px;
-    }
-
-    .model-name {
-      font-size: 0.7rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 0.25rem;
-    }
-
-    .model-score {
-      font-size: 0.9rem;
-      font-weight: 600;
-      font-family: 'JetBrains Mono', monospace;
-      color: var(--text-accent);
-    }
-
-    .feature-indicators {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 0.75rem;
-      margin-top: 1rem;
-    }
-
-    .feature-indicator {
-      background: var(--bg-tertiary);
-      border-radius: 6px;
-      padding: 0.75rem;
-      font-size: 0.75rem;
-    }
-
-    .feature-indicator .feature-name {
-      color: var(--text-secondary);
-      margin-bottom: 0.25rem;
-      font-weight: 500;
-      font-size: 0.7rem;
-    }
-
-    .feature-value {
-      font-weight: 600;
-      font-family: 'JetBrains Mono', monospace;
-    }
-
-    .feature-value.safe {
-      color: var(--matrix-green);
-    }
-
-    .feature-value.threat {
-      color: var(--danger-red);
-    }
-
-    .feature-value.neutral {
-      color: var(--text-secondary);
-    }
-
-    @media (max-width: 1024px) {
-      .main-container {
-        grid-template-columns: 1fr;
-        gap: 2rem;
-      }
-      
-      .features-panel {
-        order: 2;
-      }
-      
-      .analyzer-panel {
-        order: 1;
-      }
-    }
-
-    @media (max-width: 640px) {
-      body {
-        padding: 1rem;
-      }
-      
-      .analyzer-panel,
-      .features-panel {
-        padding: 1.5rem;
-      }
-      
-      h1 {
-        font-size: 2rem;
-      }
-
-      .feature-indicators {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .report-metadata {
-        grid-template-columns: 1fr;
-      }
-
-      .confidence-meter {
-        min-width: auto;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.25rem;
-      }
-
-      .model-comparison {
-        grid-template-columns: 1fr 1fr;
-      }
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/styles.css" />
 </head>
 <body>
   <div class="main-container">
@@ -702,12 +24,12 @@
           <label class="input-label" for="url-input">Target URL Analysis</label>
           <div class="input-wrapper">
             <div class="input-icon">🔗</div>
-            <input 
-              type="text" 
-              id="url-input" 
+            <input
+              type="text"
+              id="url-input"
               placeholder="https://example.com or domain.com"
               required
-            >
+            />
           </div>
           <button type="submit" class="analyze-btn" id="analyze-btn">
             Initialize Scan
@@ -725,26 +47,42 @@
       <div class="analysis-output" id="analysis-output">
         <div class="analysis-header">
           <div class="header-title">
-            <svg class="header-icon" viewBox="0 0 24 24" width="20" height="20">
-              <path fill="currentColor" d="M12,2L1,21H23M12,6L19.5,19H4.5M11,10V14H13V10M11,16V18H13V16"/>
+            <svg
+              class="header-icon"
+              viewBox="0 0 24 24"
+              width="20"
+              height="20"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path
+                fill="currentColor"
+                d="M12,2L1,21H23M12,6L19.5,19H4.5M11,10V14H13V10M11,16V18H13V16"
+              />
             </svg>
             <span>Threat Analysis Report</span>
           </div>
           <div class="header-actions">
-            <button class="copy-btn" id="copy-report" title="Copy Report">
-              <svg viewBox="0 0 24 24" width="16" height="16">
-                <path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/>
+            <button class="copy-btn" id="copy-report" title="Copy Report" aria-label="Copy Report">
+              <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"
+                />
               </svg>
             </button>
-            <button class="expand-btn" id="expand-report" title="Expand/Collapse">
-              <svg viewBox="0 0 24 24" width="16" height="16">
-                <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"/>
+            <button class="expand-btn" id="expand-report" title="Expand/Collapse Report" aria-expanded="false" aria-controls="analysis-content">
+              <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"
+                />
               </svg>
             </button>
           </div>
         </div>
-        
-        <div class="report-metadata">
+
+        <div class="report-metadata" aria-live="polite">
           <div class="metadata-item">
             <span class="metadata-label">Analysis Time:</span>
             <span class="metadata-value" id="report-time"></span>
@@ -758,13 +96,16 @@
             <span class="metadata-value" id="report-features"></span>
           </div>
         </div>
-        
-        <div class="report-content" id="analysis-content"></div>
-        
+
+        <div class="report-content" id="analysis-content" tabindex="0" aria-label="Detailed JSON Analysis Report"></div>
+
         <div class="report-footer">
           <div class="footer-item">
-            <svg viewBox="0 0 24 24" width="14" height="14">
-              <path fill="var(--text-muted)" d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M11,7H13V9H11V7M11,11H13V17H11V11Z"/>
+            <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+              <path
+                fill="var(--text-muted)"
+                d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M11,7H13V9H11V7M11,11H13V17H11V11Z"
+              />
             </svg>
             <span>Report generated by PhishAlert ML Engine</span>
           </div>
@@ -787,15 +128,8 @@
           <li class="feature-item">
             <span class="feature-icon">✓</span>
             <div class="feature-content">
-              <div class="feature-name">TensorFlow Neural Network</div>
-              <div class="feature-desc">Advanced deep learning model with ensemble predictions</div>
-            </div>
-          </li>
-          <li class="feature-item">
-            <span class="feature-icon">✓</span>
-            <div class="feature-content">
               <div class="feature-name">Real-time URL Analysis</div>
-              <div class="feature-desc">Instant threat assessment using multiple ML algorithms</div>
+              <div class="feature-desc">Instant threat assessment using advanced ML algorithms</div>
             </div>
           </li>
           <li class="feature-item">
@@ -803,6 +137,13 @@
             <div class="feature-content">
               <div class="feature-name">Domain Reputation Scoring</div>
               <div class="feature-desc">Comprehensive domain trust evaluation and history analysis</div>
+            </div>
+          </li>
+          <li class="feature-item">
+            <span class="feature-icon">✓</span>
+            <div class="feature-content">
+              <div class="feature-name">SSL Certificate Validation</div>
+              <div class="feature-desc">Automated certificate chain verification and security assessment</div>
             </div>
           </li>
           <li class="feature-item">
@@ -824,13 +165,6 @@
           <li class="feature-item">
             <span class="feature-icon">✓</span>
             <div class="feature-content">
-              <div class="feature-name">Ensemble Predictions</div>
-              <div class="feature-desc">Combines TensorFlow and Decision Tree models for higher accuracy</div>
-            </div>
-          </li>
-          <li class="feature-item">
-            <span class="feature-icon">✓</span>
-            <div class="feature-content">
               <div class="feature-name">Behavioral Analysis</div>
               <div class="feature-desc">Suspicious redirect patterns and JavaScript behavior detection</div>
             </div>
@@ -838,8 +172,15 @@
           <li class="feature-item">
             <span class="feature-icon">✓</span>
             <div class="feature-content">
-              <div class="feature-name">Feature Engineering</div>
-              <div class="feature-desc">Advanced URL, domain, and content feature extraction</div>
+              <div class="feature-name">Blacklist Cross-Reference</div>
+              <div class="feature-desc">Multi-source threat intelligence database integration</div>
+            </div>
+          </li>
+          <li class="feature-item">
+            <span class="feature-icon">✓</span>
+            <div class="feature-content">
+              <div class="feature-name">Lexical Analysis</div>
+              <div class="feature-desc">URL structure and character pattern anomaly detection</div>
             </div>
           </li>
           <li class="feature-item">
@@ -876,14 +217,14 @@
             <span class="feature-icon">✓</span>
             <div class="feature-content">
               <div class="feature-name">Scalable Architecture</div>
-              <div class="feature-desc">Flask-based API supporting concurrent analysis requests</div>
+              <div class="feature-desc">Cloud-native infrastructure supporting high-volume analysis</div>
             </div>
           </li>
           <li class="feature-item">
             <span class="feature-icon">✓</span>
             <div class="feature-content">
-              <div class="feature-name">Model Transparency</div>
-              <div class="feature-desc">Detailed reporting of model predictions and confidence scores</div>
+              <div class="feature-name">Real-time Updates</div>
+              <div class="feature-desc">Continuous model updates with latest threat intelligence</div>
             </div>
           </li>
         </ul>
@@ -908,11 +249,11 @@
 
     const scanMessages = [
       'Initializing threat detection...',
-      'Loading TensorFlow model...',
       'Analyzing URL structure...',
-      'Extracting domain features...',
-      'Checking HTML content...',
-      'Running ensemble prediction...',
+      'Checking domain reputation...',
+      'Validating SSL certificates...',
+      'Scanning for malicious patterns...',
+      'Cross-referencing threat databases...',
       'Finalizing security assessment...'
     ];
 
@@ -921,176 +262,149 @@
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      
+      const url = input.value.trim();
+
       // Reset UI
       resultPanel.className = 'result-panel';
       analysisOutput.className = 'analysis-output';
-      
+
       // Start scanning animation
       scanner.classList.add('active');
       analyzeBtn.disabled = true;
       analyzeBtn.textContent = 'Scanning...';
-      
+
+      // Cycle through scan messages
       scanMessageIndex = 0;
       scanStatus.textContent = scanMessages[0];
       scanInterval = setInterval(() => {
         scanMessageIndex = (scanMessageIndex + 1) % scanMessages.length;
         scanStatus.textContent = scanMessages[scanMessageIndex];
-      }, 1000);
+      }, 800);
 
       try {
-        const response = await fetch('http://localhost:5000/api/predict', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ url: input.value.trim() })
+        const response = await fetch('/api/predict', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: url }),
         });
-        const result = await response.json();
 
-        if (result.error) {
-          throw new Error(result.error);
+        if (!response.ok) {
+          throw new Error(await response.text());
         }
 
-        // Stop scanning
+        const data = await response.json();
+
+        // Stop scanning animation
         clearInterval(scanInterval);
         scanner.classList.remove('active');
         analyzeBtn.disabled = false;
         analyzeBtn.textContent = 'Initialize Scan';
 
-        // Determine prediction class and confidence display
-        const predictionClass = result.is_phishing ? 'threat' : 'safe';
-        const confidence = result.confidence || 95;
-        const phishingProb = (result.probability * 100);
-        const legitimacyProb = 100 - phishingProb;
+        // Construct result panel content
+        let prediction, detailsHtml, featuresHtml = '';
+        const riskClass = data.risk_level.toLowerCase();
 
-        // Build model comparison section
-        const modelComparisonHtml = `
-          <div class="model-comparison">
-            <div class="model-result">
-              <div class="model-name">TensorFlow NN</div>
-              <div class="model-score">${(result.tensorflow_prob * 100).toFixed(1)}%</div>
+        if (data.is_phishing) {
+          prediction = 'threat';
+          detailsHtml = `
+            <div class="result-header">
+              <span>⚠️</span>
+              <span>Threat Detected</span>
             </div>
-            <div class="model-result">
-              <div class="model-name">Decision Tree</div>
-              <div class="model-score">${(result.decision_tree_prob * 100).toFixed(1)}%</div>
+            <div class="result-details">
+              ${riskClass.toUpperCase()}-risk phishing attempt identified with ${100 - data.risk_score}% confidence.
+              This URL exhibits multiple malicious patterns and should be avoided.
             </div>
-            <div class="model-result">
-              <div class="model-name">Ensemble</div>
-              <div class="model-score">${(result.ensemble_prob * 100).toFixed(1)}%</div>
+          `;
+        } else {
+          prediction = 'safe';
+          detailsHtml = `
+            <div class="result-header">
+              <span>✅</span>
+              <span>Secure</span>
             </div>
-          </div>
-        `;
+            <div class="result-details">
+              URL analysis complete with ${100 - data.risk_score}% confidence.
+              No threats detected. This appears to be a legitimate website.
+            </div>
+          `;
+        }
 
-        let detailsHtml = `
-          <div class="result-header">
-            <span>${result.is_phishing ? '⚠️' : '✅'}</span>
-            <span>${result.is_phishing ? 'Threat Detected' : 'Secure'}</span>
-          </div>
-          <div class="result-details">
-            ${result.is_phishing ? 
-              `High-risk phishing attempt identified with ${confidence.toFixed(1)}% confidence` :
-              `URL analysis complete. No threats detected with ${confidence.toFixed(1)}% confidence`}
-            ${result.warnings && result.warnings.length ? `<br><br><strong>Warnings:</strong> ${result.warnings.join(', ')}` : ''}
-          </div>
+        // Add prediction details with confidence bar and features grid container
+        detailsHtml += `
           <div class="prediction-details">
             <div class="details-header">
-              <div class="details-title">Model Predictions</div>
-              <div class="confidence-meter">
-                <span class="confidence-value">${confidence.toFixed(1)}%</span>
-                <div class="confidence-bar">
-                  <div class="confidence-fill ${predictionClass}"
-                      style="width: ${confidence}%"></div>
+              <div class="details-title">Prediction Details</div>
+              <div class="confidence-meter" aria-label="Confidence meter">
+                <span class="confidence-value">${data.risk_score}%</span>
+                <div class="confidence-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${data.risk_score}">
+                  <div class="confidence-fill ${riskClass}" style="width: ${data.risk_score}%;"></div>
                 </div>
               </div>
             </div>
-            ${modelComparisonHtml}
             <div class="feature-indicators" id="feature-indicators"></div>
           </div>
         `;
 
-        // Set the main result panel
         resultPanel.innerHTML = detailsHtml;
-        resultPanel.classList.add('visible', predictionClass);
+        resultPanel.classList.add('visible', riskClass);
 
-        // Generate feature indicators from actual features
+        // Populate feature indicators grid
         const featureIndicators = document.getElementById('feature-indicators');
-        let featuresHtml = '';
-        
-        // Select the most important features to display
-        const importantFeatures = {
-          'HasHTTPS': 'HTTPS',
-          'IsDomainIP': 'Uses IP',
-          'TLDLegitimateProb': 'TLD Trust',
-          'NoOfSubDomain': 'Subdomains',
-          'URLLength': 'URL Length',
-          'HasTitle': 'Has Title',
-          'NoOfRedirect': 'Redirects',
-          'HasPasswordField': 'Password Field'
-        };
-        
-        for (const [feature, displayName] of Object.entries(importantFeatures)) {
-          if (result.features && result.features.hasOwnProperty(feature)) {
-            const value = result.features[feature];
-            let riskClass = 'neutral';
-            let displayValue = value;
-            
-            // Custom logic to determine risk class for each feature
-            if (feature === 'HasHTTPS' && value === 0) riskClass = 'threat';
-            if (feature === 'IsDomainIP' && value === 1) riskClass = 'threat';
-            if (feature === 'TLDLegitimateProb') {
-              riskClass = value < 0.5 ? 'threat' : (value > 0.8 ? 'safe' : 'neutral');
-              displayValue = (value * 100).toFixed(0) + '%';
+        if (data.features) {
+          for (const [feature, value] of Object.entries(data.features)) {
+            // Skip irrelevant fields if any
+            if (feature === 'true_label' || feature === 'predicted_label') continue;
+
+            // Determine risk class (simple heuristic)
+            let valueRiskClass = 'neutral';
+            if (typeof value === 'number') {
+              valueRiskClass = value > 0.7 ? 'threat' : value > 0.3 ? 'warning' : 'safe';
             }
-            if (feature === 'NoOfSubDomain' && value > 3) riskClass = 'threat';
-            if (feature === 'URLLength' && value > 100) riskClass = 'threat';
-            if (feature === 'HasTitle' && value === 0) riskClass = 'threat';
-            if (feature === 'NoOfRedirect' && value > 2) riskClass = 'threat';
-            if (feature === 'HasPasswordField' && value === 1) riskClass = 'threat';
-            
+
+            // Format feature name nicely (camelCase or underscores to spaced)
+            const featureName = feature
+              .replace(/_/g, ' ')
+              .replace(/([a-z])([A-Z])/g, '$1 $2')
+              .replace(/\b\w/g, (c) => c.toUpperCase());
+
             featuresHtml += `
-              <div class="feature-indicator">
-                <div class="feature-name">${displayName}</div>
-                <div class="feature-value ${riskClass}">${displayValue}</div>
-              </div>
-            `;
+              <div class="feature-indicator" role="group" aria-label="${featureName}">
+                <div class="feature-name">${featureName}</div>
+                <div class="feature-value ${valueRiskClass}">${value}</div>
+              </div>`;
           }
+          featureIndicators.innerHTML = featuresHtml;
         }
-        
-        featureIndicators.innerHTML = featuresHtml;
 
-        // Display technical analysis
-        reportTime.textContent = result.timestamp;
-        reportUrl.textContent = result.url;
-        reportFeatures.textContent = result.features ? Object.keys(result.features).length : 'N/A';
-        
-        // Format the JSON nicely for display
-        analysisContent.textContent = JSON.stringify(result, null, 2);
+        // Fill detailed report metadata and content
+        reportTime.textContent = data.timestamp;
+        reportUrl.textContent = url;
+        reportFeatures.textContent = data.features ? Object.keys(data.features).length : 'N/A';
+
+        analysisContent.textContent = JSON.stringify(data, null, 2);
         analysisOutput.classList.add('visible');
-
       } catch (error) {
-        console.error('Analysis error:', error);
-        
-        // Stop scanning
         clearInterval(scanInterval);
         scanner.classList.remove('active');
         analyzeBtn.disabled = false;
         analyzeBtn.textContent = 'Initialize Scan';
-        
-        // Show error message
+
         resultPanel.innerHTML = `
           <div class="result-header">
             <span>❌</span>
-            <span>Analysis Error</span>
+            <span>Error</span>
           </div>
           <div class="result-details">
-            Could not analyze URL. Please check your connection and try again.<br>
-            <strong>Error:</strong> ${error.message}
-          </div>
-        `;
+            Failed to analyze URL: ${error.message}
+          </div>`;
         resultPanel.classList.add('visible', 'warning');
+
+        console.error('Analysis error:', error);
       }
     });
 
-    // Copy report functionality
+    // Copy report to clipboard
     copyBtn.addEventListener('click', () => {
       const reportContent = analysisContent.textContent;
       navigator.clipboard.writeText(reportContent).then(() => {
@@ -1102,15 +416,14 @@
       });
     });
 
-    // Expand/collapse report functionality
+    // Expand/collapse detailed JSON report
     expandBtn.addEventListener('click', () => {
-      analysisOutput.classList.toggle('expanded');
-      const icon = expandBtn.querySelector('svg');
-      icon.style.transform = analysisOutput.classList.contains('expanded') 
-        ? 'rotate(180deg)' 
+      const expanded = analysisOutput.classList.toggle('expanded');
+      expandBtn.setAttribute('aria-expanded', expanded);
+      expandBtn.querySelector('svg').style.transform = expanded
+        ? 'rotate(180deg)'
         : 'rotate(0deg)';
     });
-    
   </script>
 </body>
 </html>
