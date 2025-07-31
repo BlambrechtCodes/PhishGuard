@@ -1110,19 +1110,7 @@
         ? 'rotate(180deg)' 
         : 'rotate(0deg)';
     });
-
-    // Enhanced input formatting
-    input.addEventListener('blur', (e) => {
-      let val = e.target.value.trim();
-      if (val && !val.startsWith('http://') && !val.startsWith('https://')) {
-        if (val.includes('.')) {
-          val = 'https://' + val;
-        } else {
-          val = 'http://' + val;
-        }
-      }
-      e.target.value = val;
-    });
+    
   </script>
 </body>
 </html>

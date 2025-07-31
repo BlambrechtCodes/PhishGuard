@@ -20,7 +20,7 @@ class PhishingDetector:
         
             # Load your machine learning model
         try:
-            self.model = joblib.load('phish_detector_model.pkl')  # Replace with your model path
+            self.model = joblib.load('phishing_detector_decision_tree.pkl')  # Replace with your model path
             self.model_loaded = True
         except Exception as e:
             print(f"Failed to load model: {e}")

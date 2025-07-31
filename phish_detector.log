@@ -1,309 +1,235 @@
-2025-07-31 12:51:28,921 [INFO] ===== Starting PhishDetector Application =====
-2025-07-31 12:51:28,921 [INFO] Loading TensorFlow model and Decision Tree...
-2025-07-31 12:51:28,922 [DEBUG] Creating converter from 3 to 5
-2025-07-31 12:51:29,038 [WARNING] Compiled the loaded model, but the compiled metrics have yet to be built. `model.compile_metrics` will be empty until you train or evaluate the model.
-2025-07-31 12:51:29,275 [INFO] Models loaded successfully with 47 features
-2025-07-31 12:51:29,275 [INFO] Starting Flask application on http://127.0.0.1:5000
-2025-07-31 12:51:29,299 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+2025-07-31 15:15:55,512 [INFO] ===== Starting PhishDetector Application =====
+2025-07-31 15:15:55,512 [INFO] Loading TensorFlow model and Decision Tree...
+2025-07-31 15:15:55,516 [DEBUG] Creating converter from 3 to 5
+2025-07-31 15:15:55,665 [WARNING] Compiled the loaded model, but the compiled metrics have yet to be built. `model.compile_metrics` will be empty until you train or evaluate the model.
+2025-07-31 15:15:56,113 [INFO] Models loaded successfully with 47 features
+2025-07-31 15:15:56,114 [INFO] Starting Flask application on http://127.0.0.1:5000
+2025-07-31 15:15:56,139 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
  * Running on all addresses (0.0.0.0)
  * Running on http://127.0.0.1:5000
  * Running on http://192.168.1.57:5000
-2025-07-31 12:51:29,299 [INFO] [33mPress CTRL+C to quit[0m
-2025-07-31 12:51:29,300 [INFO]  * Restarting with stat
-2025-07-31 12:51:32,223 [INFO] ===== Starting PhishDetector Application =====
-2025-07-31 12:51:32,223 [INFO] Loading TensorFlow model and Decision Tree...
-2025-07-31 12:51:32,224 [DEBUG] Creating converter from 3 to 5
-2025-07-31 12:51:32,337 [WARNING] Compiled the loaded model, but the compiled metrics have yet to be built. `model.compile_metrics` will be empty until you train or evaluate the model.
-2025-07-31 12:51:32,542 [INFO] Models loaded successfully with 47 features
-2025-07-31 12:51:32,543 [INFO] Starting Flask application on http://127.0.0.1:5000
-2025-07-31 12:51:32,561 [WARNING]  * Debugger is active!
-2025-07-31 12:51:32,570 [INFO]  * Debugger PIN: 109-386-709
-2025-07-31 12:51:50,221 [INFO] 127.0.0.1 - - [31/Jul/2025 12:51:50] "[36mGET / HTTP/1.1[0m" 304 -
-2025-07-31 12:51:54,776 [INFO] 127.0.0.1 - - [31/Jul/2025 12:51:54] "OPTIONS /api/predict HTTP/1.1" 200 -
-2025-07-31 12:51:54,779 [INFO] ===== New Prediction Request =====
-2025-07-31 12:51:54,779 [INFO] Analyzing URL: http://google
-2025-07-31 12:51:54,780 [DEBUG] Normalized URL: http://google
-2025-07-31 12:51:54,780 [DEBUG] Attempting to acquire lock 13204707168 on /Users/brendanlambrecht/.cache/python-tldextract/3.9.18.final__micromamba__383ab1__tldextract-5.3.0/publicsuffix.org-tlds/de84b5ca2167d4c83e38fb162f2e8738.tldextract.json.lock
-2025-07-31 12:51:54,781 [DEBUG] Lock 13204707168 acquired on /Users/brendanlambrecht/.cache/python-tldextract/3.9.18.final__micromamba__383ab1__tldextract-5.3.0/publicsuffix.org-tlds/de84b5ca2167d4c83e38fb162f2e8738.tldextract.json.lock
-2025-07-31 12:51:54,783 [DEBUG] Attempting to release lock 13204707168 on /Users/brendanlambrecht/.cache/python-tldextract/3.9.18.final__micromamba__383ab1__tldextract-5.3.0/publicsuffix.org-tlds/de84b5ca2167d4c83e38fb162f2e8738.tldextract.json.lock
-2025-07-31 12:51:54,783 [DEBUG] Lock 13204707168 released on /Users/brendanlambrecht/.cache/python-tldextract/3.9.18.final__micromamba__383ab1__tldextract-5.3.0/publicsuffix.org-tlds/de84b5ca2167d4c83e38fb162f2e8738.tldextract.json.lock
-2025-07-31 12:51:54,894 [DEBUG] Starting new HTTP connection (1): google:80
-2025-07-31 12:51:54,897 [WARNING] HTML analysis failed for http://google: HTTPConnectionPool(host='google', port=80): Max retries exceeded with url: / (Caused by NameResolutionError("<urllib3.connection.HTTPConnection object at 0x3132c72b0>: Failed to resolve 'google' ([Errno 8] nodename nor servname provided, or not known)"))
-2025-07-31 12:51:54,897 [INFO] Feature extraction completed in 0.117s
-2025-07-31 12:51:54,976 [INFO] TF Probability: 0.0000, DT Probability: 0.0002
-2025-07-31 12:51:54,976 [INFO] Ensemble Probability: 0.0001, Prediction: False
-2025-07-31 12:51:54,976 [INFO] Prediction completed in 0.197s
-2025-07-31 12:51:54,976 [INFO] 127.0.0.1 - - [31/Jul/2025 12:51:54] "POST /api/predict HTTP/1.1" 200 -
-2025-07-31 12:52:00,301 [INFO] 127.0.0.1 - - [31/Jul/2025 12:52:00] "OPTIONS /api/predict HTTP/1.1" 200 -
-2025-07-31 12:52:00,304 [INFO] ===== New Prediction Request =====
-2025-07-31 12:52:00,304 [INFO] Analyzing URL: http://google.org
-2025-07-31 12:52:00,305 [DEBUG] Normalized URL: http://google.org
-2025-07-31 12:52:00,363 [DEBUG] Starting new HTTP connection (1): google.org:80
-2025-07-31 12:52:00,419 [DEBUG] http://google.org:80 "GET / HTTP/1.1" 302 220
-2025-07-31 12:52:00,455 [DEBUG] Starting new HTTPS connection (1): www.google.org:443
-2025-07-31 12:52:00,562 [DEBUG] https://www.google.org:443 "GET / HTTP/1.1" 200 None
-2025-07-31 12:52:00,609 [DEBUG] HTML fetched and parsed in 0.30 seconds
-2025-07-31 12:52:00,617 [DEBUG] Starting new HTTP connection (1): google.org:80
-2025-07-31 12:52:00,674 [DEBUG] http://google.org:80 "GET /robots.txt HTTP/1.1" 302 230
-2025-07-31 12:52:00,678 [DEBUG] Starting new HTTPS connection (1): www.google.org:443
-2025-07-31 12:52:00,772 [DEBUG] https://www.google.org:443 "GET /robots.txt HTTP/1.1" 200 63
-2025-07-31 12:52:00,774 [INFO] HTML analysis completed successfully
-2025-07-31 12:52:00,774 [INFO] Feature extraction completed in 0.469s
-2025-07-31 12:52:00,823 [INFO] TF Probability: 0.0000, DT Probability: 0.4281
-2025-07-31 12:52:00,823 [INFO] Ensemble Probability: 0.1284, Prediction: False
-2025-07-31 12:52:00,823 [INFO] Prediction completed in 0.519s
-2025-07-31 12:52:00,824 [INFO] 127.0.0.1 - - [31/Jul/2025 12:52:00] "POST /api/predict HTTP/1.1" 200 -
-2025-07-31 12:52:06,577 [INFO] 127.0.0.1 - - [31/Jul/2025 12:52:06] "OPTIONS /api/predict HTTP/1.1" 200 -
-2025-07-31 12:52:06,580 [INFO] ===== New Prediction Request =====
-2025-07-31 12:52:06,581 [INFO] Analyzing URL: http://google.gov
-2025-07-31 12:52:06,581 [DEBUG] Normalized URL: http://google.gov
-2025-07-31 12:52:06,622 [DEBUG] Starting new HTTP connection (1): google.gov:80
-2025-07-31 12:52:06,624 [WARNING] HTML analysis failed for http://google.gov: HTTPConnectionPool(host='google.gov', port=80): Max retries exceeded with url: / (Caused by NameResolutionError("<urllib3.connection.HTTPConnection object at 0x3144ef2b0>: Failed to resolve 'google.gov' ([Errno 8] nodename nor servname provided, or not known)"))
-2025-07-31 12:52:06,624 [INFO] Feature extraction completed in 0.044s
-2025-07-31 12:52:06,676 [INFO] TF Probability: 0.0000, DT Probability: 0.0002
-2025-07-31 12:52:06,676 [INFO] Ensemble Probability: 0.0001, Prediction: False
-2025-07-31 12:52:06,677 [INFO] Prediction completed in 0.096s
-2025-07-31 12:52:06,677 [INFO] 127.0.0.1 - - [31/Jul/2025 12:52:06] "POST /api/predict HTTP/1.1" 200 -
-2025-07-31 12:52:13,234 [INFO] 127.0.0.1 - - [31/Jul/2025 12:52:13] "OPTIONS /api/predict HTTP/1.1" 200 -
-2025-07-31 12:52:13,238 [INFO] ===== New Prediction Request =====
-2025-07-31 12:52:13,239 [INFO] Analyzing URL: http://google.bank
-2025-07-31 12:52:13,239 [DEBUG] Normalized URL: http://google.bank
-2025-07-31 12:52:13,286 [DEBUG] Starting new HTTP connection (1): google.bank:80
-2025-07-31 12:52:13,288 [WARNING] HTML analysis failed for http://google.bank: HTTPConnectionPool(host='google.bank', port=80): Max retries exceeded with url: / (Caused by NameResolutionError("<urllib3.connection.HTTPConnection object at 0x3144deb20>: Failed to resolve 'google.bank' ([Errno 8] nodename nor servname provided, or not known)"))
-2025-07-31 12:52:13,288 [INFO] Feature extraction completed in 0.049s
-2025-07-31 12:52:13,341 [INFO] TF Probability: 0.0000, DT Probability: 0.0002
-2025-07-31 12:52:13,341 [INFO] Ensemble Probability: 0.0001, Prediction: False
-2025-07-31 12:52:13,341 [INFO] Prediction completed in 0.103s
-2025-07-31 12:52:13,342 [INFO] 127.0.0.1 - - [31/Jul/2025 12:52:13] "POST /api/predict HTTP/1.1" 200 -
-2025-07-31 12:52:19,527 [INFO] 127.0.0.1 - - [31/Jul/2025 12:52:19] "OPTIONS /api/predict HTTP/1.1" 200 -
-2025-07-31 12:52:19,531 [INFO] ===== New Prediction Request =====
-2025-07-31 12:52:19,531 [INFO] Analyzing URL: http://googl3.bank
-2025-07-31 12:52:19,531 [DEBUG] Normalized URL: http://googl3.bank
-2025-07-31 12:52:19,579 [DEBUG] Starting new HTTP connection (1): googl3.bank:80
-2025-07-31 12:52:19,582 [WARNING] HTML analysis failed for http://googl3.bank: HTTPConnectionPool(host='googl3.bank', port=80): Max retries exceeded with url: / (Caused by NameResolutionError("<urllib3.connection.HTTPConnection object at 0x3144e3a00>: Failed to resolve 'googl3.bank' ([Errno 8] nodename nor servname provided, or not known)"))
-2025-07-31 12:52:19,582 [INFO] Feature extraction completed in 0.051s
-2025-07-31 12:52:19,632 [INFO] TF Probability: 0.0000, DT Probability: 0.0002
-2025-07-31 12:52:19,633 [INFO] Ensemble Probability: 0.0001, Prediction: False
-2025-07-31 12:52:19,633 [INFO] Prediction completed in 0.102s
-2025-07-31 12:52:19,633 [INFO] 127.0.0.1 - - [31/Jul/2025 12:52:19] "POST /api/predict HTTP/1.1" 200 -
-2025-07-31 12:52:20,614 [INFO] ===== New Prediction Request =====
-2025-07-31 12:52:20,614 [INFO] Analyzing URL: http://googl3.bank
-2025-07-31 12:52:20,614 [DEBUG] Normalized URL: http://googl3.bank
-2025-07-31 12:52:20,619 [DEBUG] Starting new HTTP connection (1): googl3.bank:80
-2025-07-31 12:52:20,621 [WARNING] HTML analysis failed for http://googl3.bank: HTTPConnectionPool(host='googl3.bank', port=80): Max retries exceeded with url: / (Caused by NameResolutionError("<urllib3.connection.HTTPConnection object at 0x3144e3b80>: Failed to resolve 'googl3.bank' ([Errno 8] nodename nor servname provided, or not known)"))
-2025-07-31 12:52:20,621 [INFO] Feature extraction completed in 0.007s
-2025-07-31 12:52:20,672 [INFO] TF Probability: 0.0000, DT Probability: 0.0002
-2025-07-31 12:52:20,672 [INFO] Ensemble Probability: 0.0001, Prediction: False
-2025-07-31 12:52:20,672 [INFO] Prediction completed in 0.058s
-2025-07-31 12:52:20,672 [INFO] 127.0.0.1 - - [31/Jul/2025 12:52:20] "POST /api/predict HTTP/1.1" 200 -
-2025-07-31 12:52:32,268 [INFO] 127.0.0.1 - - [31/Jul/2025 12:52:32] "OPTIONS /api/predict HTTP/1.1" 200 -
-2025-07-31 12:52:32,272 [INFO] ===== New Prediction Request =====
-2025-07-31 12:52:32,272 [INFO] Analyzing URL: http://microsoft.com
-2025-07-31 12:52:32,272 [DEBUG] Normalized URL: http://microsoft.com
-2025-07-31 12:52:32,276 [DEBUG] Starting new HTTP connection (1): microsoft.com:80
-2025-07-31 12:52:32,333 [DEBUG] http://microsoft.com:80 "GET / HTTP/1.1" 307 0
-2025-07-31 12:52:32,336 [DEBUG] Starting new HTTPS connection (1): microsoft.com:443
-2025-07-31 12:52:32,454 [DEBUG] https://microsoft.com:443 "GET / HTTP/1.1" 301 0
-2025-07-31 12:52:32,496 [DEBUG] Starting new HTTPS connection (1): www.microsoft.com:443
-2025-07-31 12:52:32,661 [DEBUG] https://www.microsoft.com:443 "GET / HTTP/1.1" 200 12623
-2025-07-31 12:52:32,691 [DEBUG] HTML fetched and parsed in 0.42 seconds
-2025-07-31 12:52:32,701 [DEBUG] Starting new HTTP connection (1): microsoft.com:80
-2025-07-31 12:52:32,749 [DEBUG] http://microsoft.com:80 "GET /robots.txt HTTP/1.1" 307 0
-2025-07-31 12:52:32,753 [DEBUG] Starting new HTTPS connection (1): microsoft.com:443
-2025-07-31 12:52:33,041 [DEBUG] https://microsoft.com:443 "GET /robots.txt HTTP/1.1" 301 0
-2025-07-31 12:52:33,053 [DEBUG] Starting new HTTPS connection (1): www.microsoft.com:443
-2025-07-31 12:52:33,224 [DEBUG] https://www.microsoft.com:443 "GET /robots.txt HTTP/1.1" 200 12623
-2025-07-31 12:52:33,229 [INFO] HTML analysis completed successfully
-2025-07-31 12:52:33,229 [INFO] Feature extraction completed in 0.957s
-2025-07-31 12:52:33,285 [INFO] TF Probability: 0.0000, DT Probability: 1.0000
-2025-07-31 12:52:33,285 [INFO] Ensemble Probability: 0.3000, Prediction: False
-2025-07-31 12:52:33,285 [INFO] Prediction completed in 1.013s
-2025-07-31 12:52:33,286 [INFO] 127.0.0.1 - - [31/Jul/2025 12:52:33] "POST /api/predict HTTP/1.1" 200 -
-2025-07-31 12:52:57,141 [INFO] 127.0.0.1 - - [31/Jul/2025 12:52:57] "OPTIONS /api/predict HTTP/1.1" 200 -
-2025-07-31 12:52:57,145 [INFO] ===== New Prediction Request =====
-2025-07-31 12:52:57,145 [INFO] Analyzing URL: https://microsoft.com
-2025-07-31 12:52:57,146 [DEBUG] Normalized URL: https://microsoft.com
-2025-07-31 12:52:57,150 [DEBUG] Starting new HTTPS connection (1): microsoft.com:443
-2025-07-31 12:52:57,262 [DEBUG] https://microsoft.com:443 "GET / HTTP/1.1" 301 0
-2025-07-31 12:52:57,306 [DEBUG] Starting new HTTPS connection (1): www.microsoft.com:443
-2025-07-31 12:52:57,461 [DEBUG] https://www.microsoft.com:443 "GET / HTTP/1.1" 200 12623
-2025-07-31 12:52:57,492 [DEBUG] HTML fetched and parsed in 0.35 seconds
-2025-07-31 12:52:57,502 [DEBUG] Starting new HTTPS connection (1): microsoft.com:443
-2025-07-31 12:52:57,610 [DEBUG] https://microsoft.com:443 "GET /robots.txt HTTP/1.1" 301 0
-2025-07-31 12:52:57,614 [DEBUG] Starting new HTTPS connection (1): www.microsoft.com:443
-2025-07-31 12:52:57,797 [DEBUG] https://www.microsoft.com:443 "GET /robots.txt HTTP/1.1" 200 12623
-2025-07-31 12:52:57,800 [INFO] HTML analysis completed successfully
-2025-07-31 12:52:57,800 [INFO] Feature extraction completed in 0.655s
-2025-07-31 12:52:57,852 [INFO] TF Probability: 1.0000, DT Probability: 1.0000
-2025-07-31 12:52:57,852 [INFO] Ensemble Probability: 1.0000, Prediction: True
-2025-07-31 12:52:57,852 [INFO] Prediction completed in 0.707s
-2025-07-31 12:52:57,853 [INFO] 127.0.0.1 - - [31/Jul/2025 12:52:57] "POST /api/predict HTTP/1.1" 200 -
-2025-07-31 12:53:08,278 [INFO] 127.0.0.1 - - [31/Jul/2025 12:53:08] "OPTIONS /api/predict HTTP/1.1" 200 -
-2025-07-31 12:53:08,282 [INFO] ===== New Prediction Request =====
-2025-07-31 12:53:08,282 [INFO] Analyzing URL: http://microsoft.com
-2025-07-31 12:53:08,282 [DEBUG] Normalized URL: http://microsoft.com
-2025-07-31 12:53:08,286 [DEBUG] Starting new HTTP connection (1): microsoft.com:80
-2025-07-31 12:53:08,337 [DEBUG] http://microsoft.com:80 "GET / HTTP/1.1" 307 0
-2025-07-31 12:53:08,340 [DEBUG] Starting new HTTPS connection (1): microsoft.com:443
-2025-07-31 12:53:08,463 [DEBUG] https://microsoft.com:443 "GET / HTTP/1.1" 301 0
-2025-07-31 12:53:08,474 [DEBUG] Starting new HTTPS connection (1): www.microsoft.com:443
-2025-07-31 12:53:08,624 [DEBUG] https://www.microsoft.com:443 "GET / HTTP/1.1" 200 12623
-2025-07-31 12:53:08,656 [DEBUG] HTML fetched and parsed in 0.37 seconds
-2025-07-31 12:53:08,666 [DEBUG] Starting new HTTP connection (1): microsoft.com:80
-2025-07-31 12:53:08,711 [DEBUG] http://microsoft.com:80 "GET /robots.txt HTTP/1.1" 307 0
-2025-07-31 12:53:08,715 [DEBUG] Starting new HTTPS connection (1): microsoft.com:443
-2025-07-31 12:53:08,853 [DEBUG] https://microsoft.com:443 "GET /robots.txt HTTP/1.1" 301 0
-2025-07-31 12:53:08,865 [DEBUG] Starting new HTTPS connection (1): www.microsoft.com:443
-2025-07-31 12:53:09,015 [DEBUG] https://www.microsoft.com:443 "GET /robots.txt HTTP/1.1" 200 12623
-2025-07-31 12:53:09,020 [INFO] HTML analysis completed successfully
-2025-07-31 12:53:09,020 [INFO] Feature extraction completed in 0.738s
-2025-07-31 12:53:09,076 [INFO] TF Probability: 0.0000, DT Probability: 1.0000
-2025-07-31 12:53:09,076 [INFO] Ensemble Probability: 0.3000, Prediction: False
-2025-07-31 12:53:09,076 [INFO] Prediction completed in 0.795s
-2025-07-31 12:53:09,077 [INFO] 127.0.0.1 - - [31/Jul/2025 12:53:09] "POST /api/predict HTTP/1.1" 200 -
-2025-07-31 12:53:16,066 [INFO] 127.0.0.1 - - [31/Jul/2025 12:53:16] "OPTIONS /api/predict HTTP/1.1" 200 -
-2025-07-31 12:53:16,070 [INFO] ===== New Prediction Request =====
-2025-07-31 12:53:16,070 [INFO] Analyzing URL: https://microsoft.com
-2025-07-31 12:53:16,070 [DEBUG] Normalized URL: https://microsoft.com
-2025-07-31 12:53:16,074 [DEBUG] Starting new HTTPS connection (1): microsoft.com:443
-2025-07-31 12:53:16,183 [DEBUG] https://microsoft.com:443 "GET / HTTP/1.1" 301 0
-2025-07-31 12:53:16,244 [DEBUG] Starting new HTTPS connection (1): www.microsoft.com:443
-2025-07-31 12:53:16,403 [DEBUG] https://www.microsoft.com:443 "GET / HTTP/1.1" 200 12623
-2025-07-31 12:53:16,436 [DEBUG] HTML fetched and parsed in 0.37 seconds
-2025-07-31 12:53:16,445 [DEBUG] Starting new HTTPS connection (1): microsoft.com:443
-2025-07-31 12:53:16,549 [DEBUG] https://microsoft.com:443 "GET /robots.txt HTTP/1.1" 301 0
-2025-07-31 12:53:16,554 [DEBUG] Starting new HTTPS connection (1): www.microsoft.com:443
-2025-07-31 12:53:16,846 [DEBUG] https://www.microsoft.com:443 "GET /robots.txt HTTP/1.1" 200 12623
-2025-07-31 12:53:16,851 [INFO] HTML analysis completed successfully
-2025-07-31 12:53:16,851 [INFO] Feature extraction completed in 0.781s
-2025-07-31 12:53:16,906 [INFO] TF Probability: 1.0000, DT Probability: 1.0000
-2025-07-31 12:53:16,906 [INFO] Ensemble Probability: 1.0000, Prediction: True
-2025-07-31 12:53:16,906 [INFO] Prediction completed in 0.837s
-2025-07-31 12:53:16,907 [INFO] 127.0.0.1 - - [31/Jul/2025 12:53:16] "POST /api/predict HTTP/1.1" 200 -
-2025-07-31 12:53:38,244 [INFO] 127.0.0.1 - - [31/Jul/2025 12:53:38] "OPTIONS /api/predict HTTP/1.1" 200 -
-2025-07-31 12:53:38,247 [INFO] ===== New Prediction Request =====
-2025-07-31 12:53:38,248 [INFO] Analyzing URL: http://www.egypressoffice.com
-2025-07-31 12:53:38,248 [DEBUG] Normalized URL: http://www.egypressoffice.com
-2025-07-31 12:53:38,308 [DEBUG] Starting new HTTP connection (1): www.egypressoffice.com:80
-2025-07-31 12:53:38,310 [WARNING] HTML analysis failed for http://www.egypressoffice.com: HTTPConnectionPool(host='www.egypressoffice.com', port=80): Max retries exceeded with url: / (Caused by NameResolutionError("<urllib3.connection.HTTPConnection object at 0x3133b4a30>: Failed to resolve 'www.egypressoffice.com' ([Errno 8] nodename nor servname provided, or not known)"))
-2025-07-31 12:53:38,311 [INFO] Feature extraction completed in 0.063s
-2025-07-31 12:53:38,369 [INFO] TF Probability: 0.0001, DT Probability: 0.0002
-2025-07-31 12:53:38,370 [INFO] Ensemble Probability: 0.0002, Prediction: False
-2025-07-31 12:53:38,370 [INFO] Prediction completed in 0.122s
-2025-07-31 12:53:38,370 [INFO] 127.0.0.1 - - [31/Jul/2025 12:53:38] "POST /api/predict HTTP/1.1" 200 -
-2025-07-31 12:54:05,337 [INFO] 127.0.0.1 - - [31/Jul/2025 12:54:05] "OPTIONS /api/predict HTTP/1.1" 200 -
-2025-07-31 12:54:05,341 [INFO] ===== New Prediction Request =====
-2025-07-31 12:54:05,341 [INFO] Analyzing URL: https://microsoft.com
-2025-07-31 12:54:05,341 [DEBUG] Normalized URL: https://microsoft.com
-2025-07-31 12:54:05,345 [DEBUG] Starting new HTTPS connection (1): microsoft.com:443
-2025-07-31 12:54:05,458 [DEBUG] https://microsoft.com:443 "GET / HTTP/1.1" 301 0
-2025-07-31 12:54:05,515 [DEBUG] Starting new HTTPS connection (1): www.microsoft.com:443
-2025-07-31 12:54:05,816 [DEBUG] https://www.microsoft.com:443 "GET / HTTP/1.1" 200 12623
-2025-07-31 12:54:05,846 [DEBUG] HTML fetched and parsed in 0.50 seconds
-2025-07-31 12:54:05,855 [DEBUG] Starting new HTTPS connection (1): microsoft.com:443
-2025-07-31 12:54:05,962 [DEBUG] https://microsoft.com:443 "GET /robots.txt HTTP/1.1" 301 0
-2025-07-31 12:54:05,968 [DEBUG] Starting new HTTPS connection (1): www.microsoft.com:443
-2025-07-31 12:54:06,144 [DEBUG] https://www.microsoft.com:443 "GET /robots.txt HTTP/1.1" 200 12623
-2025-07-31 12:54:06,149 [INFO] HTML analysis completed successfully
-2025-07-31 12:54:06,150 [INFO] Feature extraction completed in 0.808s
-2025-07-31 12:54:06,202 [INFO] TF Probability: 1.0000, DT Probability: 1.0000
-2025-07-31 12:54:06,203 [INFO] Ensemble Probability: 1.0000, Prediction: True
-2025-07-31 12:54:06,203 [INFO] Prediction completed in 0.862s
-2025-07-31 12:54:06,203 [INFO] 127.0.0.1 - - [31/Jul/2025 12:54:06] "POST /api/predict HTTP/1.1" 200 -
-2025-07-31 12:54:34,762 [INFO] 127.0.0.1 - - [31/Jul/2025 12:54:34] "OPTIONS /api/predict HTTP/1.1" 200 -
-2025-07-31 12:54:34,766 [INFO] ===== New Prediction Request =====
-2025-07-31 12:54:34,767 [INFO] Analyzing URL: http://google
-2025-07-31 12:54:34,767 [DEBUG] Normalized URL: http://google
-2025-07-31 12:54:34,823 [DEBUG] Starting new HTTP connection (1): google:80
-2025-07-31 12:54:34,827 [WARNING] HTML analysis failed for http://google: HTTPConnectionPool(host='google', port=80): Max retries exceeded with url: / (Caused by NameResolutionError("<urllib3.connection.HTTPConnection object at 0x31460af70>: Failed to resolve 'google' ([Errno 8] nodename nor servname provided, or not known)"))
-2025-07-31 12:54:34,827 [INFO] Feature extraction completed in 0.061s
-2025-07-31 12:54:34,881 [INFO] TF Probability: 0.0000, DT Probability: 0.0002
-2025-07-31 12:54:34,881 [INFO] Ensemble Probability: 0.0001, Prediction: False
-2025-07-31 12:54:34,882 [INFO] Prediction completed in 0.116s
-2025-07-31 12:54:34,882 [INFO] 127.0.0.1 - - [31/Jul/2025 12:54:34] "POST /api/predict HTTP/1.1" 200 -
-2025-07-31 12:54:54,020 [INFO] 127.0.0.1 - - [31/Jul/2025 12:54:54] "OPTIONS /api/predict HTTP/1.1" 200 -
-2025-07-31 12:54:54,024 [INFO] ===== New Prediction Request =====
-2025-07-31 12:54:54,025 [INFO] Analyzing URL: http://google.fjwor
-2025-07-31 12:54:54,025 [DEBUG] Normalized URL: http://google.fjwor
-2025-07-31 12:54:54,079 [DEBUG] Starting new HTTP connection (1): google.fjwor:80
-2025-07-31 12:54:54,081 [WARNING] HTML analysis failed for http://google.fjwor: HTTPConnectionPool(host='google.fjwor', port=80): Max retries exceeded with url: / (Caused by NameResolutionError("<urllib3.connection.HTTPConnection object at 0x3133b46a0>: Failed to resolve 'google.fjwor' ([Errno 8] nodename nor servname provided, or not known)"))
-2025-07-31 12:54:54,082 [INFO] Feature extraction completed in 0.057s
-2025-07-31 12:54:54,133 [INFO] TF Probability: 0.0000, DT Probability: 0.0002
-2025-07-31 12:54:54,133 [INFO] Ensemble Probability: 0.0001, Prediction: False
-2025-07-31 12:54:54,133 [INFO] Prediction completed in 0.109s
-2025-07-31 12:54:54,134 [INFO] 127.0.0.1 - - [31/Jul/2025 12:54:54] "POST /api/predict HTTP/1.1" 200 -
-2025-07-31 12:55:01,451 [INFO] 127.0.0.1 - - [31/Jul/2025 12:55:01] "OPTIONS /api/predict HTTP/1.1" 200 -
-2025-07-31 12:55:01,454 [INFO] ===== New Prediction Request =====
-2025-07-31 12:55:01,455 [INFO] Analyzing URL: https://138.49.49.235
-2025-07-31 12:55:01,455 [DEBUG] Normalized URL: https://138.49.49.235
-2025-07-31 12:55:01,457 [DEBUG] Starting new HTTPS connection (1): 138.49.49.235:443
-2025-07-31 12:55:11,460 [WARNING] HTML analysis failed for https://138.49.49.235: HTTPSConnectionPool(host='138.49.49.235', port=443): Max retries exceeded with url: / (Caused by ConnectTimeoutError(<urllib3.connection.HTTPSConnection object at 0x314628f40>, 'Connection to 138.49.49.235 timed out. (connect timeout=10)'))
-2025-07-31 12:55:11,460 [INFO] Feature extraction completed in 10.005s
-2025-07-31 12:55:11,490 [INFO] TF Probability: 0.9999, DT Probability: 0.0002
-2025-07-31 12:55:11,490 [INFO] Ensemble Probability: 0.7000, Prediction: True
-2025-07-31 12:55:11,490 [INFO] Prediction completed in 10.036s
-2025-07-31 12:55:11,490 [INFO] 127.0.0.1 - - [31/Jul/2025 12:55:11] "POST /api/predict HTTP/1.1" 200 -
-2025-07-31 12:55:55,245 [INFO] 127.0.0.1 - - [31/Jul/2025 12:55:55] "OPTIONS /api/predict HTTP/1.1" 200 -
-2025-07-31 12:55:55,248 [INFO] ===== New Prediction Request =====
-2025-07-31 12:55:55,248 [INFO] Analyzing URL: https://138.49.49.235.org
-2025-07-31 12:55:55,248 [DEBUG] Normalized URL: https://138.49.49.235.org
-2025-07-31 12:55:55,604 [DEBUG] Starting new HTTPS connection (1): 138.49.49.235.org:443
-2025-07-31 12:55:55,606 [WARNING] HTML analysis failed for https://138.49.49.235.org: HTTPSConnectionPool(host='138.49.49.235.org', port=443): Max retries exceeded with url: / (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x31460a430>: Failed to resolve '138.49.49.235.org' ([Errno 8] nodename nor servname provided, or not known)"))
-2025-07-31 12:55:55,607 [INFO] Feature extraction completed in 0.358s
-2025-07-31 12:55:55,665 [INFO] TF Probability: 1.0000, DT Probability: 0.0002
-2025-07-31 12:55:55,665 [INFO] Ensemble Probability: 0.7001, Prediction: True
-2025-07-31 12:55:55,665 [INFO] Prediction completed in 0.417s
-2025-07-31 12:55:55,666 [INFO] 127.0.0.1 - - [31/Jul/2025 12:55:55] "POST /api/predict HTTP/1.1" 200 -
-2025-07-31 12:56:24,305 [INFO] 127.0.0.1 - - [31/Jul/2025 12:56:24] "OPTIONS /api/predict HTTP/1.1" 200 -
-2025-07-31 12:56:24,310 [INFO] ===== New Prediction Request =====
-2025-07-31 12:56:24,311 [INFO] Analyzing URL: https://www.1factoryradio.com
-2025-07-31 12:56:24,311 [DEBUG] Normalized URL: https://www.1factoryradio.com
-2025-07-31 12:56:24,409 [DEBUG] Starting new HTTPS connection (1): www.1factoryradio.com:443
-2025-07-31 12:56:25,010 [DEBUG] https://www.1factoryradio.com:443 "GET / HTTP/1.1" 200 None
-2025-07-31 12:56:25,097 [DEBUG] HTML fetched and parsed in 0.79 seconds
-2025-07-31 12:56:25,113 [DEBUG] Starting new HTTPS connection (1): www.1factoryradio.com:443
-2025-07-31 12:56:25,311 [DEBUG] https://www.1factoryradio.com:443 "GET /robots.txt HTTP/1.1" 200 None
-2025-07-31 12:56:25,317 [INFO] HTML analysis completed successfully
-2025-07-31 12:56:25,317 [INFO] Feature extraction completed in 1.006s
-2025-07-31 12:56:25,369 [INFO] TF Probability: 1.0000, DT Probability: 1.0000
-2025-07-31 12:56:25,369 [INFO] Ensemble Probability: 1.0000, Prediction: True
-2025-07-31 12:56:25,369 [INFO] Prediction completed in 1.059s
-2025-07-31 12:56:25,370 [INFO] 127.0.0.1 - - [31/Jul/2025 12:56:25] "POST /api/predict HTTP/1.1" 200 -
-2025-07-31 12:57:07,178 [INFO] 127.0.0.1 - - [31/Jul/2025 12:57:07] "OPTIONS /api/predict HTTP/1.1" 200 -
-2025-07-31 12:57:07,183 [INFO] ===== New Prediction Request =====
-2025-07-31 12:57:07,183 [INFO] Analyzing URL: https://www.globant.com
-2025-07-31 12:57:07,183 [DEBUG] Normalized URL: https://www.globant.com
-2025-07-31 12:57:07,239 [DEBUG] Starting new HTTPS connection (1): www.globant.com:443
-2025-07-31 12:57:07,438 [DEBUG] https://www.globant.com:443 "GET / HTTP/1.1" 200 None
-2025-07-31 12:57:07,559 [DEBUG] HTML fetched and parsed in 0.38 seconds
-2025-07-31 12:57:07,573 [DEBUG] Starting new HTTPS connection (1): www.globant.com:443
-2025-07-31 12:57:07,651 [DEBUG] https://www.globant.com:443 "GET /robots.txt HTTP/1.1" 403 859
-2025-07-31 12:57:07,653 [INFO] HTML analysis completed successfully
-2025-07-31 12:57:07,654 [INFO] Feature extraction completed in 0.470s
-2025-07-31 12:57:07,702 [INFO] TF Probability: 1.0000, DT Probability: 1.0000
-2025-07-31 12:57:07,702 [INFO] Ensemble Probability: 1.0000, Prediction: True
-2025-07-31 12:57:07,702 [INFO] Prediction completed in 0.519s
-2025-07-31 12:57:07,702 [INFO] 127.0.0.1 - - [31/Jul/2025 12:57:07] "POST /api/predict HTTP/1.1" 200 -
-2025-07-31 12:57:31,013 [INFO] 127.0.0.1 - - [31/Jul/2025 12:57:31] "OPTIONS /api/predict HTTP/1.1" 200 -
-2025-07-31 12:57:31,017 [INFO] ===== New Prediction Request =====
-2025-07-31 12:57:31,017 [INFO] Analyzing URL: https://bnprailbas-goonlline.top
-2025-07-31 12:57:31,017 [DEBUG] Normalized URL: https://bnprailbas-goonlline.top
-2025-07-31 12:57:31,369 [DEBUG] Starting new HTTPS connection (1): bnprailbas-goonlline.top:443
-2025-07-31 12:57:31,372 [WARNING] HTML analysis failed for https://bnprailbas-goonlline.top: HTTPSConnectionPool(host='bnprailbas-goonlline.top', port=443): Max retries exceeded with url: / (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x3149b8ee0>: Failed to resolve 'bnprailbas-goonlline.top' ([Errno 8] nodename nor servname provided, or not known)"))
-2025-07-31 12:57:31,372 [INFO] Feature extraction completed in 0.355s
-2025-07-31 12:57:31,429 [INFO] TF Probability: 1.0000, DT Probability: 0.0002
-2025-07-31 12:57:31,429 [INFO] Ensemble Probability: 0.7001, Prediction: True
-2025-07-31 12:57:31,429 [INFO] Prediction completed in 0.412s
-2025-07-31 12:57:31,429 [INFO] 127.0.0.1 - - [31/Jul/2025 12:57:31] "POST /api/predict HTTP/1.1" 200 -
-2025-07-31 12:57:42,926 [INFO] 127.0.0.1 - - [31/Jul/2025 12:57:42] "OPTIONS /api/predict HTTP/1.1" 200 -
-2025-07-31 12:57:42,931 [INFO] ===== New Prediction Request =====
-2025-07-31 12:57:42,931 [INFO] Analyzing URL: https://ipfs.io/ipfs/qmb32jtzyevdxt6ayjbckzyrtzjed1i7lds4chnajmplzy/eva.html
-2025-07-31 12:57:42,931 [DEBUG] Normalized URL: https://ipfs.io/ipfs/qmb32jtzyevdxt6ayjbckzyrtzjed1i7lds4chnajmplzy/eva.html
-2025-07-31 12:57:42,973 [DEBUG] Starting new HTTPS connection (1): ipfs.io:443
-2025-07-31 12:57:43,139 [DEBUG] https://ipfs.io:443 "GET /ipfs/qmb32jtzyevdxt6ayjbckzyrtzjed1i7lds4chnajmplzy/eva.html HTTP/1.1" 422 None
-2025-07-31 12:57:43,140 [WARNING] HTML analysis failed for https://ipfs.io/ipfs/qmb32jtzyevdxt6ayjbckzyrtzjed1i7lds4chnajmplzy/eva.html: 422 Client Error: Unprocessable Entity for url: https://ipfs.io/ipfs/qmb32jtzyevdxt6ayjbckzyrtzjed1i7lds4chnajmplzy/eva.html
-2025-07-31 12:57:43,140 [INFO] Feature extraction completed in 0.209s
-2025-07-31 12:57:43,200 [INFO] TF Probability: 1.0000, DT Probability: 0.0002
-2025-07-31 12:57:43,200 [INFO] Ensemble Probability: 0.7001, Prediction: True
-2025-07-31 12:57:43,201 [INFO] Prediction completed in 0.270s
-2025-07-31 12:57:43,201 [INFO] 127.0.0.1 - - [31/Jul/2025 12:57:43] "POST /api/predict HTTP/1.1" 200 -
+2025-07-31 15:15:56,140 [INFO] [33mPress CTRL+C to quit[0m
+2025-07-31 15:15:56,140 [INFO]  * Restarting with stat
+2025-07-31 15:15:59,099 [INFO] ===== Starting PhishDetector Application =====
+2025-07-31 15:15:59,099 [INFO] Loading TensorFlow model and Decision Tree...
+2025-07-31 15:15:59,100 [DEBUG] Creating converter from 3 to 5
+2025-07-31 15:15:59,213 [WARNING] Compiled the loaded model, but the compiled metrics have yet to be built. `model.compile_metrics` will be empty until you train or evaluate the model.
+2025-07-31 15:15:59,424 [INFO] Models loaded successfully with 47 features
+2025-07-31 15:15:59,424 [INFO] Starting Flask application on http://127.0.0.1:5000
+2025-07-31 15:15:59,444 [WARNING]  * Debugger is active!
+2025-07-31 15:15:59,453 [INFO]  * Debugger PIN: 109-386-709
+2025-07-31 15:15:59,468 [INFO] 127.0.0.1 - - [31/Jul/2025 15:15:59] "[36mGET / HTTP/1.1[0m" 304 -
+2025-07-31 15:15:59,550 [INFO] 127.0.0.1 - - [31/Jul/2025 15:15:59] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-07-31 15:16:02,973 [INFO] 127.0.0.1 - - [31/Jul/2025 15:16:02] "OPTIONS /api/predict HTTP/1.1" 200 -
+2025-07-31 15:16:02,978 [INFO] ===== New Prediction Request =====
+2025-07-31 15:16:02,978 [INFO] Analyzing URL: https://google.com
+2025-07-31 15:16:02,979 [DEBUG] Normalized URL: https://google.com
+2025-07-31 15:16:02,979 [DEBUG] Attempting to acquire lock 6118321792 on /Users/brendanlambrecht/.cache/python-tldextract/3.9.18.final__micromamba__383ab1__tldextract-5.3.0/publicsuffix.org-tlds/de84b5ca2167d4c83e38fb162f2e8738.tldextract.json.lock
+2025-07-31 15:16:02,980 [DEBUG] Lock 6118321792 acquired on /Users/brendanlambrecht/.cache/python-tldextract/3.9.18.final__micromamba__383ab1__tldextract-5.3.0/publicsuffix.org-tlds/de84b5ca2167d4c83e38fb162f2e8738.tldextract.json.lock
+2025-07-31 15:16:02,983 [DEBUG] Attempting to release lock 6118321792 on /Users/brendanlambrecht/.cache/python-tldextract/3.9.18.final__micromamba__383ab1__tldextract-5.3.0/publicsuffix.org-tlds/de84b5ca2167d4c83e38fb162f2e8738.tldextract.json.lock
+2025-07-31 15:16:02,983 [DEBUG] Lock 6118321792 released on /Users/brendanlambrecht/.cache/python-tldextract/3.9.18.final__micromamba__383ab1__tldextract-5.3.0/publicsuffix.org-tlds/de84b5ca2167d4c83e38fb162f2e8738.tldextract.json.lock
+2025-07-31 15:16:03,064 [DEBUG] Starting new HTTPS connection (1): google.com:443
+2025-07-31 15:16:03,180 [DEBUG] https://google.com:443 "GET / HTTP/1.1" 301 220
+2025-07-31 15:16:03,218 [DEBUG] Starting new HTTPS connection (1): www.google.com:443
+2025-07-31 15:16:03,383 [DEBUG] https://www.google.com:443 "GET / HTTP/1.1" 200 None
+2025-07-31 15:16:03,436 [DEBUG] HTML fetched and parsed in 0.43 seconds
+2025-07-31 15:16:03,446 [DEBUG] Starting new HTTPS connection (1): google.com:443
+2025-07-31 15:16:03,545 [DEBUG] https://google.com:443 "GET /robots.txt HTTP/1.1" 301 230
+2025-07-31 15:16:03,550 [DEBUG] Starting new HTTPS connection (1): www.google.com:443
+2025-07-31 15:16:03,653 [DEBUG] https://www.google.com:443 "GET /robots.txt HTTP/1.1" 200 1631
+2025-07-31 15:16:03,656 [INFO] HTML analysis completed successfully
+2025-07-31 15:16:03,657 [INFO] Feature extraction completed in 0.679s
+2025-07-31 15:16:03,783 [INFO] TF Probability: 1.0000, DT Probability: 0.0000
+2025-07-31 15:16:03,783 [INFO] Ensemble Probability: 0.7000, Prediction: True
+2025-07-31 15:16:03,783 [INFO] Prediction completed in 0.806s
+2025-07-31 15:16:03,784 [INFO] 127.0.0.1 - - [31/Jul/2025 15:16:03] "POST /api/predict HTTP/1.1" 200 -
+2025-07-31 15:18:05,083 [INFO]  * Detected change in '/Users/brendanlambrecht/CodingProjects/My_Personal_Projects/phishGuard/serverHTML.py', reloading
+2025-07-31 15:18:05,569 [INFO]  * Restarting with stat
+2025-07-31 15:18:08,917 [INFO] ===== Starting PhishDetector Application =====
+2025-07-31 15:18:08,917 [INFO] Loading TensorFlow model and Decision Tree...
+2025-07-31 15:18:08,918 [DEBUG] Creating converter from 3 to 5
+2025-07-31 15:18:09,034 [WARNING] Compiled the loaded model, but the compiled metrics have yet to be built. `model.compile_metrics` will be empty until you train or evaluate the model.
+2025-07-31 15:18:09,270 [INFO] Models loaded successfully with 47 features
+2025-07-31 15:18:09,271 [INFO] Starting Flask application on http://127.0.0.1:5000
+2025-07-31 15:18:09,296 [WARNING]  * Debugger is active!
+2025-07-31 15:18:09,304 [INFO]  * Debugger PIN: 109-386-709
+2025-07-31 15:18:14,797 [INFO] 127.0.0.1 - - [31/Jul/2025 15:18:14] "GET / HTTP/1.1" 200 -
+2025-07-31 15:18:16,833 [INFO] 127.0.0.1 - - [31/Jul/2025 15:18:16] "OPTIONS /api/predict HTTP/1.1" 200 -
+2025-07-31 15:18:16,838 [INFO] ===== New Prediction Request =====
+2025-07-31 15:18:16,838 [DEBUG] URL missing scheme, prepending https:// to google.com
+2025-07-31 15:18:16,838 [INFO] Analyzing URL: https://google.com
+2025-07-31 15:18:16,839 [DEBUG] Normalized URL: https://google.com
+2025-07-31 15:18:16,840 [DEBUG] Attempting to acquire lock 12898425824 on /Users/brendanlambrecht/.cache/python-tldextract/3.9.18.final__micromamba__383ab1__tldextract-5.3.0/publicsuffix.org-tlds/de84b5ca2167d4c83e38fb162f2e8738.tldextract.json.lock
+2025-07-31 15:18:16,841 [DEBUG] Lock 12898425824 acquired on /Users/brendanlambrecht/.cache/python-tldextract/3.9.18.final__micromamba__383ab1__tldextract-5.3.0/publicsuffix.org-tlds/de84b5ca2167d4c83e38fb162f2e8738.tldextract.json.lock
+2025-07-31 15:18:16,844 [DEBUG] Attempting to release lock 12898425824 on /Users/brendanlambrecht/.cache/python-tldextract/3.9.18.final__micromamba__383ab1__tldextract-5.3.0/publicsuffix.org-tlds/de84b5ca2167d4c83e38fb162f2e8738.tldextract.json.lock
+2025-07-31 15:18:16,844 [DEBUG] Lock 12898425824 released on /Users/brendanlambrecht/.cache/python-tldextract/3.9.18.final__micromamba__383ab1__tldextract-5.3.0/publicsuffix.org-tlds/de84b5ca2167d4c83e38fb162f2e8738.tldextract.json.lock
+2025-07-31 15:18:16,894 [DEBUG] Starting new HTTPS connection (1): google.com:443
+2025-07-31 15:18:16,999 [DEBUG] https://google.com:443 "GET / HTTP/1.1" 301 220
+2025-07-31 15:18:17,004 [DEBUG] Starting new HTTPS connection (1): www.google.com:443
+2025-07-31 15:18:17,174 [DEBUG] https://www.google.com:443 "GET / HTTP/1.1" 200 None
+2025-07-31 15:18:17,238 [DEBUG] HTML fetched and parsed in 0.36 seconds
+2025-07-31 15:18:17,248 [DEBUG] Starting new HTTPS connection (1): google.com:443
+2025-07-31 15:18:17,337 [DEBUG] https://google.com:443 "GET /robots.txt HTTP/1.1" 301 230
+2025-07-31 15:18:17,342 [DEBUG] Starting new HTTPS connection (1): www.google.com:443
+2025-07-31 15:18:17,452 [DEBUG] https://www.google.com:443 "GET /robots.txt HTTP/1.1" 200 1631
+2025-07-31 15:18:17,455 [INFO] HTML analysis completed successfully
+2025-07-31 15:18:17,456 [INFO] Feature extraction completed in 0.617s
+2025-07-31 15:18:17,548 [INFO] Prediction completed in 0.711s
+2025-07-31 15:18:17,549 [INFO] 127.0.0.1 - - [31/Jul/2025 15:18:17] "POST /api/predict HTTP/1.1" 200 -
+2025-07-31 15:20:32,293 [INFO]  * Detected change in '/Users/brendanlambrecht/CodingProjects/My_Personal_Projects/phishGuard/serverHTML.py', reloading
+2025-07-31 15:20:32,781 [INFO]  * Restarting with stat
+2025-07-31 15:20:36,186 [INFO] ===== Starting PhishDetector Application =====
+2025-07-31 15:20:36,187 [INFO] Loading TensorFlow model and Decision Tree...
+2025-07-31 15:20:36,188 [DEBUG] Creating converter from 3 to 5
+2025-07-31 15:20:36,308 [WARNING] Compiled the loaded model, but the compiled metrics have yet to be built. `model.compile_metrics` will be empty until you train or evaluate the model.
+2025-07-31 15:20:36,553 [INFO] Models loaded successfully with 47 features
+2025-07-31 15:20:36,553 [INFO] Starting Flask application on http://127.0.0.1:5000
+2025-07-31 15:20:36,571 [WARNING]  * Debugger is active!
+2025-07-31 15:20:36,581 [INFO]  * Debugger PIN: 109-386-709
+2025-07-31 15:20:38,611 [INFO]  * Detected change in '/Users/brendanlambrecht/CodingProjects/My_Personal_Projects/phishGuard/serverHTML.py', reloading
+2025-07-31 15:20:39,017 [INFO]  * Restarting with stat
+2025-07-31 15:20:41,946 [INFO] ===== Starting PhishDetector Application =====
+2025-07-31 15:20:41,946 [INFO] Loading TensorFlow model and Decision Tree...
+2025-07-31 15:20:41,947 [DEBUG] Creating converter from 3 to 5
+2025-07-31 15:20:42,065 [WARNING] Compiled the loaded model, but the compiled metrics have yet to be built. `model.compile_metrics` will be empty until you train or evaluate the model.
+2025-07-31 15:20:42,271 [INFO] Models loaded successfully with 47 features
+2025-07-31 15:20:42,271 [INFO] Starting Flask application on http://127.0.0.1:5000
+2025-07-31 15:20:42,289 [WARNING]  * Debugger is active!
+2025-07-31 15:20:42,297 [INFO]  * Debugger PIN: 109-386-709
+2025-07-31 15:20:45,241 [INFO] 127.0.0.1 - - [31/Jul/2025 15:20:45] "GET / HTTP/1.1" 200 -
+2025-07-31 15:20:53,607 [INFO] 127.0.0.1 - - [31/Jul/2025 15:20:53] "OPTIONS /api/predict HTTP/1.1" 200 -
+2025-07-31 15:20:53,639 [INFO] ===== New Prediction Request =====
+2025-07-31 15:20:53,639 [DEBUG] URL missing scheme, prepending https:// to google.com
+2025-07-31 15:20:53,639 [INFO] Analyzing URL: https://google.com
+2025-07-31 15:20:53,640 [DEBUG] Normalized URL: https://google.com
+2025-07-31 15:20:53,640 [DEBUG] Attempting to acquire lock 6334295344 on /Users/brendanlambrecht/.cache/python-tldextract/3.9.18.final__micromamba__383ab1__tldextract-5.3.0/publicsuffix.org-tlds/de84b5ca2167d4c83e38fb162f2e8738.tldextract.json.lock
+2025-07-31 15:20:53,640 [DEBUG] Lock 6334295344 acquired on /Users/brendanlambrecht/.cache/python-tldextract/3.9.18.final__micromamba__383ab1__tldextract-5.3.0/publicsuffix.org-tlds/de84b5ca2167d4c83e38fb162f2e8738.tldextract.json.lock
+2025-07-31 15:20:53,642 [DEBUG] Attempting to release lock 6334295344 on /Users/brendanlambrecht/.cache/python-tldextract/3.9.18.final__micromamba__383ab1__tldextract-5.3.0/publicsuffix.org-tlds/de84b5ca2167d4c83e38fb162f2e8738.tldextract.json.lock
+2025-07-31 15:20:53,642 [DEBUG] Lock 6334295344 released on /Users/brendanlambrecht/.cache/python-tldextract/3.9.18.final__micromamba__383ab1__tldextract-5.3.0/publicsuffix.org-tlds/de84b5ca2167d4c83e38fb162f2e8738.tldextract.json.lock
+2025-07-31 15:20:53,718 [DEBUG] Starting new HTTPS connection (1): google.com:443
+2025-07-31 15:20:53,832 [DEBUG] https://google.com:443 "GET / HTTP/1.1" 301 220
+2025-07-31 15:20:53,837 [DEBUG] Starting new HTTPS connection (1): www.google.com:443
+2025-07-31 15:20:54,011 [DEBUG] https://www.google.com:443 "GET / HTTP/1.1" 200 None
+2025-07-31 15:20:54,070 [DEBUG] HTML fetched and parsed in 0.40 seconds
+2025-07-31 15:20:54,080 [DEBUG] Starting new HTTPS connection (1): google.com:443
+2025-07-31 15:20:54,244 [DEBUG] https://google.com:443 "GET /robots.txt HTTP/1.1" 301 230
+2025-07-31 15:20:54,250 [DEBUG] Starting new HTTPS connection (1): www.google.com:443
+2025-07-31 15:20:54,363 [DEBUG] https://www.google.com:443 "GET /robots.txt HTTP/1.1" 200 1631
+2025-07-31 15:20:54,367 [INFO] HTML analysis completed successfully
+2025-07-31 15:20:54,368 [INFO] Feature extraction completed in 0.728s
+2025-07-31 15:20:54,453 [INFO] Prediction completed in 0.814s
+2025-07-31 15:20:54,453 [INFO] 127.0.0.1 - - [31/Jul/2025 15:20:54] "POST /api/predict HTTP/1.1" 200 -
+2025-07-31 15:21:00,347 [INFO] 127.0.0.1 - - [31/Jul/2025 15:21:00] "OPTIONS /api/predict HTTP/1.1" 200 -
+2025-07-31 15:21:00,352 [INFO] ===== New Prediction Request =====
+2025-07-31 15:21:00,352 [INFO] Analyzing URL: https://google.com
+2025-07-31 15:21:00,353 [DEBUG] Normalized URL: https://google.com
+2025-07-31 15:21:00,359 [DEBUG] Starting new HTTPS connection (1): google.com:443
+2025-07-31 15:21:00,530 [DEBUG] https://google.com:443 "GET / HTTP/1.1" 301 220
+2025-07-31 15:21:00,537 [DEBUG] Starting new HTTPS connection (1): www.google.com:443
+2025-07-31 15:21:00,703 [DEBUG] https://www.google.com:443 "GET / HTTP/1.1" 200 None
+2025-07-31 15:21:00,763 [DEBUG] HTML fetched and parsed in 0.41 seconds
+2025-07-31 15:21:00,772 [DEBUG] Starting new HTTPS connection (1): google.com:443
+2025-07-31 15:21:00,867 [DEBUG] https://google.com:443 "GET /robots.txt HTTP/1.1" 301 230
+2025-07-31 15:21:00,873 [DEBUG] Starting new HTTPS connection (1): www.google.com:443
+2025-07-31 15:21:01,056 [DEBUG] https://www.google.com:443 "GET /robots.txt HTTP/1.1" 200 1631
+2025-07-31 15:21:01,059 [INFO] HTML analysis completed successfully
+2025-07-31 15:21:01,060 [INFO] Feature extraction completed in 0.707s
+2025-07-31 15:21:01,118 [INFO] Prediction completed in 0.767s
+2025-07-31 15:21:01,119 [INFO] 127.0.0.1 - - [31/Jul/2025 15:21:01] "POST /api/predict HTTP/1.1" 200 -
+2025-07-31 15:21:03,322 [INFO] ===== New Prediction Request =====
+2025-07-31 15:21:03,323 [INFO] Analyzing URL: http://google.com
+2025-07-31 15:21:03,323 [DEBUG] Normalized URL: http://google.com
+2025-07-31 15:21:03,328 [DEBUG] Starting new HTTP connection (1): google.com:80
+2025-07-31 15:21:03,390 [DEBUG] http://google.com:80 "GET / HTTP/1.1" 301 219
+2025-07-31 15:21:03,397 [DEBUG] Starting new HTTP connection (1): www.google.com:80
+2025-07-31 15:21:03,463 [DEBUG] http://www.google.com:80 "GET / HTTP/1.1" 302 231
+2025-07-31 15:21:03,472 [DEBUG] Starting new HTTPS connection (1): www.google.com:443
+2025-07-31 15:21:03,696 [DEBUG] https://www.google.com:443 "GET /?gws_rd=ssl HTTP/1.1" 200 None
+2025-07-31 15:21:03,755 [DEBUG] HTML fetched and parsed in 0.43 seconds
+2025-07-31 15:21:03,764 [DEBUG] Starting new HTTP connection (1): google.com:80
+2025-07-31 15:21:03,817 [DEBUG] http://google.com:80 "GET /robots.txt HTTP/1.1" 301 230
+2025-07-31 15:21:03,822 [DEBUG] Starting new HTTPS connection (1): www.google.com:443
+2025-07-31 15:21:03,942 [DEBUG] https://www.google.com:443 "GET /robots.txt HTTP/1.1" 200 1631
+2025-07-31 15:21:03,946 [INFO] HTML analysis completed successfully
+2025-07-31 15:21:03,947 [INFO] Feature extraction completed in 0.624s
+2025-07-31 15:21:04,002 [INFO] Prediction completed in 0.681s
+2025-07-31 15:21:04,003 [INFO] 127.0.0.1 - - [31/Jul/2025 15:21:04] "POST /api/predict HTTP/1.1" 200 -
+2025-07-31 15:21:31,557 [INFO] 127.0.0.1 - - [31/Jul/2025 15:21:31] "OPTIONS /api/predict HTTP/1.1" 200 -
+2025-07-31 15:21:31,563 [INFO] ===== New Prediction Request =====
+2025-07-31 15:21:31,563 [INFO] Analyzing URL: https://www.google.com/?client=safari
+2025-07-31 15:21:31,563 [DEBUG] Normalized URL: https://www.google.com/?client=safari
+2025-07-31 15:21:31,568 [DEBUG] Starting new HTTPS connection (1): www.google.com:443
+2025-07-31 15:21:31,728 [DEBUG] https://www.google.com:443 "GET /?client=safari HTTP/1.1" 200 None
+2025-07-31 15:21:31,782 [DEBUG] HTML fetched and parsed in 0.22 seconds
+2025-07-31 15:21:31,793 [DEBUG] Starting new HTTPS connection (1): www.google.com:443
+2025-07-31 15:21:31,952 [DEBUG] https://www.google.com:443 "GET /robots.txt HTTP/1.1" 200 1631
+2025-07-31 15:21:31,955 [INFO] HTML analysis completed successfully
+2025-07-31 15:21:31,955 [INFO] Feature extraction completed in 0.391s
+2025-07-31 15:21:32,017 [INFO] Prediction completed in 0.455s
+2025-07-31 15:21:32,018 [INFO] 127.0.0.1 - - [31/Jul/2025 15:21:32] "POST /api/predict HTTP/1.1" 200 -
+2025-07-31 15:24:08,713 [INFO] 127.0.0.1 - - [31/Jul/2025 15:24:08] "OPTIONS /api/predict HTTP/1.1" 200 -
+2025-07-31 15:24:08,718 [INFO] ===== New Prediction Request =====
+2025-07-31 15:24:08,718 [DEBUG] URL missing scheme, prepending https:// to bing.com
+2025-07-31 15:24:08,718 [INFO] Analyzing URL: https://bing.com
+2025-07-31 15:24:08,719 [DEBUG] Normalized URL: https://bing.com
+2025-07-31 15:24:08,756 [DEBUG] Starting new HTTPS connection (1): bing.com:443
+2025-07-31 15:24:08,892 [DEBUG] https://bing.com:443 "GET / HTTP/1.1" 301 144
+2025-07-31 15:24:08,960 [DEBUG] Starting new HTTPS connection (1): www.bing.com:443
+2025-07-31 15:24:09,196 [DEBUG] https://www.bing.com:443 "GET /?toWww=1&redig=8359BB0692DD455E802A9C0D38592672 HTTP/1.1" 200 None
+2025-07-31 15:24:09,250 [DEBUG] HTML fetched and parsed in 0.53 seconds
+2025-07-31 15:24:09,257 [DEBUG] Starting new HTTPS connection (1): bing.com:443
+2025-07-31 15:24:09,387 [DEBUG] https://bing.com:443 "GET /robots.txt HTTP/1.1" 301 151
+2025-07-31 15:24:09,397 [DEBUG] Starting new HTTPS connection (1): www.bing.com:443
+2025-07-31 15:24:09,567 [DEBUG] https://www.bing.com:443 "GET /robots.txt?toWww=1&redig=CEDAE77A6CAE4D18B977C1F6D13BB7DC HTTP/1.1" 200 782
+2025-07-31 15:24:09,572 [INFO] HTML analysis completed successfully
+2025-07-31 15:24:09,572 [INFO] Feature extraction completed in 0.853s
+2025-07-31 15:24:09,628 [INFO] Prediction completed in 0.911s
+2025-07-31 15:24:09,629 [INFO] 127.0.0.1 - - [31/Jul/2025 15:24:09] "POST /api/predict HTTP/1.1" 200 -
+2025-07-31 15:24:24,434 [INFO] 127.0.0.1 - - [31/Jul/2025 15:24:24] "OPTIONS /api/predict HTTP/1.1" 200 -
+2025-07-31 15:24:24,437 [INFO] ===== New Prediction Request =====
+2025-07-31 15:24:24,437 [DEBUG] URL missing scheme, prepending https:// to microsoft.com
+2025-07-31 15:24:24,437 [INFO] Analyzing URL: https://microsoft.com
+2025-07-31 15:24:24,437 [DEBUG] Normalized URL: https://microsoft.com
+2025-07-31 15:24:24,473 [DEBUG] Starting new HTTPS connection (1): microsoft.com:443
+2025-07-31 15:24:24,585 [DEBUG] https://microsoft.com:443 "GET / HTTP/1.1" 301 0
+2025-07-31 15:24:24,643 [DEBUG] Starting new HTTPS connection (1): www.microsoft.com:443
+2025-07-31 15:24:24,807 [DEBUG] https://www.microsoft.com:443 "GET / HTTP/1.1" 200 12623
+2025-07-31 15:24:24,838 [DEBUG] HTML fetched and parsed in 0.40 seconds
+2025-07-31 15:24:24,848 [DEBUG] Starting new HTTPS connection (1): microsoft.com:443
+2025-07-31 15:24:25,047 [DEBUG] https://microsoft.com:443 "GET /robots.txt HTTP/1.1" 301 0
+2025-07-31 15:24:25,054 [DEBUG] Starting new HTTPS connection (1): www.microsoft.com:443
+2025-07-31 15:24:25,227 [DEBUG] https://www.microsoft.com:443 "GET /robots.txt HTTP/1.1" 200 12623
+2025-07-31 15:24:25,231 [INFO] HTML analysis completed successfully
+2025-07-31 15:24:25,232 [INFO] Feature extraction completed in 0.794s
+2025-07-31 15:24:25,289 [INFO] Prediction completed in 0.852s
+2025-07-31 15:24:25,290 [INFO] 127.0.0.1 - - [31/Jul/2025 15:24:25] "POST /api/predict HTTP/1.1" 200 -
+2025-07-31 15:24:34,229 [INFO] 127.0.0.1 - - [31/Jul/2025 15:24:34] "OPTIONS /api/predict HTTP/1.1" 200 -
+2025-07-31 15:24:34,234 [INFO] ===== New Prediction Request =====
+2025-07-31 15:24:34,234 [INFO] Analyzing URL: https://microsoft.com
+2025-07-31 15:24:34,234 [DEBUG] Normalized URL: https://microsoft.com
+2025-07-31 15:24:34,240 [DEBUG] Starting new HTTPS connection (1): microsoft.com:443
+2025-07-31 15:24:34,421 [DEBUG] https://microsoft.com:443 "GET / HTTP/1.1" 301 0
+2025-07-31 15:24:34,429 [DEBUG] Starting new HTTPS connection (1): www.microsoft.com:443
+2025-07-31 15:24:34,638 [DEBUG] https://www.microsoft.com:443 "GET / HTTP/1.1" 200 12623
+2025-07-31 15:24:34,669 [DEBUG] HTML fetched and parsed in 0.43 seconds
+2025-07-31 15:24:34,679 [DEBUG] Starting new HTTPS connection (1): microsoft.com:443
+2025-07-31 15:24:34,802 [DEBUG] https://microsoft.com:443 "GET /robots.txt HTTP/1.1" 301 0
+2025-07-31 15:24:34,808 [DEBUG] Starting new HTTPS connection (1): www.microsoft.com:443
+2025-07-31 15:24:35,033 [DEBUG] https://www.microsoft.com:443 "GET /robots.txt HTTP/1.1" 200 12623
+2025-07-31 15:24:35,037 [INFO] HTML analysis completed successfully
+2025-07-31 15:24:35,038 [INFO] Feature extraction completed in 0.803s
+2025-07-31 15:24:35,096 [INFO] Prediction completed in 0.862s
+2025-07-31 15:24:35,096 [INFO] 127.0.0.1 - - [31/Jul/2025 15:24:35] "POST /api/predict HTTP/1.1" 200 -
+2025-07-31 15:24:40,294 [INFO] 127.0.0.1 - - [31/Jul/2025 15:24:40] "OPTIONS /api/predict HTTP/1.1" 200 -
+2025-07-31 15:24:40,298 [INFO] ===== New Prediction Request =====
+2025-07-31 15:24:40,298 [INFO] Analyzing URL: https://www.Microsoft.com
+2025-07-31 15:24:40,298 [DEBUG] Normalized URL: https://www.Microsoft.com
+2025-07-31 15:24:40,307 [DEBUG] Starting new HTTPS connection (1): www.microsoft.com:443
+2025-07-31 15:24:40,653 [DEBUG] https://www.microsoft.com:443 "GET / HTTP/1.1" 200 12623
+2025-07-31 15:24:40,677 [DEBUG] HTML fetched and parsed in 0.38 seconds
+2025-07-31 15:24:40,687 [DEBUG] Starting new HTTPS connection (1): www.microsoft.com:443
+2025-07-31 15:24:40,845 [DEBUG] https://www.microsoft.com:443 "GET /robots.txt HTTP/1.1" 200 12623
+2025-07-31 15:24:40,849 [INFO] HTML analysis completed successfully
+2025-07-31 15:24:40,849 [INFO] Feature extraction completed in 0.551s
+2025-07-31 15:24:40,905 [INFO] Prediction completed in 0.607s
+2025-07-31 15:24:40,906 [INFO] 127.0.0.1 - - [31/Jul/2025 15:24:40] "POST /api/predict HTTP/1.1" 200 -

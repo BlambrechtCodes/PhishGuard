@@ -14,13 +14,16 @@ import logging
 import traceback
 import sys
 import tldextract
-import time
+import threading
+
 
 # Suppress warnings
 simplefilter("ignore", category=UserWarning)
 
+
 app = Flask(__name__)
 CORS(app)
+
 
 # Configure logging
 logging.basicConfig(
@@ -33,7 +36,13 @@ logging.basicConfig(
 )
 logger = logging.getLogger('PhishDetector')
 
+
 logger.info("===== Starting PhishDetector Application =====")
+
+
+# Thread lock for TensorFlow prediction
+tf_lock = threading.Lock()
+
 
 # Load models, scaler, and feature list
 try:
@@ -55,6 +64,7 @@ except Exception as e:
     scaler = None
     feature_columns = []
 
+
 def normalize_url(url: str) -> str:
     """Ensure URL has a scheme; default to https."""
     parsed = urlparse(url)
@@ -62,6 +72,44 @@ def normalize_url(url: str) -> str:
         logger.debug(f"URL missing scheme, prepending https:// to {url}")
         return 'https://' + url
     return url
+
+
+def is_ip_address(domain):
+    ipv4_pattern = r'^(\d{1,3}\.){3}\d{1,3}$'
+    ipv6_pattern = r'^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$'
+    return bool(re.match(ipv4_pattern, domain) or re.match(ipv6_pattern, domain))
+
+
+def contains_keywords(url, keywords):
+    return any(keyword in url.lower() for keyword in keywords)
+
+
+def continuation_rate(url):
+    if len(url) < 2:
+        return 0.0
+    repeats = sum(1 for i in range(1, len(url)) if url[i] == url[i-1])
+    return repeats / (len(url) - 1)
+
+
+def tld_legitimacy(root_domain):
+    legit_tlds = ['.com', '.org', '.net', '.edu', '.gov']
+    suspicious_tlds = ['.tk', '.ml', '.ga', '.cf', '.pw']
+    tld = '.' + root_domain.split('.')[-1] if '.' in root_domain else ''
+    if tld in legit_tlds:
+        return 0.9
+    elif tld in suspicious_tlds:
+        return 0.1
+    else:
+        return 0.5
+
+
+def url_character_prob(url):
+    unusual_chars = ['@', '~', '%', '!', '*']
+    if not url:
+        return 0.5
+    count = sum(url.count(c) for c in unusual_chars)
+    return 1 - (count / len(url))
+
 
 def extract_url_features(url):
     """Extract all features exactly as done during training."""
@@ -263,38 +311,6 @@ def extract_url_features(url):
     logger.info(f"Feature extraction completed in {(datetime.now() - start_time).total_seconds():.3f}s")
     return features
 
-# Helper functions (same as before)
-def is_ip_address(domain):
-    ipv4_pattern = r'^(\d{1,3}\.){3}\d{1,3}$'
-    ipv6_pattern = r'^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$'
-    return bool(re.match(ipv4_pattern, domain) or re.match(ipv6_pattern, domain))
-
-def contains_keywords(url, keywords):
-    return any(keyword in url.lower() for keyword in keywords)
-
-def continuation_rate(url):
-    if len(url) < 2:
-        return 0.0
-    repeats = sum(1 for i in range(1, len(url)) if url[i] == url[i-1])
-    return repeats / (len(url) - 1)
-
-def tld_legitimacy(root_domain):
-    legit_tlds = ['.com', '.org', '.net', '.edu', '.gov']
-    suspicious_tlds = ['.tk', '.ml', '.ga', '.cf', '.pw']
-    tld = '.' + root_domain.split('.')[-1] if '.' in root_domain else ''
-    if tld in legit_tlds:
-        return 0.9
-    elif tld in suspicious_tlds:
-        return 0.1
-    else:
-        return 0.5
-
-def url_character_prob(url):
-    unusual_chars = ['@', '~', '%', '!', '*']
-    if not url:
-        return 0.5
-    count = sum(url.count(c) for c in unusual_chars)
-    return 1 - (count / len(url))
 
 @app.route('/api/predict', methods=['POST'])
 def predict():
@@ -306,7 +322,7 @@ def predict():
         if not raw_url or not isinstance(raw_url, str) or not raw_url.strip():
             logger.warning("Empty or invalid URL received.")
             return jsonify({'error': 'URL is required and must be a non-empty string'}), 400
-        
+
         url = normalize_url(raw_url.strip())
         logger.info(f"Analyzing URL: {url}")
 
@@ -314,37 +330,36 @@ def predict():
             logger.error("Models not loaded.")
             return jsonify({'error': 'Models not loaded'}), 500
 
-        # Extract features
         features = extract_url_features(url)
         feature_df = pd.DataFrame([features], columns=feature_columns)
-        
+
         # Scale features for TensorFlow model
         scaled_features = scaler.transform(feature_df)
-        
-        # Get predictions from both models
-        tf_proba = tf_model.predict(scaled_features, verbose=0)[0][0]
+
+        # Validate input shape matches model expected shape
+        if scaled_features.shape[1] != tf_model.input_shape[1]:
+            error_msg = f"Input features length ({scaled_features.shape[1]}) does not match model expected ({tf_model.input_shape[1]})"
+            logger.error(error_msg)
+            return jsonify({'error': error_msg}), 400
+
+        with tf_lock:
+            tf_proba = tf_model.predict(scaled_features, verbose=0)[0][0]
+
         dt_proba = dt_model.predict_proba(feature_df)[0][1]
-        
-        # Use ensemble prediction (weighted toward TensorFlow)
+
         ensemble_proba = 0.7 * tf_proba + 0.3 * dt_proba
         prediction = int(ensemble_proba > 0.5)
-        
-        logger.info(f"TF Probability: {tf_proba:.4f}, DT Probability: {dt_proba:.4f}")
-        logger.info(f"Ensemble Probability: {ensemble_proba:.4f}, Prediction: {bool(prediction)}")
 
-        # Calculate confidence correctly
         confidence_score = max(ensemble_proba, 1 - ensemble_proba) * 100
-        
-        # Risk assessment
+
         risk_score = int(ensemble_proba * 100)
         if risk_score < 20:
             risk_level = "LOW"
         elif risk_score < 60:
-            risk_level = "MEDIUM" 
+            risk_level = "MEDIUM"
         else:
             risk_level = "HIGH"
 
-        # Generate warnings
         warnings = []
         if features.get('IsDomainIP', 0):
             warnings.append("URL uses an IP address instead of a domain name.")
@@ -362,8 +377,8 @@ def predict():
             'is_phishing': bool(prediction),
             'risk_score': risk_score,
             'risk_level': risk_level,
-            'probability': float(ensemble_proba),  # Phishing probability
-            'confidence': float(confidence_score),  # Confidence percentage
+            'probability': float(ensemble_proba),
+            'confidence': float(confidence_score),
             'tensorflow_prob': float(tf_proba),
             'decision_tree_prob': float(dt_proba),
             'ensemble_prob': float(ensemble_proba),
@@ -380,6 +395,7 @@ def predict():
         logger.error(traceback.format_exc())
         return jsonify({'error': f'Analysis failed: {e}'}), 500
 
+
 @app.route('/api/health', methods=['GET'])
 def health():
     status = {
@@ -392,14 +408,16 @@ def health():
     }
     return jsonify(status)
 
+
 @app.route('/')
 def index():
     return send_from_directory('.', 'index.html')
+
 
 if __name__ == '__main__':
     if not model_loaded:
         logger.critical("Models not loaded, cannot start server.")
         sys.exit(1)
-    
+
     logger.info("Starting Flask application on http://127.0.0.1:5000")
     app.run(host='0.0.0.0', port=5000, debug=True, threaded=True)
