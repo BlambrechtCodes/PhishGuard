@@ -379,7 +379,7 @@
       line-height: 1.4;
     }
 
-    /* NEW: Enhanced Threat Analysis Report */
+    /* Enhanced Threat Analysis Report */
     .analysis-output {
       background: var(--bg-secondary);
       border: 1px solid var(--border-primary);
@@ -502,23 +502,6 @@
       flex-shrink: 0;
     }
 
-    /* Syntax highlighting for JSON */
-    .token.key {
-      color: var(--cyber-blue);
-    }
-    .token.string {
-      color: var(--matrix-green);
-    }
-    .token.number {
-      color: var(--electric-blue);
-    }
-    .token.boolean {
-      color: var(--warning-orange);
-    }
-    .token.null {
-      color: var(--danger-red);
-    }
-
     /* Prediction Details Section */
     .prediction-details {
       margin-top: 1.5rem;
@@ -546,18 +529,21 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
+      min-width: 200px;
     }
 
     .confidence-value {
       font-weight: 700;
       font-family: 'JetBrains Mono', monospace;
+      min-width: 60px;
+      text-align: right;
     }
 
     .confidence-bar {
       height: 6px;
+      width: 100px;
       border-radius: 3px;
       background: var(--bg-tertiary);
-      flex-grow: 1;
       overflow: hidden;
     }
 
@@ -579,6 +565,38 @@
       background: var(--warning-orange);
     }
 
+    .model-comparison {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 0.75rem;
+      margin: 1rem 0;
+      padding: 1rem;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 6px;
+    }
+
+    .model-result {
+      text-align: center;
+      padding: 0.5rem;
+      background: var(--bg-tertiary);
+      border-radius: 4px;
+    }
+
+    .model-name {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.25rem;
+    }
+
+    .model-score {
+      font-size: 0.9rem;
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-accent);
+    }
+
     .feature-indicators {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -593,10 +611,11 @@
       font-size: 0.75rem;
     }
 
-    .feature-name {
+    .feature-indicator .feature-name {
       color: var(--text-secondary);
       margin-bottom: 0.25rem;
       font-weight: 500;
+      font-size: 0.7rem;
     }
 
     .feature-value {
@@ -651,6 +670,17 @@
 
       .report-metadata {
         grid-template-columns: 1fr;
+      }
+
+      .confidence-meter {
+        min-width: auto;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+      }
+
+      .model-comparison {
+        grid-template-columns: 1fr 1fr;
       }
     }
   </style>
@@ -757,8 +787,15 @@
           <li class="feature-item">
             <span class="feature-icon">✓</span>
             <div class="feature-content">
+              <div class="feature-name">TensorFlow Neural Network</div>
+              <div class="feature-desc">Advanced deep learning model with ensemble predictions</div>
+            </div>
+          </li>
+          <li class="feature-item">
+            <span class="feature-icon">✓</span>
+            <div class="feature-content">
               <div class="feature-name">Real-time URL Analysis</div>
-              <div class="feature-desc">Instant threat assessment using advanced ML algorithms</div>
+              <div class="feature-desc">Instant threat assessment using multiple ML algorithms</div>
             </div>
           </li>
           <li class="feature-item">
@@ -766,13 +803,6 @@
             <div class="feature-content">
               <div class="feature-name">Domain Reputation Scoring</div>
               <div class="feature-desc">Comprehensive domain trust evaluation and history analysis</div>
-            </div>
-          </li>
-          <li class="feature-item">
-            <span class="feature-icon">✓</span>
-            <div class="feature-content">
-              <div class="feature-name">SSL Certificate Validation</div>
-              <div class="feature-desc">Automated certificate chain verification and security assessment</div>
             </div>
           </li>
           <li class="feature-item">
@@ -794,6 +824,13 @@
           <li class="feature-item">
             <span class="feature-icon">✓</span>
             <div class="feature-content">
+              <div class="feature-name">Ensemble Predictions</div>
+              <div class="feature-desc">Combines TensorFlow and Decision Tree models for higher accuracy</div>
+            </div>
+          </li>
+          <li class="feature-item">
+            <span class="feature-icon">✓</span>
+            <div class="feature-content">
               <div class="feature-name">Behavioral Analysis</div>
               <div class="feature-desc">Suspicious redirect patterns and JavaScript behavior detection</div>
             </div>
@@ -801,15 +838,8 @@
           <li class="feature-item">
             <span class="feature-icon">✓</span>
             <div class="feature-content">
-              <div class="feature-name">Blacklist Cross-Reference</div>
-              <div class="feature-desc">Multi-source threat intelligence database integration</div>
-            </div>
-          </li>
-          <li class="feature-item">
-            <span class="feature-icon">✓</span>
-            <div class="feature-content">
-              <div class="feature-name">Lexical Analysis</div>
-              <div class="feature-desc">URL structure and character pattern anomaly detection</div>
+              <div class="feature-name">Feature Engineering</div>
+              <div class="feature-desc">Advanced URL, domain, and content feature extraction</div>
             </div>
           </li>
           <li class="feature-item">
@@ -846,14 +876,14 @@
             <span class="feature-icon">✓</span>
             <div class="feature-content">
               <div class="feature-name">Scalable Architecture</div>
-              <div class="feature-desc">Cloud-native infrastructure supporting high-volume analysis</div>
+              <div class="feature-desc">Flask-based API supporting concurrent analysis requests</div>
             </div>
           </li>
           <li class="feature-item">
             <span class="feature-icon">✓</span>
             <div class="feature-content">
-              <div class="feature-name">Real-time Updates</div>
-              <div class="feature-desc">Continuous model updates with latest threat intelligence</div>
+              <div class="feature-name">Model Transparency</div>
+              <div class="feature-desc">Detailed reporting of model predictions and confidence scores</div>
             </div>
           </li>
         </ul>
@@ -878,26 +908,16 @@
 
     const scanMessages = [
       'Initializing threat detection...',
+      'Loading TensorFlow model...',
       'Analyzing URL structure...',
-      'Checking domain reputation...',
-      'Validating SSL certificates...',
-      'Scanning for malicious patterns...',
-      'Cross-referencing threat databases...',
+      'Extracting domain features...',
+      'Checking HTML content...',
+      'Running ensemble prediction...',
       'Finalizing security assessment...'
     ];
 
     let scanMessageIndex = 0;
     let scanInterval;
-
-    // Sample feature data for demonstration
-    const sampleFeatures = {
-      "domain_age": {"value": "2 years", "risk": "low"},
-      "ssl_grade": {"value": "A+", "risk": "low"},
-      "redirect_count": {"value": "3", "risk": "high"},
-      "ip_reputation": {"value": "Suspicious", "risk": "medium"},
-      "similar_domains": {"value": "5 detected", "risk": "high"},
-      "content_similarity": {"value": "92% match", "risk": "high"}
-    };
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -916,7 +936,7 @@
       scanInterval = setInterval(() => {
         scanMessageIndex = (scanMessageIndex + 1) % scanMessages.length;
         scanStatus.textContent = scanMessages[scanMessageIndex];
-      }, 800);
+      }, 1000);
 
       try {
         const response = await fetch('http://localhost:5000/api/predict', {
@@ -926,27 +946,39 @@
         });
         const result = await response.json();
 
+        if (result.error) {
+          throw new Error(result.error);
+        }
+
         // Stop scanning
         clearInterval(scanInterval);
         scanner.classList.remove('active');
         analyzeBtn.disabled = false;
         analyzeBtn.textContent = 'Initialize Scan';
 
-        // Use the actual API response instead of sample data
-        let predictionClass = result.is_phishing ? 'threat' : 'safe';
-        
-        // Calculate confidence as legitimacy percentage (100% - phishing probability)
-        const legitimacyConfidence = (1 - result.probability) * 100;
-        
-        // Format the confidence display
-        let confidence;
-        if (legitimacyConfidence >= 99.999) {
-            confidence = legitimacyConfidence.toFixed(5); // Shows 99.99977
-        } else if (legitimacyConfidence >= 99.9) {
-            confidence = legitimacyConfidence.toFixed(3); // Shows 99.997
-        } else {
-            confidence = legitimacyConfidence.toFixed(1); // Shows 99.9
-        }
+        // Determine prediction class and confidence display
+        const predictionClass = result.is_phishing ? 'threat' : 'safe';
+        const confidence = result.confidence || 95;
+        const phishingProb = (result.probability * 100);
+        const legitimacyProb = 100 - phishingProb;
+
+        // Build model comparison section
+        const modelComparisonHtml = `
+          <div class="model-comparison">
+            <div class="model-result">
+              <div class="model-name">TensorFlow NN</div>
+              <div class="model-score">${(result.tensorflow_prob * 100).toFixed(1)}%</div>
+            </div>
+            <div class="model-result">
+              <div class="model-name">Decision Tree</div>
+              <div class="model-score">${(result.decision_tree_prob * 100).toFixed(1)}%</div>
+            </div>
+            <div class="model-result">
+              <div class="model-name">Ensemble</div>
+              <div class="model-score">${(result.ensemble_prob * 100).toFixed(1)}%</div>
+            </div>
+          </div>
+        `;
 
         let detailsHtml = `
           <div class="result-header">
@@ -955,21 +987,22 @@
           </div>
           <div class="result-details">
             ${result.is_phishing ? 
-              `High-risk phishing attempt identified (confidence: ${confidence}${result.probability < 0.01 ? '' : '%'})` :
-              `URL analysis complete (confidence: ${confidence}${result.probability < 0.01 ? '' : '%'}). No threats detected.`}
-            ${result.warnings.length ? `<br><br><strong>Warnings:</strong> ${result.warnings.join(', ')}` : ''}
+              `High-risk phishing attempt identified with ${confidence.toFixed(1)}% confidence` :
+              `URL analysis complete. No threats detected with ${confidence.toFixed(1)}% confidence`}
+            ${result.warnings && result.warnings.length ? `<br><br><strong>Warnings:</strong> ${result.warnings.join(', ')}` : ''}
           </div>
           <div class="prediction-details">
             <div class="details-header">
-              <div class="details-title">Prediction Details</div>
+              <div class="details-title">Model Predictions</div>
               <div class="confidence-meter">
-                <span class="confidence-value">${confidence}%</span>
+                <span class="confidence-value">${confidence.toFixed(1)}%</span>
                 <div class="confidence-bar">
                   <div class="confidence-fill ${predictionClass}"
                       style="width: ${confidence}%"></div>
                 </div>
               </div>
             </div>
+            ${modelComparisonHtml}
             <div class="feature-indicators" id="feature-indicators"></div>
           </div>
         `;
@@ -985,30 +1018,41 @@
         // Select the most important features to display
         const importantFeatures = {
           'HasHTTPS': 'HTTPS',
-          'IsDomainIP': 'Uses IP Address',
-          'TLDLegitimateProb': 'TLD Legitimacy',
+          'IsDomainIP': 'Uses IP',
+          'TLDLegitimateProb': 'TLD Trust',
           'NoOfSubDomain': 'Subdomains',
           'URLLength': 'URL Length',
-          'HasHTMLTag': 'Has HTML'
+          'HasTitle': 'Has Title',
+          'NoOfRedirect': 'Redirects',
+          'HasPasswordField': 'Password Field'
         };
         
         for (const [feature, displayName] of Object.entries(importantFeatures)) {
-          const value = result.features[feature];
-          let riskClass = 'neutral';
-          
-          // Custom logic to determine risk class for each feature
-          if (feature === 'HasHTTPS' && value === 0) riskClass = 'threat';
-          if (feature === 'IsDomainIP' && value === 1) riskClass = 'threat';
-          if (feature === 'TLDLegitimateProb' && value < 0.5) riskClass = 'threat';
-          if (feature === 'NoOfSubDomain' && value > 2) riskClass = 'warning';
-          if (feature === 'URLLength' && value > 75) riskClass = 'warning';
-          
-          featuresHtml += `
-            <div class="feature-indicator">
-              <div class="feature-name">${displayName}</div>
-              <div class="feature-value ${riskClass}">${value}</div>
-            </div>
-          `;
+          if (result.features && result.features.hasOwnProperty(feature)) {
+            const value = result.features[feature];
+            let riskClass = 'neutral';
+            let displayValue = value;
+            
+            // Custom logic to determine risk class for each feature
+            if (feature === 'HasHTTPS' && value === 0) riskClass = 'threat';
+            if (feature === 'IsDomainIP' && value === 1) riskClass = 'threat';
+            if (feature === 'TLDLegitimateProb') {
+              riskClass = value < 0.5 ? 'threat' : (value > 0.8 ? 'safe' : 'neutral');
+              displayValue = (value * 100).toFixed(0) + '%';
+            }
+            if (feature === 'NoOfSubDomain' && value > 3) riskClass = 'threat';
+            if (feature === 'URLLength' && value > 100) riskClass = 'threat';
+            if (feature === 'HasTitle' && value === 0) riskClass = 'threat';
+            if (feature === 'NoOfRedirect' && value > 2) riskClass = 'threat';
+            if (feature === 'HasPasswordField' && value === 1) riskClass = 'threat';
+            
+            featuresHtml += `
+              <div class="feature-indicator">
+                <div class="feature-name">${displayName}</div>
+                <div class="feature-value ${riskClass}">${displayValue}</div>
+              </div>
+            `;
+          }
         }
         
         featureIndicators.innerHTML = featuresHtml;
@@ -1016,21 +1060,33 @@
         // Display technical analysis
         reportTime.textContent = result.timestamp;
         reportUrl.textContent = result.url;
-        reportFeatures.textContent = Object.keys(result.features).length;
+        reportFeatures.textContent = result.features ? Object.keys(result.features).length : 'N/A';
         
         // Format the JSON nicely for display
         analysisContent.textContent = JSON.stringify(result, null, 2);
         analysisOutput.classList.add('visible');
 
       } catch (error) {
-        // Show error message
-        resultPanel.innerHTML = `<div class="result-header"><span>❌</span><span>Error</span></div>
-          <div class="result-details">Could not analyze URL. Please try again.<br>${error.message}</div>`;
-        resultPanel.classList.add('visible', 'warning');
+        console.error('Analysis error:', error);
+        
+        // Stop scanning
         clearInterval(scanInterval);
         scanner.classList.remove('active');
         analyzeBtn.disabled = false;
         analyzeBtn.textContent = 'Initialize Scan';
+        
+        // Show error message
+        resultPanel.innerHTML = `
+          <div class="result-header">
+            <span>❌</span>
+            <span>Analysis Error</span>
+          </div>
+          <div class="result-details">
+            Could not analyze URL. Please check your connection and try again.<br>
+            <strong>Error:</strong> ${error.message}
+          </div>
+        `;
+        resultPanel.classList.add('visible', 'warning');
       }
     });
 
@@ -1049,18 +1105,23 @@
     // Expand/collapse report functionality
     expandBtn.addEventListener('click', () => {
       analysisOutput.classList.toggle('expanded');
-      expandBtn.querySelector('svg').style.transform = analysisOutput.classList.contains('expanded') 
+      const icon = expandBtn.querySelector('svg');
+      icon.style.transform = analysisOutput.classList.contains('expanded') 
         ? 'rotate(180deg)' 
         : 'rotate(0deg)';
     });
 
     // Enhanced input formatting
-    input.addEventListener('input', (e) => {
-      const value = e.target.value.trim();
-      // Basic URL validation - customize as needed for your implementation
-      if (value && !value.startsWith('http://') && !value.startsWith('https://') && value.includes('.')) {
-        // Keep as-is, your backend can handle protocol addition
+    input.addEventListener('blur', (e) => {
+      let val = e.target.value.trim();
+      if (val && !val.startsWith('http://') && !val.startsWith('https://')) {
+        if (val.includes('.')) {
+          val = 'https://' + val;
+        } else {
+          val = 'http://' + val;
+        }
       }
+      e.target.value = val;
     });
   </script>
 </body>
