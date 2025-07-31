@@ -108,7 +108,7 @@ def analyze_url_features(input_url):
         risk_score = min(risk_score, 100)
         is_phishing = risk_score >= 50
 
-    risk_level = "LOW" if risk_score < 30 else "MEDIUM" if risk_score < 60 else "HIGH"
+    risk_level = "LOW" if risk_score <= 30 else "MEDIUM" if risk_score <= 60 else "HIGH"
 
     return {
         'url': input_url,
