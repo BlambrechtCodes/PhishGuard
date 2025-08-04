@@ -83,28 +83,21 @@ def analyze_url_features(input_url):
         except Exception as exc:
             print(f"Model prediction error: {exc}")
             # fallback rule-based scoring
-            risk_score = 0
-            if features['url_length'] > 100:
-                risk_score += 15
-            if features['has_ip_address']:
-                risk_score += 25
-            if features['subdomain_count'] > 3:
-                risk_score += 20
-            if not features['has_https']:
-                risk_score += 15
-            risk_score = min(risk_score, 100)
+            risk_score = (
+                0.3 * features['url_length'] / 100 +
+                0.4 * features['has_ip_address'] +
+                0.2 * features['subdomain_count'] / 5 +
+                0.1 * (1 - features['has_https'])
+            ) * 100
             is_phishing = risk_score >= 50
     else:
         # fallback rule-based scoring if model not loaded
-        risk_score = 0
-        if features['url_length'] > 100:
-            risk_score += 15
-        if features['has_ip_address']:
-            risk_score += 25
-        if features['subdomain_count'] > 3:
-            risk_score += 20
-        if not features['has_https']:
-            risk_score += 15
+        risk_score = (
+            0.3 * features['url_length'] / 100 +
+            0.4 * features['has_ip_address'] +
+            0.2 * features['subdomain_count'] / 5 +
+            0.1 * (1 - features['has_https'])
+        ) * 100
         risk_score = min(risk_score, 100)
         is_phishing = risk_score >= 50
 
