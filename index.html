@@ -5,7 +5,857 @@
   <title>PhishAlert - Advanced Threat Detection System</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/styles.css" />
+  <style>
+    /* Enhanced PhishAlert Styles with Image Analysis Support */
+
+    :root {
+      --primary-bg: #0a0a0a;
+      --secondary-bg: #1a1a1a;
+      --accent-bg: #2a2a2a;
+      --border-color: #333;
+      --text-primary: #ffffff;
+      --text-secondary: #cccccc;
+      --text-muted: #888888;
+      --accent-color: #00ff88;
+      --warning-color: #ffaa00;
+      --danger-color: #ff4444;
+      --safe-color: #00ff88;
+      --threat-color: #ff4444;
+      --neutral-color: #666666;
+      --gradient-primary: linear-gradient(135deg, #00ff88 0%, #00cc66 100%);
+      --gradient-warning: linear-gradient(135deg, #ffaa00 0%, #ff8800 100%);
+      --gradient-danger: linear-gradient(135deg, #ff4444 0%, #cc2222 100%);
+      --font-mono: 'JetBrains Mono', monospace;
+      --font-sans: 'Inter', sans-serif;
+      --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.5);
+      --border-radius: 8px;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--primary-bg);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    .main-container {
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      min-height: 100vh;
+      gap: 0;
+    }
+
+    /* Analyzer Panel */
+    .analyzer-panel {
+      background: var(--secondary-bg);
+      padding: 2rem;
+      border-right: 1px solid var(--border-color);
+      overflow-y: auto;
+      max-height: 100vh;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .system-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--accent-bg);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.875rem;
+      margin-bottom: 1rem;
+      border: 1px solid var(--border-color);
+    }
+
+    .status-indicator {
+      width: 8px;
+      height: 8px;
+      background: var(--accent-color);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      font-weight: 400;
+    }
+
+    /* Input Section */
+    .input-section {
+      margin-bottom: 2rem;
+    }
+
+    .input-label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--text-secondary);
+    }
+
+    .input-wrapper {
+      position: relative;
+      margin-bottom: 1rem;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.25rem;
+      z-index: 2;
+    }
+
+    #url-input {
+      width: 100%;
+      padding: 1rem 1rem 1rem 3rem;
+      background: var(--accent-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      transition: var(--transition);
+    }
+
+    #url-input:focus {
+      outline: none;
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 2px rgba(0, 255, 136, 0.2);
+    }
+
+    /* Analysis Options */
+    .analysis-options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      background: var(--accent-bg);
+      border-radius: var(--border-radius);
+      border: 1px solid var(--border-color);
+    }
+
+    .option-group {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .option-group input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent-color);
+    }
+
+    .option-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      transition: var(--transition);
+    }
+
+    .option-label:hover {
+      color: var(--text-primary);
+    }
+
+    .option-icon {
+      font-size: 1rem;
+    }
+
+    .option-text {
+      font-weight: 500;
+    }
+
+    /* Button Group */
+    .button-group {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .analyze-btn {
+      flex: 1;
+      padding: 1rem 1.5rem;
+      background: var(--gradient-primary);
+      color: var(--primary-bg);
+      border: none;
+      border-radius: var(--border-radius);
+      font-weight: 600;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: var(--transition);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .analyze-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .analyze-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .analyze-btn.secondary {
+      background: var(--accent-bg);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+
+    .analyze-btn.secondary:hover:not(:disabled) {
+      background: var(--border-color);
+    }
+
+    /* Scanner */
+    .scanner {
+      display: none;
+      text-align: center;
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .scanner.active {
+      display: block;
+    }
+
+    .scan-animation {
+      width: 60px;
+      height: 60px;
+      border: 3px solid var(--accent-bg);
+      border-top: 3px solid var(--accent-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .scan-status {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      font-family: var(--font-mono);
+    }
+
+    /* Result Panel */
+    .result-panel {
+      display: none;
+      background: var(--accent-bg);
+      border-radius: var(--border-radius);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      border: 1px solid var(--border-color);
+    }
+
+    .result-panel.visible {
+      display: block;
+    }
+
+    .result-panel.safe {
+      border-color: var(--safe-color);
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.1) 0%, var(--accent-bg) 100%);
+    }
+
+    .result-panel.warning {
+      border-color: var(--warning-color);
+      background: linear-gradient(135deg, rgba(255, 170, 0, 0.1) 0%, var(--accent-bg) 100%);
+    }
+
+    .result-panel.threat {
+      border-color: var(--threat-color);
+      background: linear-gradient(135deg, rgba(255, 68, 68, 0.1) 0%, var(--accent-bg) 100%);
+    }
+
+    .result-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .result-details {
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+
+    .prediction-details {
+      border-top: 1px solid var(--border-color);
+      padding-top: 1.5rem;
+    }
+
+    .details-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .details-title {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .confidence-meter {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .confidence-value {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      min-width: 3rem;
+    }
+
+    .confidence-bar {
+      width: 120px;
+      height: 8px;
+      background: var(--accent-bg);
+      border-radius: 4px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+
+    .confidence-fill {
+      height: 100%;
+      transition: width 0.5s ease;
+    }
+
+    .confidence-fill.safe {
+      background: var(--gradient-primary);
+    }
+
+    .confidence-fill.warning {
+      background: var(--gradient-warning);
+    }
+
+    .confidence-fill.threat {
+      background: var(--gradient-danger);
+    }
+
+    .feature-indicators {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .feature-indicator {
+      background: var(--primary-bg);
+      padding: 0.75rem;
+      border-radius: var(--border-radius);
+      border: 1px solid var(--border-color);
+    }
+
+    .feature-name {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+
+    .feature-value {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+
+    .feature-value.safe {
+      color: var(--safe-color);
+    }
+
+    .feature-value.warning {
+      color: var(--warning-color);
+    }
+
+    .feature-value.threat {
+      color: var(--threat-color);
+    }
+
+    .feature-value.neutral {
+      color: var(--text-secondary);
+    }
+
+    /* Image Analysis Panel */
+    .image-analysis-panel {
+      display: none;
+      background: var(--accent-bg);
+      border-radius: var(--border-radius);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      border: 1px solid var(--border-color);
+    }
+
+    .image-analysis-panel.visible {
+      display: block;
+    }
+
+    .image-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: var(--primary-bg);
+      padding: 1rem;
+      border-radius: var(--border-radius);
+      border: 1px solid var(--border-color);
+      text-align: center;
+      transition: var(--transition);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .stat-card.warning {
+      border-color: var(--warning-color);
+      background: linear-gradient(135deg, rgba(255, 170, 0, 0.1) 0%, var(--primary-bg) 100%);
+    }
+
+    .stat-card.threat {
+      border-color: var(--threat-color);
+      background: linear-gradient(135deg, rgba(255, 68, 68, 0.1) 0%, var(--primary-bg) 100%);
+    }
+
+    .stat-icon {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .image-details-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+    }
+
+    .image-detail-card {
+      background: var(--primary-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      padding: 1rem;
+      transition: var(--transition);
+    }
+
+    .image-detail-card:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .image-detail-card.external {
+      border-color: var(--warning-color);
+      background: linear-gradient(135deg, rgba(255, 170, 0, 0.05) 0%, var(--primary-bg) 100%);
+    }
+
+    .image-detail-card.suspicious {
+      border-color: var(--threat-color);
+      background: linear-gradient(135deg, rgba(255, 68, 68, 0.05) 0%, var(--primary-bg) 100%);
+    }
+
+    .image-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .image-index {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      background: var(--accent-bg);
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+    }
+
+    .image-status {
+      font-size: 1rem;
+    }
+
+    .image-src {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-primary);
+      word-break: break-all;
+      margin-bottom: 0.75rem;
+      padding: 0.5rem;
+      background: var(--accent-bg);
+      border-radius: 4px;
+    }
+
+    .image-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .meta-item {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    .meta-item strong {
+      color: var(--text-muted);
+    }
+
+    .no-images {
+      grid-column: 1 / -1;
+      text-align: center;
+      color: var(--text-muted);
+      font-style: italic;
+      padding: 2rem;
+    }
+
+    /* Analysis Output */
+    .analysis-output {
+      display: none;
+      background: var(--accent-bg);
+      border-radius: var(--border-radius);
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+    }
+
+    .analysis-output.visible {
+      display: block;
+    }
+
+    .analysis-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.5rem;
+      background: var(--primary-bg);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .header-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .header-icon {
+      color: var(--accent-color);
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .copy-btn, .expand-btn {
+      background: var(--accent-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 0.5rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .copy-btn:hover, .expand-btn:hover {
+      background: var(--border-color);
+      color: var(--text-primary);
+    }
+
+    .report-metadata {
+      padding: 1rem 1.5rem;
+      background: var(--primary-bg);
+      border-bottom: 1px solid var(--border-color);
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .metadata-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .metadata-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .metadata-value {
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      color: var(--text-primary);
+      word-break: break-all;
+    }
+
+    .report-content {
+      padding: 1.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      line-height: 1.6;
+      color: var(--text-secondary);
+      background: var(--primary-bg);
+      white-space: pre-wrap;
+      overflow-x: auto;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .analysis-output.expanded .report-content {
+      max-height: none;
+    }
+
+    .report-footer {
+      padding: 1rem 1.5rem;
+      background: var(--accent-bg);
+      border-top: 1px solid var(--border-color);
+    }
+
+    .footer-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* Features Panel */
+    .features-panel {
+      background: var(--primary-bg);
+      padding: 2rem;
+      overflow-y: auto;
+      max-height: 100vh;
+    }
+
+    .features-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .features-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .features-subtitle {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+
+    .feature-category {
+      margin-bottom: 2rem;
+    }
+
+    .category-title {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .category-title span:first-child {
+      font-size: 1.25rem;
+    }
+
+    .feature-list {
+      list-style: none;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 1rem;
+      background: var(--secondary-bg);
+      border-radius: var(--border-radius);
+      border: 1px solid var(--border-color);
+      margin-bottom: 0.75rem;
+      transition: var(--transition);
+    }
+
+    .feature-item:hover {
+      transform: translateX(4px);
+      border-color: var(--accent-color);
+    }
+
+    .feature-icon {
+      color: var(--accent-color);
+      font-weight: 600;
+      font-size: 0.875rem;
+      margin-top: 0.125rem;
+    }
+
+    .feature-content {
+      flex: 1;
+    }
+
+    .feature-name {
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+    }
+
+    .feature-desc {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+      .main-container {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto;
+      }
+      
+      .features-panel {
+        border-top: 1px solid var(--border-color);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .analyzer-panel, .features-panel {
+        padding: 1rem;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+      
+      .button-group {
+        flex-direction: column;
+      }
+      
+      .image-stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      }
+      
+      .image-details-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .report-metadata {
+        grid-template-columns: 1fr;
+      }
+      
+      .details-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+      
+      .confidence-meter {
+        width: 100%;
+        justify-content: space-between;
+      }
+      
+      .confidence-bar {
+        flex: 1;
+        max-width: 200px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .feature-indicators {
+        grid-template-columns: 1fr;
+      }
+      
+      .image-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    /* Accessibility */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* Focus styles for keyboard navigation */
+    button:focus-visible,
+    input:focus-visible,
+    .option-label:focus-visible {
+      outline: 2px solid var(--accent-color);
+      outline-offset: 2px;
+    }
+
+    /* High contrast mode support */
+    @media (prefers-contrast: high) {
+      :root {
+        --border-color: #666;
+        --text-muted: #aaa;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="main-container">
@@ -18,7 +868,7 @@
         <h1>PhishAlert</h1>
         <p class="subtitle">Advanced Machine Learning Threat Detection System</p>
       </div>
-
+      
       <div class="input-section">
         <form id="threat-analyzer" autocomplete="off">
           <label class="input-label" for="url-input">Target URL Analysis</label>
@@ -31,9 +881,33 @@
               required
             />
           </div>
-          <button type="submit" class="analyze-btn" id="analyze-btn">
-            Initialize Scan
-          </button>
+          
+          <!-- Enhanced Analysis Options -->
+          <div class="analysis-options">
+            <div class="option-group">
+              <input type="checkbox" id="html-analysis" checked>
+              <label for="html-analysis" class="option-label">
+                <span class="option-icon">🌐</span>
+                <span class="option-text">HTML Content Analysis</span>
+              </label>
+            </div>
+            <div class="option-group">
+              <input type="checkbox" id="image-analysis" checked>
+              <label for="image-analysis" class="option-label">
+                <span class="option-icon">🖼️</span>
+                <span class="option-text">Image Parsing & Analysis</span>
+              </label>
+            </div>
+          </div>
+          
+          <div class="button-group">
+            <button type="submit" class="analyze-btn" id="analyze-btn">
+              Initialize Scan
+            </button>
+            <button type="button" class="analyze-btn secondary" id="image-only-btn">
+              Images Only
+            </button>
+          </div>
         </form>
       </div>
 
@@ -44,45 +918,51 @@
 
       <div class="result-panel" id="result-panel"></div>
 
-      <div class="analysis-output" id="analysis-output">
+      <!-- Enhanced Image Analysis Panel -->
+      <div class="image-analysis-panel" id="image-analysis-panel">
         <div class="analysis-header">
           <div class="header-title">
-            <svg
-              class="header-icon"
-              viewBox="0 0 24 24"
-              width="20"
-              height="20"
-              aria-hidden="true"
-              focusable="false"
-            >
-              <path
-                fill="currentColor"
-                d="M12,2L1,21H23M12,6L19.5,19H4.5M11,10V14H13V10M11,16V18H13V16"
-              />
+            <svg class="header-icon" viewBox="0 0 24 24" width="20" height="20">
+              <path fill="currentColor" d="M8.5,13.5L11,16.5L14.5,12L19,18H5M21,19V5C21,3.89 20.1,3 19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19Z"/>
             </svg>
-            <span>Threat Analysis Report</span>
+            <span>Image Analysis Report</span>
           </div>
           <div class="header-actions">
-            <button class="copy-btn" id="copy-report" title="Copy Report" aria-label="Copy Report">
-              <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
-                <path
-                  fill="currentColor"
-                  d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"
-                />
-              </svg>
-            </button>
-            <button class="expand-btn" id="expand-report" title="Expand/Collapse Report" aria-expanded="false" aria-controls="analysis-content">
-              <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
-                <path
-                  fill="currentColor"
-                  d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"
-                />
+            <button class="copy-btn" id="copy-image-report" title="Copy Image Report">
+              <svg viewBox="0 0 24 24" width="16" height="16">
+                <path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/>
               </svg>
             </button>
           </div>
         </div>
+        
+        <div class="image-stats-grid" id="image-stats-grid"></div>
+        <div class="image-details-grid" id="image-details-grid"></div>
+      </div>
 
-        <div class="report-metadata" aria-live="polite">
+      <div class="analysis-output" id="analysis-output">
+        <div class="analysis-header">
+          <div class="header-title">
+            <svg class="header-icon" viewBox="0 0 24 24" width="20" height="20">
+              <path fill="currentColor" d="M12,2L1,21H23M12,6L19.5,19H4.5M11,10V14H13V10M11,16V18H13V16"/>
+            </svg>
+            <span>Threat Analysis Report</span>
+          </div>
+          <div class="header-actions">
+            <button class="copy-btn" id="copy-report" title="Copy Report">
+              <svg viewBox="0 0 24 24" width="16" height="16">
+                <path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/>
+              </svg>
+            </button>
+            <button class="expand-btn" id="expand-report" title="Expand/Collapse Report" aria-expanded="false">
+              <svg viewBox="0 0 24 24" width="16" height="16">
+                <path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        
+        <div class="report-metadata">
           <div class="metadata-item">
             <span class="metadata-label">Analysis Time:</span>
             <span class="metadata-value" id="report-time"></span>
@@ -95,19 +975,20 @@
             <span class="metadata-label">Features Analyzed:</span>
             <span class="metadata-value" id="report-features"></span>
           </div>
+          <div class="metadata-item">
+            <span class="metadata-label">HTML Analyzed:</span>
+            <span class="metadata-value" id="report-html-status"></span>
+          </div>
         </div>
-
-        <div class="report-content" id="analysis-content" tabindex="0" aria-label="Detailed JSON Analysis Report"></div>
-
+        
+        <div class="report-content" id="analysis-content" tabindex="0"></div>
+        
         <div class="report-footer">
           <div class="footer-item">
-            <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
-              <path
-                fill="var(--text-muted)"
-                d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M11,7H13V9H11V7M11,11H13V17H11V11Z"
-              />
+            <svg viewBox="0 0 24 24" width="14" height="14">
+              <path fill="var(--text-muted)" d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M11,7H13V9H11V7M11,11H13V17H11V11Z"/>
             </svg>
-            <span>Report generated by PhishAlert ML Engine</span>
+            <span>Report generated by PhishAlert ML Engine v2.0</span>
           </div>
         </div>
       </div>
@@ -118,7 +999,7 @@
         <h2 class="features-title">System Capabilities</h2>
         <p class="features-subtitle">Advanced cybersecurity features powered by machine learning</p>
       </div>
-
+      
       <div class="feature-category">
         <h3 class="category-title">
           <span>🛡️</span>
@@ -135,8 +1016,15 @@
           <li class="feature-item">
             <span class="feature-icon">✓</span>
             <div class="feature-content">
-              <div class="feature-name">Domain Reputation Scoring</div>
-              <div class="feature-desc">Comprehensive domain trust evaluation and history analysis</div>
+              <div class="feature-name">HTML Content Parsing</div>
+              <div class="feature-desc">Deep analysis of webpage structure, forms, and metadata</div>
+            </div>
+          </li>
+          <li class="feature-item">
+            <span class="feature-icon">✓</span>
+            <div class="feature-content">
+              <div class="feature-name">Image Analysis Engine</div>
+              <div class="feature-desc">Advanced image parsing with tracking pixel detection</div>
             </div>
           </li>
           <li class="feature-item">
@@ -146,16 +1034,9 @@
               <div class="feature-desc">Automated certificate chain verification and security assessment</div>
             </div>
           </li>
-          <li class="feature-item">
-            <span class="feature-icon">✓</span>
-            <div class="feature-content">
-              <div class="feature-name">Content Pattern Recognition</div>
-              <div class="feature-desc">Deep learning analysis of webpage content and structure</div>
-            </div>
-          </li>
         </ul>
       </div>
-
+      
       <div class="feature-category">
         <h3 class="category-title">
           <span>🔍</span>
@@ -172,15 +1053,15 @@
           <li class="feature-item">
             <span class="feature-icon">✓</span>
             <div class="feature-content">
-              <div class="feature-name">Blacklist Cross-Reference</div>
-              <div class="feature-desc">Multi-source threat intelligence database integration</div>
+              <div class="feature-name">Form Security Analysis</div>
+              <div class="feature-desc">Detection of external form submissions and hidden fields</div>
             </div>
           </li>
           <li class="feature-item">
             <span class="feature-icon">✓</span>
             <div class="feature-content">
-              <div class="feature-name">Lexical Analysis</div>
-              <div class="feature-desc">URL structure and character pattern anomaly detection</div>
+              <div class="feature-name">Image Threat Detection</div>
+              <div class="feature-desc">Identification of tracking pixels and suspicious image patterns</div>
             </div>
           </li>
           <li class="feature-item">
@@ -192,7 +1073,7 @@
           </li>
         </ul>
       </div>
-
+      
       <div class="feature-category">
         <h3 class="category-title">
           <span>⚡</span>
@@ -238,18 +1119,27 @@
     const scanner = document.getElementById('scanner');
     const scanStatus = document.getElementById('scan-status');
     const resultPanel = document.getElementById('result-panel');
+    const imageAnalysisPanel = document.getElementById('image-analysis-panel');
     const analysisOutput = document.getElementById('analysis-output');
     const analysisContent = document.getElementById('analysis-content');
     const analyzeBtn = document.getElementById('analyze-btn');
+    const imageOnlyBtn = document.getElementById('image-only-btn');
     const copyBtn = document.getElementById('copy-report');
+    const copyImageBtn = document.getElementById('copy-image-report');
     const expandBtn = document.getElementById('expand-report');
     const reportTime = document.getElementById('report-time');
     const reportUrl = document.getElementById('report-url');
     const reportFeatures = document.getElementById('report-features');
+    const reportHtmlStatus = document.getElementById('report-html-status');
+    const htmlAnalysisCheckbox = document.getElementById('html-analysis');
+    const imageAnalysisCheckbox = document.getElementById('image-analysis');
 
     const scanMessages = [
       'Initializing threat detection...',
       'Analyzing URL structure...',
+      'Fetching HTML content...',
+      'Parsing webpage elements...',
+      'Analyzing images and media...',
       'Checking domain reputation...',
       'Validating SSL certificates...',
       'Scanning for malicious patterns...',
@@ -260,32 +1150,61 @@
     let scanMessageIndex = 0;
     let scanInterval;
 
+    // Enhanced scan messages for image-only analysis
+    const imageScanMessages = [
+      'Initializing image analysis...',
+      'Fetching webpage content...',
+      'Parsing HTML structure...',
+      'Extracting image elements...',
+      'Analyzing image metadata...',
+      'Detecting tracking pixels...',
+      'Checking external resources...',
+      'Finalizing image report...'
+    ];
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
+      await performAnalysis('/api/predict', false);
+    });
+
+    imageOnlyBtn.addEventListener('click', async () => {
+      await performAnalysis('/api/analyze-images', true);
+    });
+
+    async function performAnalysis(endpoint, isImageOnly = false) {
       const url = input.value.trim();
+      if (!url) return;
 
       // Reset UI
       resultPanel.className = 'result-panel';
+      imageAnalysisPanel.className = 'image-analysis-panel';
       analysisOutput.className = 'analysis-output';
 
       // Start scanning animation
       scanner.classList.add('active');
       analyzeBtn.disabled = true;
+      imageOnlyBtn.disabled = true;
       analyzeBtn.textContent = 'Scanning...';
 
-      // Cycle through scan messages
+      // Use appropriate scan messages
+      const messages = isImageOnly ? imageScanMessages : scanMessages;
       scanMessageIndex = 0;
-      scanStatus.textContent = scanMessages[0];
+      scanStatus.textContent = messages[0];
       scanInterval = setInterval(() => {
-        scanMessageIndex = (scanMessageIndex + 1) % scanMessages.length;
-        scanStatus.textContent = scanMessages[scanMessageIndex];
-      }, 800);
+        scanMessageIndex = (scanMessageIndex + 1) % messages.length;
+        scanStatus.textContent = messages[scanMessageIndex];
+      }, 1000);
 
       try {
-        const response = await fetch('/api/predict', {
+        const requestBody = { url: url };
+        if (!isImageOnly) {
+          requestBody.fetch_html = htmlAnalysisCheckbox.checked;
+        }
+
+        const response = await fetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url: url }),
+          body: JSON.stringify(requestBody),
         });
 
         if (!response.ok) {
@@ -298,96 +1217,20 @@
         clearInterval(scanInterval);
         scanner.classList.remove('active');
         analyzeBtn.disabled = false;
+        imageOnlyBtn.disabled = false;
         analyzeBtn.textContent = 'Initialize Scan';
 
-        // Construct result panel content
-        let prediction, detailsHtml, featuresHtml = '';
-        const riskClass = data.risk_level.toLowerCase();
-
-        if (data.is_phishing) {
-          prediction = 'threat';
-          detailsHtml = `
-            <div class="result-header">
-              <span>⚠️</span>
-              <span>Threat Detected</span>
-            </div>
-            <div class="result-details">
-              ${riskClass.toUpperCase()}-risk phishing attempt identified with ${100 - data.risk_score}% confidence.
-              This URL exhibits multiple malicious patterns and should be avoided.
-            </div>
-          `;
+        if (isImageOnly) {
+          displayImageAnalysis(data);
         } else {
-          prediction = 'safe';
-          detailsHtml = `
-            <div class="result-header">
-              <span>✅</span>
-              <span>Secure</span>
-            </div>
-            <div class="result-details">
-              URL analysis complete with ${100 - data.risk_score}% confidence.
-              No threats detected. This appears to be a legitimate website.
-            </div>
-          `;
+          displayFullAnalysis(data);
         }
 
-        // Add prediction details with confidence bar and features grid container
-        detailsHtml += `
-          <div class="prediction-details">
-            <div class="details-header">
-              <div class="details-title">Prediction Details</div>
-              <div class="confidence-meter" aria-label="Confidence meter">
-                <span class="confidence-value">${data.risk_score}%</span>
-                <div class="confidence-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${data.risk_score}">
-                  <div class="confidence-fill ${riskClass}" style="width: ${data.risk_score}%;"></div>
-                </div>
-              </div>
-            </div>
-            <div class="feature-indicators" id="feature-indicators"></div>
-          </div>
-        `;
-
-        resultPanel.innerHTML = detailsHtml;
-        resultPanel.classList.add('visible', riskClass);
-
-        // Populate feature indicators grid
-        const featureIndicators = document.getElementById('feature-indicators');
-        if (data.features) {
-          for (const [feature, value] of Object.entries(data.features)) {
-            // Skip irrelevant fields if any
-            if (feature === 'true_label' || feature === 'predicted_label') continue;
-
-            // Determine risk class (simple heuristic)
-            let valueRiskClass = 'neutral';
-            if (typeof value === 'number') {
-              valueRiskClass = value > 0.7 ? 'threat' : value > 0.3 ? 'warning' : 'safe';
-            }
-
-            // Format feature name nicely (camelCase or underscores to spaced)
-            const featureName = feature
-              .replace(/_/g, ' ')
-              .replace(/([a-z])([A-Z])/g, '$1 $2')
-              .replace(/\b\w/g, (c) => c.toUpperCase());
-
-            featuresHtml += `
-              <div class="feature-indicator" role="group" aria-label="${featureName}">
-                <div class="feature-name">${featureName}</div>
-                <div class="feature-value ${valueRiskClass}">${value}</div>
-              </div>`;
-          }
-          featureIndicators.innerHTML = featuresHtml;
-        }
-
-        // Fill detailed report metadata and content
-        reportTime.textContent = data.timestamp;
-        reportUrl.textContent = url;
-        reportFeatures.textContent = data.features ? Object.keys(data.features).length : 'N/A';
-
-        analysisContent.textContent = JSON.stringify(data, null, 2);
-        analysisOutput.classList.add('visible');
       } catch (error) {
         clearInterval(scanInterval);
         scanner.classList.remove('active');
         analyzeBtn.disabled = false;
+        imageOnlyBtn.disabled = false;
         analyzeBtn.textContent = 'Initialize Scan';
 
         resultPanel.innerHTML = `
@@ -399,10 +1242,199 @@
             Failed to analyze URL: ${error.message}
           </div>`;
         resultPanel.classList.add('visible', 'warning');
-
         console.error('Analysis error:', error);
       }
-    });
+    }
+
+    function displayFullAnalysis(data) {
+      let prediction, detailsHtml, featuresHtml = '';
+      const riskClass = data.risk_level.toLowerCase();
+
+      if (data.prediction === 1) {
+        prediction = 'threat';
+        detailsHtml = `
+          <div class="result-header">
+            <span>⚠️</span>
+            <span>Threat Detected</span>
+          </div>
+          <div class="result-details">
+            ${riskClass.toUpperCase()}-risk phishing attempt identified with ${data.risk_score}% confidence.
+            This URL exhibits multiple malicious patterns and should be avoided.
+          </div>
+        `;
+      } else {
+        prediction = 'safe';
+        detailsHtml = `
+          <div class="result-header">
+            <span>✅</span>
+            <span>Secure</span>
+          </div>
+          <div class="result-details">
+            URL analysis complete with ${100 - data.risk_score}% safety confidence.
+            No significant threats detected. This appears to be a legitimate website.
+          </div>
+        `;
+      }
+
+      // Add prediction details with confidence bar and features grid container
+      detailsHtml += `
+        <div class="prediction-details">
+          <div class="details-header">
+            <div class="details-title">Prediction Details</div>
+            <div class="confidence-meter">
+              <span class="confidence-value">${data.risk_score}%</span>
+              <div class="confidence-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${data.risk_score}">
+                <div class="confidence-fill ${riskClass}" style="width: ${data.risk_score}%;"></div>
+              </div>
+            </div>
+          </div>
+          <div class="feature-indicators" id="feature-indicators"></div>
+        </div>
+      `;
+
+      resultPanel.innerHTML = detailsHtml;
+      resultPanel.classList.add('visible', riskClass);
+
+      // Populate feature indicators grid
+      const featureIndicators = document.getElementById('feature-indicators');
+      if (data.features) {
+        for (const [feature, value] of Object.entries(data.features)) {
+          if (feature === 'true_label' || feature === 'predicted_label') continue;
+          
+          let valueRiskClass = 'neutral';
+          if (typeof value === 'number') {
+            valueRiskClass = value > 0.7 ? 'threat' : value > 0.3 ? 'warning' : 'safe';
+          }
+
+          const featureName = feature
+            .replace(/_/g, ' ')
+            .replace(/([a-z])([A-Z])/g, '$1 $2')
+            .replace(/\b\w/g, (c) => c.toUpperCase());
+
+          featuresHtml += `
+            <div class="feature-indicator">
+              <div class="feature-name">${featureName}</div>
+              <div class="feature-value ${valueRiskClass}">${value}</div>
+            </div>`;
+        }
+        featureIndicators.innerHTML = featuresHtml;
+      }
+
+      // Display image analysis if available
+      if (data.image_analysis) {
+        displayImageAnalysis(data, false);
+      }
+
+      // Fill detailed report metadata and content
+      reportTime.textContent = data.timestamp;
+      reportUrl.textContent = data.url;
+      reportFeatures.textContent = data.features ? Object.keys(data.features).length : 'N/A';
+      reportHtmlStatus.textContent = data.html_analyzed ? 'Yes' : 'No';
+      analysisContent.textContent = JSON.stringify(data, null, 2);
+      analysisOutput.classList.add('visible');
+    }
+
+    function displayImageAnalysis(data, standalone = true) {
+      const imageData = data.image_analysis;
+      if (!imageData) return;
+
+      const imageStatsGrid = document.getElementById('image-stats-grid');
+      const imageDetailsGrid = document.getElementById('image-details-grid');
+
+      // Create image statistics overview
+      imageStatsGrid.innerHTML = `
+        <div class="stat-card">
+          <div class="stat-icon">🖼️</div>
+          <div class="stat-content">
+            <div class="stat-value">${imageData.NoOfImage}</div>
+            <div class="stat-label">Total Images</div>
+          </div>
+        </div>
+        <div class="stat-card ${imageData.external_images > 0 ? 'warning' : ''}">
+          <div class="stat-icon">🌐</div>
+          <div class="stat-content">
+            <div class="stat-value">${imageData.external_images}</div>
+            <div class="stat-label">External Images</div>
+          </div>
+        </div>
+        <div class="stat-card ${imageData.suspicious_images > 0 ? 'threat' : ''}">
+          <div class="stat-icon">⚠️</div>
+          <div class="stat-content">
+            <div class="stat-value">${imageData.suspicious_images}</div>
+            <div class="stat-label">Suspicious Images</div>
+          </div>
+        </div>
+        <div class="stat-card ${imageData.broken_images > 0 ? 'warning' : ''}">
+          <div class="stat-icon">❌</div>
+          <div class="stat-content">
+            <div class="stat-value">${imageData.broken_images}</div>
+            <div class="stat-label">Broken Images</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📊</div>
+          <div class="stat-content">
+            <div class="stat-value">${formatBytes(imageData.total_image_size)}</div>
+            <div class="stat-label">Total Size</div>
+          </div>
+        </div>
+      `;
+
+      // Create detailed image grid
+      if (imageData.image_details && imageData.image_details.length > 0) {
+        let imageDetailsHtml = '';
+        imageData.image_details.slice(0, 12).forEach((img, index) => {
+          const statusClass = img.is_suspicious ? 'suspicious' : img.is_external ? 'external' : 'normal';
+          const statusIcon = img.is_suspicious ? '⚠️' : img.is_external ? '🌐' : '✅';
+          
+          imageDetailsHtml += `
+            <div class="image-detail-card ${statusClass}">
+              <div class="image-header">
+                <span class="image-index">#${index + 1}</span>
+                <span class="image-status">${statusIcon}</span>
+              </div>
+              <div class="image-info">
+                <div class="image-src" title="${img.src}">${truncateText(img.src, 40)}</div>
+                <div class="image-meta">
+                  ${img.alt ? `<div class="meta-item"><strong>Alt:</strong> ${truncateText(img.alt, 30)}</div>` : ''}
+                  ${img.size ? `<div class="meta-item"><strong>Size:</strong> ${formatBytes(img.size)}</div>` : ''}
+                  ${img.format ? `<div class="meta-item"><strong>Format:</strong> ${img.format}</div>` : ''}
+                  <div class="meta-item"><strong>External:</strong> ${img.is_external ? 'Yes' : 'No'}</div>
+                  <div class="meta-item"><strong>Suspicious:</strong> ${img.is_suspicious ? 'Yes' : 'No'}</div>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+        imageDetailsGrid.innerHTML = imageDetailsHtml;
+      } else {
+        imageDetailsGrid.innerHTML = '<div class="no-images">No images found in the webpage</div>';
+      }
+
+      imageAnalysisPanel.classList.add('visible');
+
+      if (standalone) {
+        // For image-only analysis, also update the report metadata
+        reportTime.textContent = data.timestamp;
+        reportUrl.textContent = data.url;
+        reportFeatures.textContent = 'Image Analysis Only';
+        reportHtmlStatus.textContent = 'Yes';
+        analysisContent.textContent = JSON.stringify(data, null, 2);
+        analysisOutput.classList.add('visible');
+      }
+    }
+
+    function formatBytes(bytes) {
+      if (bytes === 0) return '0 B';
+      const k = 1024;
+      const sizes = ['B', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+    }
+
+    function truncateText(text, maxLength) {
+      return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+    }
 
     // Copy report to clipboard
     copyBtn.addEventListener('click', () => {
@@ -412,6 +1444,21 @@
         copyBtn.setAttribute('title', 'Copied!');
         setTimeout(() => {
           copyBtn.setAttribute('title', originalTitle);
+        }, 2000);
+      });
+    });
+
+    // Copy image report to clipboard
+    copyImageBtn.addEventListener('click', () => {
+      const imageStatsText = document.getElementById('image-stats-grid').textContent;
+      const imageDetailsText = document.getElementById('image-details-grid').textContent;
+      const fullReport = `Image Analysis Report\n\n${imageStatsText}\n\nImage Details:\n${imageDetailsText}`;
+      
+      navigator.clipboard.writeText(fullReport).then(() => {
+        const originalTitle = copyImageBtn.getAttribute('title');
+        copyImageBtn.setAttribute('title', 'Copied!');
+        setTimeout(() => {
+          copyImageBtn.setAttribute('title', originalTitle);
         }, 2000);
       });
     });
@@ -427,3 +1474,4 @@
   </script>
 </body>
 </html>
+
