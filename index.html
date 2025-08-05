@@ -5,857 +5,7 @@
   <title>PhishAlert - Advanced Threat Detection System</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <style>
-    /* Enhanced PhishAlert Styles with Image Analysis Support */
-
-    :root {
-      --primary-bg: #0a0a0a;
-      --secondary-bg: #1a1a1a;
-      --accent-bg: #2a2a2a;
-      --border-color: #333;
-      --text-primary: #ffffff;
-      --text-secondary: #cccccc;
-      --text-muted: #888888;
-      --accent-color: #00ff88;
-      --warning-color: #ffaa00;
-      --danger-color: #ff4444;
-      --safe-color: #00ff88;
-      --threat-color: #ff4444;
-      --neutral-color: #666666;
-      --gradient-primary: linear-gradient(135deg, #00ff88 0%, #00cc66 100%);
-      --gradient-warning: linear-gradient(135deg, #ffaa00 0%, #ff8800 100%);
-      --gradient-danger: linear-gradient(135deg, #ff4444 0%, #cc2222 100%);
-      --font-mono: 'JetBrains Mono', monospace;
-      --font-sans: 'Inter', sans-serif;
-      --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
-      --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4);
-      --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.5);
-      --border-radius: 8px;
-      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: var(--font-sans);
-      background: var(--primary-bg);
-      color: var(--text-primary);
-      line-height: 1.6;
-      overflow-x: hidden;
-    }
-
-    .main-container {
-      display: grid;
-      grid-template-columns: 1fr 400px;
-      min-height: 100vh;
-      gap: 0;
-    }
-
-    /* Analyzer Panel */
-    .analyzer-panel {
-      background: var(--secondary-bg);
-      padding: 2rem;
-      border-right: 1px solid var(--border-color);
-      overflow-y: auto;
-      max-height: 100vh;
-    }
-
-    .header {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-
-    .system-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: var(--accent-bg);
-      padding: 0.5rem 1rem;
-      border-radius: 20px;
-      font-size: 0.875rem;
-      margin-bottom: 1rem;
-      border: 1px solid var(--border-color);
-    }
-
-    .status-indicator {
-      width: 8px;
-      height: 8px;
-      background: var(--accent-color);
-      border-radius: 50%;
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
-
-    h1 {
-      font-size: 2.5rem;
-      font-weight: 700;
-      background: var(--gradient-primary);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 0.5rem;
-    }
-
-    .subtitle {
-      color: var(--text-muted);
-      font-size: 0.875rem;
-      font-weight: 400;
-    }
-
-    /* Input Section */
-    .input-section {
-      margin-bottom: 2rem;
-    }
-
-    .input-label {
-      display: block;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-      color: var(--text-secondary);
-    }
-
-    .input-wrapper {
-      position: relative;
-      margin-bottom: 1rem;
-    }
-
-    .input-icon {
-      position: absolute;
-      left: 1rem;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 1.25rem;
-      z-index: 2;
-    }
-
-    #url-input {
-      width: 100%;
-      padding: 1rem 1rem 1rem 3rem;
-      background: var(--accent-bg);
-      border: 1px solid var(--border-color);
-      border-radius: var(--border-radius);
-      color: var(--text-primary);
-      font-family: var(--font-mono);
-      font-size: 0.875rem;
-      transition: var(--transition);
-    }
-
-    #url-input:focus {
-      outline: none;
-      border-color: var(--accent-color);
-      box-shadow: 0 0 0 2px rgba(0, 255, 136, 0.2);
-    }
-
-    /* Analysis Options */
-    .analysis-options {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      margin-bottom: 1.5rem;
-      padding: 1rem;
-      background: var(--accent-bg);
-      border-radius: var(--border-radius);
-      border: 1px solid var(--border-color);
-    }
-
-    .option-group {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    .option-group input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
-      accent-color: var(--accent-color);
-    }
-
-    .option-label {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      cursor: pointer;
-      font-size: 0.875rem;
-      color: var(--text-secondary);
-      transition: var(--transition);
-    }
-
-    .option-label:hover {
-      color: var(--text-primary);
-    }
-
-    .option-icon {
-      font-size: 1rem;
-    }
-
-    .option-text {
-      font-weight: 500;
-    }
-
-    /* Button Group */
-    .button-group {
-      display: flex;
-      gap: 0.75rem;
-    }
-
-    .analyze-btn {
-      flex: 1;
-      padding: 1rem 1.5rem;
-      background: var(--gradient-primary);
-      color: var(--primary-bg);
-      border: none;
-      border-radius: var(--border-radius);
-      font-weight: 600;
-      font-size: 0.875rem;
-      cursor: pointer;
-      transition: var(--transition);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .analyze-btn:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-md);
-    }
-
-    .analyze-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .analyze-btn.secondary {
-      background: var(--accent-bg);
-      color: var(--text-primary);
-      border: 1px solid var(--border-color);
-    }
-
-    .analyze-btn.secondary:hover:not(:disabled) {
-      background: var(--border-color);
-    }
-
-    /* Scanner */
-    .scanner {
-      display: none;
-      text-align: center;
-      padding: 2rem;
-      margin-bottom: 2rem;
-    }
-
-    .scanner.active {
-      display: block;
-    }
-
-    .scan-animation {
-      width: 60px;
-      height: 60px;
-      border: 3px solid var(--accent-bg);
-      border-top: 3px solid var(--accent-color);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 1rem;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .scan-status {
-      color: var(--text-secondary);
-      font-size: 0.875rem;
-      font-family: var(--font-mono);
-    }
-
-    /* Result Panel */
-    .result-panel {
-      display: none;
-      background: var(--accent-bg);
-      border-radius: var(--border-radius);
-      padding: 1.5rem;
-      margin-bottom: 2rem;
-      border: 1px solid var(--border-color);
-    }
-
-    .result-panel.visible {
-      display: block;
-    }
-
-    .result-panel.safe {
-      border-color: var(--safe-color);
-      background: linear-gradient(135deg, rgba(0, 255, 136, 0.1) 0%, var(--accent-bg) 100%);
-    }
-
-    .result-panel.warning {
-      border-color: var(--warning-color);
-      background: linear-gradient(135deg, rgba(255, 170, 0, 0.1) 0%, var(--accent-bg) 100%);
-    }
-
-    .result-panel.threat {
-      border-color: var(--threat-color);
-      background: linear-gradient(135deg, rgba(255, 68, 68, 0.1) 0%, var(--accent-bg) 100%);
-    }
-
-    .result-header {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      font-size: 1.25rem;
-      font-weight: 600;
-      margin-bottom: 1rem;
-    }
-
-    .result-details {
-      color: var(--text-secondary);
-      line-height: 1.6;
-      margin-bottom: 1.5rem;
-    }
-
-    .prediction-details {
-      border-top: 1px solid var(--border-color);
-      padding-top: 1.5rem;
-    }
-
-    .details-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-    }
-
-    .details-title {
-      font-weight: 600;
-      color: var(--text-primary);
-    }
-
-    .confidence-meter {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    .confidence-value {
-      font-family: var(--font-mono);
-      font-weight: 600;
-      min-width: 3rem;
-    }
-
-    .confidence-bar {
-      width: 120px;
-      height: 8px;
-      background: var(--accent-bg);
-      border-radius: 4px;
-      overflow: hidden;
-      border: 1px solid var(--border-color);
-    }
-
-    .confidence-fill {
-      height: 100%;
-      transition: width 0.5s ease;
-    }
-
-    .confidence-fill.safe {
-      background: var(--gradient-primary);
-    }
-
-    .confidence-fill.warning {
-      background: var(--gradient-warning);
-    }
-
-    .confidence-fill.threat {
-      background: var(--gradient-danger);
-    }
-
-    .feature-indicators {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 0.75rem;
-      margin-top: 1rem;
-    }
-
-    .feature-indicator {
-      background: var(--primary-bg);
-      padding: 0.75rem;
-      border-radius: var(--border-radius);
-      border: 1px solid var(--border-color);
-    }
-
-    .feature-name {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      margin-bottom: 0.25rem;
-    }
-
-    .feature-value {
-      font-family: var(--font-mono);
-      font-weight: 600;
-      font-size: 0.875rem;
-    }
-
-    .feature-value.safe {
-      color: var(--safe-color);
-    }
-
-    .feature-value.warning {
-      color: var(--warning-color);
-    }
-
-    .feature-value.threat {
-      color: var(--threat-color);
-    }
-
-    .feature-value.neutral {
-      color: var(--text-secondary);
-    }
-
-    /* Image Analysis Panel */
-    .image-analysis-panel {
-      display: none;
-      background: var(--accent-bg);
-      border-radius: var(--border-radius);
-      padding: 1.5rem;
-      margin-bottom: 2rem;
-      border: 1px solid var(--border-color);
-    }
-
-    .image-analysis-panel.visible {
-      display: block;
-    }
-
-    .image-stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 1rem;
-      margin-bottom: 2rem;
-    }
-
-    .stat-card {
-      background: var(--primary-bg);
-      padding: 1rem;
-      border-radius: var(--border-radius);
-      border: 1px solid var(--border-color);
-      text-align: center;
-      transition: var(--transition);
-    }
-
-    .stat-card:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-sm);
-    }
-
-    .stat-card.warning {
-      border-color: var(--warning-color);
-      background: linear-gradient(135deg, rgba(255, 170, 0, 0.1) 0%, var(--primary-bg) 100%);
-    }
-
-    .stat-card.threat {
-      border-color: var(--threat-color);
-      background: linear-gradient(135deg, rgba(255, 68, 68, 0.1) 0%, var(--primary-bg) 100%);
-    }
-
-    .stat-icon {
-      font-size: 1.5rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .stat-value {
-      font-size: 1.5rem;
-      font-weight: 700;
-      font-family: var(--font-mono);
-      color: var(--text-primary);
-      margin-bottom: 0.25rem;
-    }
-
-    .stat-label {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .image-details-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1rem;
-    }
-
-    .image-detail-card {
-      background: var(--primary-bg);
-      border: 1px solid var(--border-color);
-      border-radius: var(--border-radius);
-      padding: 1rem;
-      transition: var(--transition);
-    }
-
-    .image-detail-card:hover {
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-sm);
-    }
-
-    .image-detail-card.external {
-      border-color: var(--warning-color);
-      background: linear-gradient(135deg, rgba(255, 170, 0, 0.05) 0%, var(--primary-bg) 100%);
-    }
-
-    .image-detail-card.suspicious {
-      border-color: var(--threat-color);
-      background: linear-gradient(135deg, rgba(255, 68, 68, 0.05) 0%, var(--primary-bg) 100%);
-    }
-
-    .image-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 0.75rem;
-    }
-
-    .image-index {
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      background: var(--accent-bg);
-      padding: 0.25rem 0.5rem;
-      border-radius: 4px;
-    }
-
-    .image-status {
-      font-size: 1rem;
-    }
-
-    .image-src {
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      color: var(--text-primary);
-      word-break: break-all;
-      margin-bottom: 0.75rem;
-      padding: 0.5rem;
-      background: var(--accent-bg);
-      border-radius: 4px;
-    }
-
-    .image-meta {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-    }
-
-    .meta-item {
-      font-size: 0.75rem;
-      color: var(--text-secondary);
-    }
-
-    .meta-item strong {
-      color: var(--text-muted);
-    }
-
-    .no-images {
-      grid-column: 1 / -1;
-      text-align: center;
-      color: var(--text-muted);
-      font-style: italic;
-      padding: 2rem;
-    }
-
-    /* Analysis Output */
-    .analysis-output {
-      display: none;
-      background: var(--accent-bg);
-      border-radius: var(--border-radius);
-      border: 1px solid var(--border-color);
-      overflow: hidden;
-    }
-
-    .analysis-output.visible {
-      display: block;
-    }
-
-    .analysis-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem 1.5rem;
-      background: var(--primary-bg);
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .header-title {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-weight: 600;
-      color: var(--text-primary);
-    }
-
-    .header-icon {
-      color: var(--accent-color);
-    }
-
-    .header-actions {
-      display: flex;
-      gap: 0.5rem;
-    }
-
-    .copy-btn, .expand-btn {
-      background: var(--accent-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
-      padding: 0.5rem;
-      color: var(--text-secondary);
-      cursor: pointer;
-      transition: var(--transition);
-    }
-
-    .copy-btn:hover, .expand-btn:hover {
-      background: var(--border-color);
-      color: var(--text-primary);
-    }
-
-    .report-metadata {
-      padding: 1rem 1.5rem;
-      background: var(--primary-bg);
-      border-bottom: 1px solid var(--border-color);
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
-    }
-
-    .metadata-item {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-    }
-
-    .metadata-label {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .metadata-value {
-      font-family: var(--font-mono);
-      font-size: 0.875rem;
-      color: var(--text-primary);
-      word-break: break-all;
-    }
-
-    .report-content {
-      padding: 1.5rem;
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      line-height: 1.6;
-      color: var(--text-secondary);
-      background: var(--primary-bg);
-      white-space: pre-wrap;
-      overflow-x: auto;
-      max-height: 300px;
-      overflow-y: auto;
-    }
-
-    .analysis-output.expanded .report-content {
-      max-height: none;
-    }
-
-    .report-footer {
-      padding: 1rem 1.5rem;
-      background: var(--accent-bg);
-      border-top: 1px solid var(--border-color);
-    }
-
-    .footer-item {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.75rem;
-      color: var(--text-muted);
-    }
-
-    /* Features Panel */
-    .features-panel {
-      background: var(--primary-bg);
-      padding: 2rem;
-      overflow-y: auto;
-      max-height: 100vh;
-    }
-
-    .features-header {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-
-    .features-title {
-      font-size: 1.5rem;
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 0.5rem;
-    }
-
-    .features-subtitle {
-      color: var(--text-muted);
-      font-size: 0.875rem;
-    }
-
-    .feature-category {
-      margin-bottom: 2rem;
-    }
-
-    .category-title {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      font-size: 1.125rem;
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 1rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .category-title span:first-child {
-      font-size: 1.25rem;
-    }
-
-    .feature-list {
-      list-style: none;
-    }
-
-    .feature-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 0.75rem;
-      padding: 1rem;
-      background: var(--secondary-bg);
-      border-radius: var(--border-radius);
-      border: 1px solid var(--border-color);
-      margin-bottom: 0.75rem;
-      transition: var(--transition);
-    }
-
-    .feature-item:hover {
-      transform: translateX(4px);
-      border-color: var(--accent-color);
-    }
-
-    .feature-icon {
-      color: var(--accent-color);
-      font-weight: 600;
-      font-size: 0.875rem;
-      margin-top: 0.125rem;
-    }
-
-    .feature-content {
-      flex: 1;
-    }
-
-    .feature-name {
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 0.25rem;
-    }
-
-    .feature-desc {
-      font-size: 0.875rem;
-      color: var(--text-secondary);
-      line-height: 1.5;
-    }
-
-    /* Responsive Design */
-    @media (max-width: 1024px) {
-      .main-container {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto auto;
-      }
-      
-      .features-panel {
-        border-top: 1px solid var(--border-color);
-      }
-    }
-
-    @media (max-width: 768px) {
-      .analyzer-panel, .features-panel {
-        padding: 1rem;
-      }
-      
-      h1 {
-        font-size: 2rem;
-      }
-      
-      .button-group {
-        flex-direction: column;
-      }
-      
-      .image-stats-grid {
-        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-      }
-      
-      .image-details-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .report-metadata {
-        grid-template-columns: 1fr;
-      }
-      
-      .details-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-      }
-      
-      .confidence-meter {
-        width: 100%;
-        justify-content: space-between;
-      }
-      
-      .confidence-bar {
-        flex: 1;
-        max-width: 200px;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .feature-indicators {
-        grid-template-columns: 1fr;
-      }
-      
-      .image-stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    /* Accessibility */
-    @media (prefers-reduced-motion: reduce) {
-      * {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-      }
-    }
-
-    /* Focus styles for keyboard navigation */
-    button:focus-visible,
-    input:focus-visible,
-    .option-label:focus-visible {
-      outline: 2px solid var(--accent-color);
-      outline-offset: 2px;
-    }
-
-    /* High contrast mode support */
-    @media (prefers-contrast: high) {
-      :root {
-        --border-color: #666;
-        --text-muted: #aaa;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="static/styles.css" />
 </head>
 <body>
   <div class="main-container">
@@ -881,8 +31,6 @@
               required
             />
           </div>
-          
-        
           
           <div class="button-group">
             <button type="submit" class="analyze-btn" id="analyze-btn">
@@ -979,16 +127,50 @@
     </div>
 
     <div class="features-panel">
-      <div class="features-header">
-        <h2 class="features-title">System Capabilities</h2>
-        <p class="features-subtitle">Advanced cybersecurity features powered by machine learning</p>
-      </div>
-      
-      <div class="feature-category">
-        <h3 class="category-title">
-          <span>🛡️</span>
-          <span>Detection Engine</span>
-        </h3>
+  <div class="features-header">
+    <h2 class="features-title">System Capabilities</h2>
+    <p class="features-subtitle">Advanced cybersecurity features powered by machine learning</p>
+  </div>
+
+  <div class="feature-category">
+    <h3 class="category-title">
+      <span>🛡️</span>
+      <span>Detection Engine</span>
+    </h3>
+    <div class="feature-scroll-wrapper">
+      <div class="scroller">
+        <ul class="feature-list">
+          <li class="feature-item">
+            <span class="feature-icon">✓</span>
+            <div class="feature-content">
+              <div class="feature-name">Real-time URL Analysis</div>
+              <div class="feature-desc">Instant threat assessment using advanced ML algorithms</div>
+            </div>
+          </li>
+          <li class="feature-item">
+            <span class="feature-icon">✓</span>
+            <div class="feature-content">
+              <div class="feature-name">HTML Content Parsing</div>
+              <div class="feature-desc">Deep analysis of webpage structure, forms, and metadata</div>
+            </div>
+          </li>
+          <li class="feature-item">
+            <span class="feature-icon">✓</span>
+            <div class="feature-content">
+              <div class="feature-name">Image Analysis Engine</div>
+              <div class="feature-desc">Advanced image parsing with tracking pixel detection</div>
+            </div>
+          </li>
+          <li class="feature-item">
+            <span class="feature-icon">✓</span>
+            <div class="feature-content">
+              <div class="feature-name">SSL Certificate Validation</div>
+              <div class="feature-desc">Automated certificate chain verification and security assessment</div>
+            </div>
+          </li>
+        </ul>
+
+        <!-- Duplicate the list for looping -->
         <ul class="feature-list">
           <li class="feature-item">
             <span class="feature-icon">✓</span>
@@ -1020,12 +202,48 @@
           </li>
         </ul>
       </div>
-      
-      <div class="feature-category">
-        <h3 class="category-title">
-          <span>🔍</span>
-          <span>Analysis Features</span>
-        </h3>
+    </div>
+  </div>
+
+  <div class="feature-category">
+    <h3 class="category-title">
+      <span>🔍</span>
+      <span>Analysis Features</span>
+    </h3>
+    <div class="feature-scroll-wrapper">
+      <div class="scroller">
+        <ul class="feature-list">
+          <li class="feature-item">
+            <span class="feature-icon">✓</span>
+            <div class="feature-content">
+              <div class="feature-name">Behavioral Analysis</div>
+              <div class="feature-desc">Suspicious redirect patterns and JavaScript behavior detection</div>
+            </div>
+          </li>
+          <li class="feature-item">
+            <span class="feature-icon">✓</span>
+            <div class="feature-content">
+              <div class="feature-name">Form Security Analysis</div>
+              <div class="feature-desc">Detection of external form submissions and hidden fields</div>
+            </div>
+          </li>
+          <li class="feature-item">
+            <span class="feature-icon">✓</span>
+            <div class="feature-content">
+              <div class="feature-name">Image Threat Detection</div>
+              <div class="feature-desc">Identification of tracking pixels and suspicious image patterns</div>
+            </div>
+          </li>
+          <li class="feature-item">
+            <span class="feature-icon">✓</span>
+            <div class="feature-content">
+              <div class="feature-name">Network Fingerprinting</div>
+              <div class="feature-desc">Infrastructure analysis and hosting provider assessment</div>
+            </div>
+          </li>
+        </ul>
+        
+        <!-- Duplicate -->
         <ul class="feature-list">
           <li class="feature-item">
             <span class="feature-icon">✓</span>
@@ -1057,12 +275,48 @@
           </li>
         </ul>
       </div>
-      
-      <div class="feature-category">
-        <h3 class="category-title">
-          <span>⚡</span>
-          <span>Performance</span>
-        </h3>
+    </div>
+  </div>
+
+  <div class="feature-category">
+    <h3 class="category-title">
+      <span>⚡</span>
+      <span>Performance</span>
+    </h3>
+    <div class="feature-scroll-wrapper">
+      <div class="scroller">
+        <ul class="feature-list">
+          <li class="feature-item">
+            <span class="feature-icon">✓</span>
+            <div class="feature-content">
+              <div class="feature-name">High-Speed Processing</div>
+              <div class="feature-desc">Optimized processing pipeline for rapid threat assessment</div>
+            </div>
+          </li>
+          <li class="feature-item">
+            <span class="feature-icon">✓</span>
+            <div class="feature-content">
+              <div class="feature-name">Machine Learning Accuracy</div>
+              <div class="feature-desc">Continuously trained models with minimal false positives</div>
+            </div>
+          </li>
+          <li class="feature-item">
+            <span class="feature-icon">✓</span>
+            <div class="feature-content">
+              <div class="feature-name">Scalable Architecture</div>
+              <div class="feature-desc">Cloud-native infrastructure supporting high-volume analysis</div>
+            </div>
+          </li>
+          <li class="feature-item">
+            <span class="feature-icon">✓</span>
+            <div class="feature-content">
+              <div class="feature-name">Real-time Updates</div>
+              <div class="feature-desc">Continuous model updates with latest threat intelligence</div>
+            </div>
+          </li>
+        </ul>
+        
+        <!-- Duplicate -->
         <ul class="feature-list">
           <li class="feature-item">
             <span class="feature-icon">✓</span>
@@ -1096,6 +350,7 @@
       </div>
     </div>
   </div>
+</div>
 
   <script>
     const form = document.getElementById('threat-analyzer');
