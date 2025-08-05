@@ -882,23 +882,7 @@
             />
           </div>
           
-          <!-- Enhanced Analysis Options -->
-          <div class="analysis-options">
-            <div class="option-group">
-              <input type="checkbox" id="html-analysis" checked>
-              <label for="html-analysis" class="option-label">
-                <span class="option-icon">🌐</span>
-                <span class="option-text">HTML Content Analysis</span>
-              </label>
-            </div>
-            <div class="option-group">
-              <input type="checkbox" id="image-analysis" checked>
-              <label for="image-analysis" class="option-label">
-                <span class="option-icon">🖼️</span>
-                <span class="option-text">Image Parsing & Analysis</span>
-              </label>
-            </div>
-          </div>
+        
           
           <div class="button-group">
             <button type="submit" class="analyze-btn" id="analyze-btn">
@@ -1131,8 +1115,6 @@
     const reportUrl = document.getElementById('report-url');
     const reportFeatures = document.getElementById('report-features');
     const reportHtmlStatus = document.getElementById('report-html-status');
-    const htmlAnalysisCheckbox = document.getElementById('html-analysis');
-    const imageAnalysisCheckbox = document.getElementById('image-analysis');
 
     const scanMessages = [
       'Initializing threat detection...',
@@ -1197,9 +1179,6 @@
 
       try {
         const requestBody = { url: url };
-        if (!isImageOnly) {
-          requestBody.fetch_html = htmlAnalysisCheckbox.checked;
-        }
 
         const response = await fetch(endpoint, {
           method: 'POST',
@@ -1259,7 +1238,8 @@
           </div>
           <div class="result-details">
             ${riskClass.toUpperCase()}-risk phishing attempt identified with ${data.risk_score}% confidence.
-            This URL exhibits multiple malicious patterns and should be avoided.
+            This URL exhibits multiple malicious patterns and should be avoided. 
+            If you believe this is not a phishing scam, proceed with caution.
           </div>
         `;
       } else {

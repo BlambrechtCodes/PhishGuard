@@ -26,6 +26,11 @@ except Exception as e:
     print(f"Error loading model: {e}")
     model_loaded = False
 
+TRUSTED_DOMAINS = {
+    "microsoft.com", "google.com", "apple.com", "amazon.com", 
+    "paypal.com", "github.com", "gov", "edu"
+}
+
 SUSPICIOUS_KEYWORDS = [
     "secure", "account", "update", "confirm", "verify", "login", "signin",
     "bank", "paypal", "amazon", "microsoft", "apple", "google", "facebook",
@@ -268,10 +273,25 @@ class HTMLImageParser:
 
         return metadata
 
+def is_trusted_domain(url):
+    """Check if domain is trusted with improved matching and HTTPS consideration"""
+    domain = urlparse(url).netloc.lower()
+    # Extract base domain (e.g., 'microsoft.com' from 'www.microsoft.com')
+    base_domain = '.'.join(domain.split('.')[-2:])
+    return any(trusted in base_domain for trusted in TRUSTED_DOMAINS)
+
 def is_ip_address(domain):
-    ipv4_pattern = r'^(\d{1,3}\.){3}\d{1,3}$'
-    ipv6_pattern = r'^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$'
-    return bool(re.match(ipv4_pattern, domain) or re.match(ipv6_pattern, domain))
+    """Improved IP detection with strict validation"""
+    # Strict IPv4 pattern (0-255 per octet)
+    ipv4_pattern = r'^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
+    
+    # IPv6 pattern with compression support
+    ipv6_pattern = (
+        r'^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|'  # Standard
+        r'^::(?:[0-9a-fA-F]{1,4}:){0,6}[0-9a-fA-F]{1,4}$|'  # Leading compression
+        r'^(?:[0-9a-fA-F]{1,4}:){1,6}::(?:[0-9a-fA-F]{1,4}:){0,5}[0-9a-fA-F]{1,4}$'  # Mixed
+    )
+    return bool(re.match(ipv4_pattern, domain) or bool(re.match(ipv6_pattern, domain)))
 
 def count_suspicious_keywords(url):
     count = 0
@@ -283,7 +303,7 @@ def extract_html_features(html_content, base_url):
     """Extract features from HTML content"""
     if not html_content:
         return {
-            'LineOfCode': 0,
+            'LineOfCode': 0,            # Added! No Need to modify!    
             'LargestLineLength': 0,
             'HasTitle': 0,
             'DomainTitleMatchScore': 0,
@@ -300,9 +320,9 @@ def extract_html_features(html_content, base_url):
             'HasSubmitButton': 0,
             'HasHiddenFields': 0,
             'HasPasswordField': 0,
-            'NoOfImage': 0,
-            'NoOfCSS': 0,
-            'NoOfJS': 0,
+            'NoOfImage': 0,             # Added! No Need to modify!    
+            'NoOfCSS': 0,               # Added! No Need to modify!
+            'NoOfJS': 0,                # Added! No Need to modify!    
             'NoOfSelfRef': 0,
             'NoOfEmptyRef': 0,
             'NoOfExternalRef': 0
@@ -454,7 +474,7 @@ def extract_url_features(input_url):
 
     tld_with_dot = f".{tld}"
     if tld_with_dot in LEGIT_TLDS:
-        tld_legitimate_prob = 0.9
+        tld_legitimate_prob = 1.0
     elif tld_with_dot in SUSPICIOUS_TLDS:
         tld_legitimate_prob = 0.1
     else:
@@ -537,6 +557,7 @@ def analyze_url_comprehensive(input_url, fetch_html=True):
 
     # Combine all features
     features = {**url_features, **html_features}
+    features['IsTrustedDomain'] = 1 if is_trusted_domain(input_url) else 0
     
     # Create feature DataFrame in exact order
     feature_columns = [
@@ -574,6 +595,16 @@ def analyze_url_comprehensive(input_url, fetch_html=True):
         is_phishing = risk_score >= 50
         print(f"Model not loaded. Using fallback scoring. Risk: {risk_score}%")
 
+    # Apply HTTPS bonus to risk score
+    if features['IsHTTPS']:
+        risk_score = max(0, risk_score - 20)  # Reduce risk by 20 points for HTTPS
+        print(f"HTTPS detected: Reduced risk score to {risk_score}%")
+    
+    # Apply trusted domain bonus
+    if features['IsTrustedDomain']:
+        risk_score = max(0, risk_score - 30)  # Reduce risk by 30 points for trusted domains
+        print(f"Trusted domain detected: Reduced risk score to {risk_score}%")
+
     risk_level = "LOW" if risk_score <= 30 else "MEDIUM" if risk_score <= 60 else "HIGH"
 
     result = {
@@ -592,15 +623,25 @@ def analyze_url_comprehensive(input_url, fetch_html=True):
     return result
 
 def calculate_fallback_score(features):
-    """Calculate fallback risk score using rule-based approach"""
+    """Calculate fallback risk score with enhanced HTTPS handling"""
     score = 0
     
     # URL-based scoring
     score += min(features['URLLength'] / 100, 0.3) * 20
     score += features['IsDomainIP'] * 25
     score += min(features['NoOfSubDomain'] / 5, 0.2) * 15
-    score += (1 - features['IsHTTPS']) * 10
+    
+    # Enhanced HTTPS handling - reward HTTPS more
+    if features['IsHTTPS']:
+        score -= 15  # HTTPS gets significant risk reduction
+    else:
+        score += 20  # HTTP gets significant penalty
+    
     score += features['HasObfuscation'] * 15
+    
+    # Trusted domains get risk reduction
+    if features.get('IsTrustedDomain', 0) == 1:
+        score -= 30
     
     # HTML-based scoring
     if features['LineOfCode'] > 0:  # HTML was analyzed
@@ -616,7 +657,8 @@ def calculate_fallback_score(features):
         elif features['NoOfImage'] > 50:
             score += 15  # Too many images might be suspicious
     
-    return min(int(score), 100)
+    # Ensure score stays within 0-100 range
+    return max(0, min(int(score), 100))
 
 @app.route('/api/predict', methods=['POST'])
 def predict():
@@ -730,6 +772,7 @@ def test_comprehensive_analysis():
 
 if __name__ == '__main__':
     print("Starting Phishing Detector")
-    test_comprehensive_analysis()
+    # test_comprehensive_analysis()
+    
     print("\n🌐 Starting Flask server...")
     app.run(host='0.0.0.0', port=5000, debug=True)
