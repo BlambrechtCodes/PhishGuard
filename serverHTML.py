@@ -18,7 +18,7 @@ CORS(app)
 
 # Load model once
 try:
-    model = joblib.load('phishing_detector_decision_tree.pkl')
+    model = joblib.load('best_rf_model.pkl')
     model_loaded = True
     if hasattr(model, 'feature_names_in_'):
         print("Model expects features:", model.feature_names_in_)

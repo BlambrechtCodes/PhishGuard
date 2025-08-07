@@ -470,10 +470,11 @@
         resultPanel.innerHTML = `
           <div class="result-header">
             <span>❌</span>
-            <span>Error</span>
+            <span>Uh Oh!</span>
           </div>
           <div class="result-details">
-            Failed to analyze URL: ${error.message}
+            Failed to analyze URL: Please check the URL format to validate it is correct.
+            <br>Details: ${error.message || 'Unknown error occurred.'}
           </div>`;
         resultPanel.classList.add('visible', 'warning');
         console.error('Analysis error:', error);
@@ -517,7 +518,7 @@
           <div class="details-header">
             <div class="details-title">Prediction Details</div>
             <div class="confidence-meter">
-              <span class="confidence-value">${data.risk_score}%</span>
+              <span class="confidence-value">${data.risk_score}% Chance of Phishing </span>
               <div class="confidence-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${data.risk_score}">
                 <div class="confidence-fill ${riskClass}" style="width: ${data.risk_score}%;"></div>
               </div>
@@ -565,7 +566,8 @@
       reportUrl.textContent = data.url;
       reportFeatures.textContent = data.features ? Object.keys(data.features).length : 'N/A';
       reportHtmlStatus.textContent = data.html_analyzed ? 'Yes' : 'No';
-      analysisContent.textContent = JSON.stringify(data, null, 2);
+      analysisContent.innerHTML = `<pre style="font-family: var(--font-mono); font-size: 0.85em; overflow-x: auto; max-height: 300px; white-space: pre-wrap;">${JSON.stringify(data, null, 2)}</pre>`;
+
       analysisOutput.classList.add('visible');
     }
 

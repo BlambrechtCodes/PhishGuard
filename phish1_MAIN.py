@@ -8,14 +8,13 @@ import pandas as pd
 import numpy as np
 import tensorflow as tf
 from sklearn.model_selection import train_test_split, StratifiedKFold
-from sklearn.preprocessing import StandardScaler, RobustScaler
+from sklearn.preprocessing import StandardScaler
 from sklearn.tree import DecisionTreeClassifier
 from sklearn import metrics
 from sklearn.metrics import confusion_matrix, roc_curve, auc, classification_report
 import matplotlib.pyplot as plt
 import seaborn as sns
 import joblib
-from urllib.parse import urlparse
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -35,7 +34,6 @@ class PhishingDetector:
         print("\n=== Loading Dataset ===")
         df = pd.read_csv(filepath)
         print("Dataset shape:", df.shape)
-        print("First 5 rows:\n", df.head())
         
         # Data quality checks
         print("\n=== Data Quality Checks ===")
@@ -43,18 +41,16 @@ class PhishingDetector:
         print("Label distribution:\n", df['label'].value_counts())
         
         # Feature engineering
-        print("\n=== Feature Engineering ===")
         X = df.select_dtypes(include=[np.number])
         y = df['label']
         
         # Remove problematic features
         features_to_drop = ['URLSimilarityIndex', 'HasSocialNet', 'HasCopyrightInfo']
-        X = X.drop(columns=[col for col in features_to_drop if col in X.columns])
+        X = X.drop(columns=[col for col in features_to_drop if col in X.columns], errors='ignore')
         
-        # Remove highly correlated features with target (to avoid data leakage)
-        correlations = df.corr(numeric_only=True)['label'].abs()
-        high_corr_features = correlations[correlations > 0.8].index.tolist()
-        high_corr_features = [f for f in high_corr_features if f != 'label' and f in X.columns]
+        # Remove highly correlated features with target (aggressive removal)
+        correlations = X.corrwith(y).abs()
+        high_corr_features = correlations[correlations > 0.3].index.tolist()  # Lower threshold
         if high_corr_features:
             print("Dropping highly correlated features:", high_corr_features)
             X = X.drop(columns=high_corr_features)
@@ -64,102 +60,100 @@ class PhishingDetector:
             X = X.drop(columns=['label'])
             
         self.feature_columns = list(X.columns)
-        print("Final features:", len(self.feature_columns))
+        print("Final features:", len(self.feature_columns), ":", self.feature_columns)
         
         return X, y
     
     def build_tensorflow_model(self, input_dim):
-        """Build TensorFlow neural network model"""
+        """Build TensorFlow neural network model with balanced complexity"""
         print("\n=== Building TensorFlow Model ===")
         
         model = tf.keras.Sequential([
-            # Input layer with normalization
             tf.keras.layers.InputLayer(input_shape=(input_dim,)),
             tf.keras.layers.BatchNormalization(),
             
-            # Hidden layers with dropout for regularization
-            tf.keras.layers.Dense(128, activation='relu', 
-                                kernel_regularizer=tf.keras.regularizers.l2(0.001)),
+            # Balanced architecture
+            tf.keras.layers.Dense(96, activation='relu', 
+                                kernel_regularizer=tf.keras.regularizers.l2(0.005)),
+            tf.keras.layers.Dropout(0.4),
+            
+            tf.keras.layers.Dense(48, activation='relu',
+                                kernel_regularizer=tf.keras.regularizers.l2(0.005)),
             tf.keras.layers.Dropout(0.3),
             
-            tf.keras.layers.Dense(64, activation='relu',
-                                kernel_regularizer=tf.keras.regularizers.l2(0.001)),
-            tf.keras.layers.Dropout(0.3),
-            
-            tf.keras.layers.Dense(32, activation='relu',
-                                kernel_regularizer=tf.keras.regularizers.l2(0.001)),
+            tf.keras.layers.Dense(24, activation='relu'),
             tf.keras.layers.Dropout(0.2),
             
-            # Output layer for binary classification
             tf.keras.layers.Dense(1, activation='sigmoid')
         ])
         
-        # Compile with Adam optimizer and binary crossentropy
+        # Compile with custom optimizer
         model.compile(
-            optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+            optimizer=tf.keras.optimizers.Adam(learning_rate=0.0008),
             loss='binary_crossentropy',
             metrics=[
                 'accuracy',
                 tf.keras.metrics.Precision(name='precision'),
-                tf.keras.metrics.Recall(name='recall')
+                tf.keras.metrics.Recall(name='recall'),
+                tf.keras.metrics.AUC(name='auc')
             ]
         )
         
         model.summary()
         return model
     
-    def train_models(self, X, y, test_size=0.2, validation_split=0.2):
+    def train_models(self, X, y, validation_split=0.25):  # No test split here
         """Train both TensorFlow and Decision Tree models"""
-        print("\n=== Splitting Data ===")
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=test_size, random_state=42, stratify=y
-        )
-        
-        print(f"Train size: {X_train.shape[0]}, Test size: {X_test.shape[0]}")
-        
-        # Scale features for neural network
         print("\n=== Scaling Features ===")
-        X_train_scaled = self.scaler.fit_transform(X_train)
-        X_test_scaled = self.scaler.transform(X_test)
+        X_scaled = self.scaler.fit_transform(X)
         
         # Build and train TensorFlow model
-        self.tf_model = self.build_tensorflow_model(X_train.shape[1])
+        self.tf_model = self.build_tensorflow_model(X.shape[1])
         
-        # Callbacks for training
+        # Enhanced callbacks
         callbacks = [
             tf.keras.callbacks.EarlyStopping(
-                monitor='val_loss', patience=15, restore_best_weights=True
+                monitor='val_loss', 
+                patience=10,
+                restore_best_weights=True,
+                min_delta=0.001
             ),
             tf.keras.callbacks.ReduceLROnPlateau(
-                monitor='val_loss', factor=0.5, patience=8, min_lr=1e-6
+                monitor='val_loss', 
+                factor=0.6, 
+                patience=5,
+                min_lr=1e-6,
+                verbose=1
             )
         ]
         
         print("\n=== Training TensorFlow Model ===")
         self.history = self.tf_model.fit(
-            X_train_scaled, y_train,
-            epochs=100,
-            batch_size=32,
+            X_scaled, y,
+            epochs=80,
+            batch_size=128,  # Larger batch size
             validation_split=validation_split,
             callbacks=callbacks,
             verbose=1
         )
         
-        # Train Decision Tree for comparison
+        # Train Decision Tree with balanced parameters
         print("\n=== Training Decision Tree Model ===")
         self.tree_model = DecisionTreeClassifier(
             class_weight='balanced',
-            max_depth=10,
-            min_samples_split=10,
+            max_depth=7,
+            min_samples_split=15,
+            min_samples_leaf=5,
             random_state=42
         )
-        self.tree_model.fit(X_train, y_train)
+        self.tree_model.fit(X, y)
         
-        return X_train_scaled, X_test_scaled, X_test, y_train, y_test
-    
-    def evaluate_models(self, X_test_scaled, X_test, y_test):
-        """Evaluate both models"""
+    def evaluate_models(self, X_test, y_test):
+        """Evaluate both models on test data"""
         print("\n=== Model Evaluation ===")
+        
+        # Scale test features
+        X_test_scaled = self.scaler.transform(X_test)
         
         # TensorFlow predictions
         tf_pred_proba = self.tf_model.predict(X_test_scaled).flatten()
@@ -387,32 +381,33 @@ if __name__ == "__main__":
     print(f"Decision Tree Probability: {result['decision_tree_prob']:.3f}")
     
     print("\n=== Cross-Validation ===")
-kfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-cv_scores = []
+    kfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+    cv_scores = []
 
-for fold_num, (train_idx, val_idx) in enumerate(kfold.split(X, y), 1):
-    print(f"\n--- Cross-Validation Fold {fold_num}/{kfold.n_splits} ---")
-    X_cv_train, X_cv_val = X.iloc[train_idx], X.iloc[val_idx]
-    y_cv_train, y_cv_val = y.iloc[train_idx], y.iloc[val_idx]
-    
-    scaler_cv = StandardScaler()
-    X_cv_train_scaled = scaler_cv.fit_transform(X_cv_train)
-    X_cv_val_scaled = scaler_cv.transform(X_cv_val)
-    
-    print(f"  Training TensorFlow model for fold {fold_num}...")
-    model_cv = detector.build_tensorflow_model(X_cv_train.shape[1])
-    model_cv.fit(
-        X_cv_train_scaled, y_cv_train,
-        epochs=50, verbose=1,
-        validation_split=0.2,
-        callbacks=[tf.keras.callbacks.EarlyStopping(patience=10)]
-    )
-    print(f"  Training completed for fold {fold_num}. Evaluating...")
-    
-    val_pred = (model_cv.predict(X_cv_val_scaled) > 0.5).astype(int)
-    score = metrics.accuracy_score(y_cv_val, val_pred)
-    cv_scores.append(score)
-    print(f"  Fold {fold_num} accuracy: {score:.4f}")
+    for fold_num, (train_idx, val_idx) in enumerate(kfold.split(X, y), 1):
+        print(f"\n--- Cross-Validation Fold {fold_num}/{kfold.n_splits} ---")
+        X_cv_train, X_cv_val = X.iloc[train_idx], X.iloc[val_idx]
+        y_cv_train, y_cv_val = y.iloc[train_idx], y.iloc[val_idx]
+        
+        scaler_cv = StandardScaler()
+        X_cv_train_scaled = scaler_cv.fit_transform(X_cv_train)
+        X_cv_val_scaled = scaler_cv.transform(X_cv_val)
+        
+        print(f"  Training TensorFlow model for fold {fold_num}...")
+        model_cv = detector.build_tensorflow_model(X_cv_train.shape[1])
+        model_cv.fit(
+            X_cv_train_scaled, y_cv_train,
+            epochs=50, verbose=1,
+            validation_split=0.2,
+            callbacks=[tf.keras.callbacks.EarlyStopping(patience=10)]
+        )
+        print(f"  Training completed for fold {fold_num}. Evaluating...")
+        
+        val_pred = (model_cv.predict(X_cv_val_scaled) > 0.5).astype(int)
+        score = metrics.accuracy_score(y_cv_val, val_pred)
+        cv_scores.append(score)
+        print(f"  Fold {fold_num} accuracy: {score:.4f}")
 
-print("\nCross-validation scores:", cv_scores)
-print(f"Mean CV accuracy: {np.mean(cv_scores):.3f} (+/- {np.std(cv_scores)*2:.3f})")
+    print("\nCross-validation scores:", cv_scores)
+    print(f"Mean CV accuracy: {np.mean(cv_scores):.3f} (+/- {np.std(cv_scores)*2:.3f})")
+    

@@ -396,16 +396,16 @@ h1 {
   transition: width 0.5s ease;
 }
 
-.confidence-fill.safe {
-  background: var(--gradient-primary);
+.confidence-fill.low {
+  background: linear-gradient(135deg, #00ff88 0%, #00cc66 100%);
 }
 
-.confidence-fill.warning {
-  background: var(--gradient-warning);
+.confidence-fill.medium {
+  background: linear-gradient(135deg, #ffaa00 0%, #ffcc00 100%);
 }
 
-.confidence-fill.threat {
-  background: var(--gradient-danger);
+.confidence-fill.high {
+  background: linear-gradient(135deg, #ffaa00 0%, #ffcc00 100%);
 }
 
 /* === Feature Indicators Grid === */
@@ -650,7 +650,9 @@ h1 {
 }
 
 .analysis-output.expanded .report-content {
-  max-height: none;
+  padding: 1.5rem;
+  max-height: 600px; /* Use a value large enough for your content */
+  opacity: 1;
 }
 
 .analysis-header {
@@ -728,9 +730,9 @@ h1 {
   word-break: break-word;
 }
 
-/* Scrollable report content */
+/* Scrollable report content - default CLOSED state */
 .report-content {
-  padding: 1.5rem;
+  padding: 0 1.5rem;              /* Remove top/bottom padding when closed */
   font-family: var(--font-mono);
   font-size: 0.75rem;
   line-height: 1.6;
@@ -738,10 +740,22 @@ h1 {
   background: var(--primary-bg);
   white-space: pre-wrap;
   overflow-x: auto;
-  max-height: 300px;
-  overflow-y: auto;
-  border-radius: 0 0  var(--border-radius) var(--border-radius);
+  max-height: 0;                 /* Collapsed initially */
+  opacity: 0;                   /* Invisible initially */
+  min-height: 0;
+  transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
+  overflow-y: hidden;           /* Hide vertical scrollbar while closed */
+  border-radius: 0 0 var(--border-radius) var(--border-radius);
 }
+
+/* Scrollable report content - expanded state */
+.report-content.expanded {
+  padding: 1.5rem;
+  max-height: 300px;             /* Adjust as needed to fully show content */
+  opacity: 1;
+  overflow-y: auto;
+}
+
 
 /* Report footer */
 .report-footer {
@@ -894,9 +908,39 @@ h1 {
   }
 
   .confidence-bar {
-    flex: 1;
-    max-width: 200px;
+    position: relative; /* Needed to position .confidence-fill inside */
+    width: 120px;
+    height: 8px;
+    background: var(--accent-bg);
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
   }
+
+  .confidence-fill {
+    position: absolute; /* Make fill position inside the bar */
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 0; /* Start at 0 width to enable transition */
+    transition: width 0.5s ease;
+    border-radius: 4px 0 0 4px; /* Round left corners only */
+    background: var(--gradient-primary); /* Default gradient, overridden by modifier classes */
+  }
+
+  /* Override backgrounds for different states */
+  .confidence-fill.low {
+    background: linear-gradient(135deg, #00ff88 0%, #00cc66 100%);
+  }
+
+  .confidence-fill.medium {
+    background: linear-gradient(135deg, #ffaa00 0%, #ffcc00 100%);
+  }
+
+  .confidence-fill.high {
+    background: linear-gradient(135deg, #ff4444 0%, #ff6666 100%);
+  }
+
 }
 
 @media (max-width: 480px) {
@@ -928,6 +972,17 @@ input:focus-visible,
 .expand-btn:focus-visible {
   outline: 2px solid var(--accent-color);
   outline-offset: 2px;
+}
+/* Base arrow style (pointing down) */
+.expand-btn svg {
+  display: block;
+  transition: transform 0.3s var(--transition-timing, cubic-bezier(0.4, 0, 0.2, 1));
+  transform-origin: 50% 50%;
+}
+
+/* When aria-expanded="true", rotate arrow up */
+.expand-btn[aria-expanded="true"] svg {
+  transform: rotate(180deg);
 }
 
 /* High contrast mode support */
