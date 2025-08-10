@@ -15,6 +15,20 @@ import base64
 app = Flask(__name__)
 CORS(app)
 
+# Add section to compare to Obvious working websites (reference a txt file list)
+def load_obvious_websites(file_path):
+    try:
+        with open(file_path, 'r') as file:
+            websites = {line.strip().lower() for line in file if line.strip()}
+        print(f"[DEBUG] Loaded obvious websites: {websites}")
+        return websites
+    except Exception as e:
+        print(f"[DEBUG] Error loading obvious websites: {e}")
+        return set()
+
+# CREATE FILE WITH LIST OF ALL VALID OBVIOUS WEBSITES
+
+
 # Load model and artifacts ONCE with debug
 try:
     print("[DEBUG] Loading model and preprocessing artifacts...")
