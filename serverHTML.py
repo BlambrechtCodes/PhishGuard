@@ -8,7 +8,6 @@ from datetime import datetime
 import os
 import requests
 from bs4 import BeautifulSoup
-import time
 from PIL import Image
 from io import BytesIO
 import base64
@@ -16,103 +15,87 @@ import base64
 app = Flask(__name__)
 CORS(app)
 
-# Load model once
+# Load model and artifacts ONCE with debug
 try:
+    print("[DEBUG] Loading model and preprocessing artifacts...")
     model = joblib.load('best_rf_model.pkl')
+    scaler = joblib.load('scaler.pkl')
+    top_k_features = joblib.load('top_features.pkl')
+    training_columns = joblib.load('training_columns.pkl')
     model_loaded = True
-    if hasattr(model, 'feature_names_in_'):
-        print("Model expects features:", model.feature_names_in_)
+    print("[DEBUG] Model/artifacts loaded successfully.")
+    print("[DEBUG] Model type: {}".format(type(model)))
+    print("[DEBUG] top_k_features: {}".format(top_k_features))
+    print("[DEBUG] training_columns: {}".format(training_columns))
 except Exception as e:
-    print(f"Error loading model: {e}")
+    print(f"[DEBUG] Error loading model/artifacts: {e}")
+    model = scaler = top_k_features = training_columns = None
     model_loaded = False
 
 TRUSTED_DOMAINS = {
-    "microsoft.com", "google.com", "apple.com", "amazon.com", 
-    "paypal.com", "github.com", "gov", "edu"
+    "microsoft.com","google.com","apple.com","amazon.com",
+    "paypal.com","github.com","gov","edu"
 }
 
+# ----- constants unchanged -----
+
 SUSPICIOUS_KEYWORDS = [
-    "secure", "account", "update", "confirm", "verify", "login", "signin",
-    "bank", "paypal", "amazon", "microsoft", "apple", "google", "facebook",
-    "twitter", "urgent", "suspended", "limited", "restricted", "temporary",
-    "expire", "click", "free", "winner", "congratulations", "prize", "offer", "deal"
+    "secure","account","update","confirm","verify","login","signin",
+    "bank","paypal","amazon","microsoft","apple","google","facebook",
+    "twitter","urgent","suspended","limited","restricted","temporary",
+    "expire","click","free","winner","congratulations","prize","offer","deal"
 ]
 
 URL_SHORTENERS = [
-    "bit.ly", "tinyurl.com", "t.co", "goo.gl", "ow.ly", "short.link",
-    "tiny.cc", "lnkd.in", "buff.ly", "ift.tt", "is.gd", "v.gd"
+    "bit.ly","tinyurl.com","t.co","goo.gl","ow.ly","short.link",
+    "tiny.cc","lnkd.in","buff.ly","ift.tt","is.gd","v.gd"
 ]
 
 SUSPICIOUS_TLDS = [
-    ".tk", ".ml", ".ga", ".cf", ".pw", ".top", ".click", ".download",
-    ".stream", ".science", ".work", ".party", ".review"
+    ".tk",".ml",".ga",".cf",".pw",".top",".click",".download",
+    ".stream",".science",".work",".party",".review"
 ]
 
-LEGIT_TLDS = ['.com', '.org', '.net', '.edu', '.gov']
+LEGIT_TLDS = ['.com','.org','.net','.edu','.gov']
 
 class HTMLImageParser:
-    def __init__(self, timeout=10, max_image_size=5*1024*1024):  # 5MB max
+    def __init__(self, timeout=10, max_image_size=5*1024*1024):
         self.timeout = timeout
         self.max_image_size = max_image_size
         self.session = requests.Session()
-        self.session.headers.update({
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-        })
+        self.session.headers.update({'User-Agent': 'Mozilla/5.0 ... Chrome'})
 
     def fetch_html_content(self, url):
-        """Fetch HTML content from URL with error handling"""
         try:
-            # Normalize URL
             if not url.startswith(('http://', 'https://')):
                 url = 'http://' + url
-            
-            print(f"Fetching HTML content from: {url}")
+            print(f"[DEBUG] Fetching HTML content for: {url}")
             response = self.session.get(url, timeout=self.timeout, allow_redirects=True)
             response.raise_for_status()
-            
-            # Check content type
             content_type = response.headers.get('content-type', '').lower()
+            print(f"[DEBUG] Response content-type: {content_type}")
             if 'text/html' not in content_type:
-                print(f"Non-HTML content type: {content_type}")
+                print("[DEBUG] Content is not HTML, skipping.")
                 return None, None
-            
+            print("[DEBUG] HTML fetched successfully.")
             return response.text, response.url
         except requests.exceptions.RequestException as e:
-            print(f"❌ Failed to fetch HTML: {str(e)}")
+            print(f"[DEBUG] Failed to fetch HTML: {str(e)}")
             return None, None
 
     def parse_images_from_html(self, html_content, base_url):
-        """Parse and analyze images from HTML content"""
+        print("[DEBUG] Parsing images from HTML.")
         if not html_content:
-            return {
-                'NoOfImage': 0,
-                'total_image_size': 0,
-                'external_images': 0,
-                'broken_images': 0,
-                'suspicious_images': 0,
-                'image_details': []
-            }
-
+            print("[DEBUG] No HTML content to parse for images.")
+            return {'NoOfImage': 0,'total_image_size': 0,'external_images': 0,'broken_images': 0,'suspicious_images': 0,'image_details': []}
         try:
             soup = BeautifulSoup(html_content, 'html.parser')
             images = soup.find_all('img')
-            
-            image_stats = {
-                'NoOfImage': len(images),
-                'total_image_size': 0,
-                'external_images': 0,
-                'broken_images': 0,
-                'suspicious_images': 0,
-                'image_details': []
-            }
-
-            print(f"🖼️ Found {len(images)} images in HTML")
-
+            print(f"[DEBUG] Found {len(images)} images in HTML.")
+            image_stats = {'NoOfImage': len(images),'total_image_size': 0,'external_images': 0,'broken_images': 0,'suspicious_images': 0,'image_details': []}
             for i, img in enumerate(images):
                 img_data = self.analyze_single_image(img, base_url, i)
                 image_stats['image_details'].append(img_data)
-                
-                # Update counters
                 if img_data['is_external']:
                     image_stats['external_images'] += 1
                 if img_data['is_broken']:
@@ -121,97 +104,44 @@ class HTMLImageParser:
                     image_stats['suspicious_images'] += 1
                 if img_data['size']:
                     image_stats['total_image_size'] += img_data['size']
-
+            print(f"[DEBUG] Image stats: {image_stats}")
             return image_stats
-
         except Exception as e:
-            print(f"❌ Error parsing images: {str(e)}")
-            return {
-                'NoOfImage': 0,
-                'total_image_size': 0,
-                'external_images': 0,
-                'broken_images': 0,
-                'suspicious_images': 0,
-                'image_details': []
-            }
+            print(f"[DEBUG] Error parsing images: {str(e)}")
+            return {'NoOfImage': 0,'total_image_size': 0,'external_images': 0,'broken_images': 0,'suspicious_images': 0,'image_details': []}
 
     def analyze_single_image(self, img_tag, base_url, index):
-        """Analyze a single image tag"""
-        img_data = {
-            'index': index,
-            'src': img_tag.get('src', ''),
-            'alt': img_tag.get('alt', ''),
-            'title': img_tag.get('title', ''),
-            'width': img_tag.get('width'),
-            'height': img_tag.get('height'),
-            'is_external': False,
-            'is_broken': False,
-            'is_suspicious': False,
-            'size': 0,
-            'format': None,
-            'absolute_url': ''
-        }
-
+        img_data = {'index': index,'src': img_tag.get('src', ''),'alt': img_tag.get('alt', ''),'title': img_tag.get('title', ''),'width': img_tag.get('width'),'height': img_tag.get('height'),'is_external': False,'is_broken': False,'is_suspicious': False,'size': 0,'format': None,'absolute_url': ''}
         src = img_data['src']
         if not src:
             img_data['is_broken'] = True
             return img_data
-
-        # Handle different URL formats
         if src.startswith('data:'):
-            # Data URL (base64 encoded image)
             img_data['format'] = 'data_url'
             img_data['size'] = len(src)
             return img_data
         elif src.startswith('//'):
-            # Protocol-relative URL
             parsed_base = urlparse(base_url)
             img_data['absolute_url'] = f"{parsed_base.scheme}:{src}"
         elif src.startswith(('http://', 'https://')):
-            # Absolute URL
             img_data['absolute_url'] = src
         else:
-            # Relative URL
             img_data['absolute_url'] = urljoin(base_url, src)
-
-        # Check if image is external
         base_domain = urlparse(base_url).netloc
         img_domain = urlparse(img_data['absolute_url']).netloc
         img_data['is_external'] = base_domain != img_domain
-
-        # Check for suspicious patterns
         img_data['is_suspicious'] = self.is_suspicious_image(img_data)
-
-        # Try to get image metadata
         if img_data['absolute_url']:
             img_data.update(self.get_image_metadata(img_data['absolute_url']))
-
         return img_data
 
     def is_suspicious_image(self, img_data):
-        """Check if image has suspicious characteristics"""
-        suspicious_patterns = [
-            r'1x1\.gif',  # Tracking pixels
-            r'pixel\.gif',
-            r'transparent\.gif',
-            r'spacer\.gif',
-            r'blank\.gif',
-            r'clear\.gif',
-            r'invisible\.png',
-            r'track',
-            r'analytics',
-            r'beacon'
-        ]
-
+        suspicious_patterns = [r'1x1\.gif',r'pixel\.gif',r'transparent\.gif',r'spacer\.gif',r'blank\.gif',r'clear\.gif',r'invisible\.png',r'track',r'analytics',r'beacon']
         src = img_data['src'].lower()
         alt = img_data['alt'].lower()
-        
-        # Check for suspicious patterns in src or alt
         for pattern in suspicious_patterns:
             if re.search(pattern, src) or re.search(pattern, alt):
                 return True
-
-        # Check for very small dimensions (likely tracking pixels)
         try:
             width = int(img_data['width']) if img_data['width'] else 0
             height = int(img_data['height']) if img_data['height'] else 0
@@ -219,185 +149,102 @@ class HTMLImageParser:
                 return True
         except (ValueError, TypeError):
             pass
-
         return False
 
     def get_image_metadata(self, img_url):
-        """Get image metadata (size, format, dimensions)"""
-        metadata = {
-            'size': 0,
-            'format': None,
-            'actual_width': None,
-            'actual_height': None,
-            'is_broken': False
-        }
-
+        metadata = {'size': 0,'format': None,'actual_width': None,'actual_height': None,'is_broken': False}
         try:
-            # Use HEAD request first to get content length
             head_response = self.session.head(img_url, timeout=5)
             if head_response.status_code == 200:
                 content_length = head_response.headers.get('content-length')
                 if content_length:
                     metadata['size'] = int(content_length)
-                    
-                # If image is too large, don't download it
                 if metadata['size'] > self.max_image_size:
-                    print(f"Image too large ({metadata['size']} bytes): {img_url}")
+                    print(f"[DEBUG] Image {img_url} too large ({metadata['size']} bytes). Skip fetch.")
                     return metadata
-
-            # Get actual image data for format and dimensions
             img_response = self.session.get(img_url, timeout=5, stream=True)
             if img_response.status_code == 200:
-                # Read only first chunk to determine format
                 chunk = next(img_response.iter_content(chunk_size=1024), b'')
                 if chunk:
                     try:
-                        # Use PIL to get image info
                         img = Image.open(BytesIO(chunk))
                         metadata['format'] = img.format
                         metadata['actual_width'], metadata['actual_height'] = img.size
                     except Exception:
-                        # Fallback: determine format from content type or URL
                         content_type = img_response.headers.get('content-type', '')
                         if 'image/' in content_type:
                             metadata['format'] = content_type.split('/')[-1]
                         else:
-                            # Guess from URL extension
                             ext = img_url.split('.')[-1].lower()
-                            if ext in ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']:
+                            if ext in ['jpg','jpeg','png','gif','webp','svg']:
                                 metadata['format'] = ext
-
         except Exception as e:
-            print(f"Could not fetch image metadata for {img_url}: {str(e)}")
+            print(f"[DEBUG] Couldn't fetch image metadata for {img_url}: {str(e)}")
             metadata['is_broken'] = True
-
         return metadata
 
 def is_trusted_domain(url):
-    """Check if domain is trusted with improved matching and HTTPS consideration"""
     domain = urlparse(url).netloc.lower()
-    # Extract base domain (e.g., 'microsoft.com' from 'www.microsoft.com')
     base_domain = '.'.join(domain.split('.')[-2:])
     return any(trusted in base_domain for trusted in TRUSTED_DOMAINS)
 
 def is_ip_address(domain):
-    """Improved IP detection with strict validation"""
-    # Strict IPv4 pattern (0-255 per octet)
-    ipv4_pattern = r'^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
-    
-    # IPv6 pattern with compression support
-    ipv6_pattern = (
-        r'^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|'  # Standard
-        r'^::(?:[0-9a-fA-F]{1,4}:){0,6}[0-9a-fA-F]{1,4}$|'  # Leading compression
-        r'^(?:[0-9a-fA-F]{1,4}:){1,6}::(?:[0-9a-fA-F]{1,4}:){0,5}[0-9a-fA-F]{1,4}$'  # Mixed
-    )
+    ipv4_pattern = r'^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?){1,3}\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?){1}$'
+    ipv6_pattern = r'^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$'
     return bool(re.match(ipv4_pattern, domain) or bool(re.match(ipv6_pattern, domain)))
 
-def count_suspicious_keywords(url):
-    count = 0
-    for keyword in SUSPICIOUS_KEYWORDS:
-        count += url.count(keyword)
-    return count
-
 def extract_html_features(html_content, base_url):
-    """Extract features from HTML content"""
+    print("[DEBUG] Extracting HTML features...")
     if not html_content:
-        return {
-            'LineOfCode': 0,            # Added! No Need to modify!    
-            'LargestLineLength': 0,
-            'HasTitle': 0,
-            'DomainTitleMatchScore': 0,
-            'URLTitleMatchScore': 0,
-            'HasFavicon': 0,
-            'Robots': 0,
-            'IsResponsive': 0,
-            'NoOfURLRedirect': 0,
-            'NoOfSelfRedirect': 0,
-            'HasDescription': 0,
-            'NoOfPopup': 0,
-            'NoOfiFrame': 0,
-            'HasExternalFormSubmit': 0,
-            'HasSubmitButton': 0,
-            'HasHiddenFields': 0,
-            'HasPasswordField': 0,
-            'NoOfImage': 0,             # Added! No Need to modify!    
-            'NoOfCSS': 0,               # Added! No Need to modify!
-            'NoOfJS': 0,                # Added! No Need to modify!    
-            'NoOfSelfRef': 0,
-            'NoOfEmptyRef': 0,
-            'NoOfExternalRef': 0
-        }
-
+        print("[DEBUG] No HTML content provided for extraction.")
+        return {'LineOfCode': 0, 'LargestLineLength': 0, 'HasTitle': 0,'DomainTitleMatchScore': 0, 'URLTitleMatchScore': 0, 'HasFavicon': 0, 'Robots': 0, 'IsResponsive': 0, 'NoOfURLRedirect': 0,'NoOfSelfRedirect': 0,'HasDescription': 0,'NoOfPopup': 0,'NoOfiFrame': 0,'HasExternalFormSubmit': 0,'HasSubmitButton': 0,'HasHiddenFields': 0,'HasPasswordField': 0,'NoOfImage': 0,'NoOfCSS': 0,'NoOfJS': 0,'NoOfSelfRef': 0,'NoOfEmptyRef': 0,'NoOfExternalRef': 0}
     try:
         soup = BeautifulSoup(html_content, 'html.parser')
         base_domain = urlparse(base_url).netloc
-        
-        # Basic HTML metrics
         lines = html_content.split('\n')
         line_count = len(lines)
         largest_line = max(len(line) for line in lines) if lines else 0
-        
-        # Title analysis
         title_tag = soup.find('title')
         has_title = 1 if title_tag and title_tag.get_text().strip() else 0
         title_text = title_tag.get_text().strip().lower() if title_tag else ""
-        
-        # Domain-title matching
         domain_title_match = 0
         url_title_match = 0
         if title_text:
             domain_words = base_domain.lower().replace('.', ' ').split()
             url_words = base_url.lower().replace('/', ' ').replace('.', ' ').split()
-            
             domain_matches = sum(1 for word in domain_words if word in title_text)
             url_matches = sum(1 for word in url_words if word in title_text)
-            
             domain_title_match = domain_matches / max(len(domain_words), 1)
             url_title_match = url_matches / max(len(url_words), 1)
-
-        # Meta tags
         has_description = 1 if soup.find('meta', attrs={'name': 'description'}) else 0
         has_favicon = 1 if soup.find('link', rel='icon') or soup.find('link', rel='shortcut icon') else 0
         robots_meta = 1 if soup.find('meta', attrs={'name': 'robots'}) else 0
-        
-        # Responsive design indicators
         viewport_meta = soup.find('meta', attrs={'name': 'viewport'})
         is_responsive = 1 if viewport_meta else 0
-        
-        # Forms analysis
         forms = soup.find_all('form')
         external_form_submit = 0
         has_submit_button = 0
         has_hidden_fields = 0
         has_password_field = 0
-        
         for form in forms:
             action = form.get('action', '')
             if action and not action.startswith(('#', '/', '?')):
                 form_domain = urlparse(urljoin(base_url, action)).netloc
                 if form_domain != base_domain:
                     external_form_submit = 1
-            
             if form.find('input', type='submit') or form.find('button', type='submit'):
                 has_submit_button = 1
-            
             if form.find('input', type='hidden'):
                 has_hidden_fields = 1
-                
             if form.find('input', type='password'):
                 has_password_field = 1
-
-        # Count various elements
         iframes = len(soup.find_all('iframe'))
         css_links = len(soup.find_all('link', rel='stylesheet'))
         js_scripts = len(soup.find_all('script'))
-        
-        # Analyze links
         links = soup.find_all('a', href=True)
         self_refs = 0
         empty_refs = 0
         external_refs = 0
-        
         for link in links:
             href = link['href'].strip()
             if not href or href == '#':
@@ -409,69 +256,33 @@ def extract_html_features(html_content, base_url):
                 else:
                     external_refs += 1
             else:
-                self_refs += 1  # Relative links are self-references
-
-        # Popup indicators (basic heuristics)
-        popup_indicators = ['window.open', 'popup', 'alert(', 'confirm(']
+                self_refs += 1
+        popup_indicators = ['window.open','popup','alert(','confirm(']
         popup_count = sum(html_content.lower().count(indicator) for indicator in popup_indicators)
-
-        return {
-            'LineOfCode': line_count,
-            'LargestLineLength': largest_line,
-            'HasTitle': has_title,
-            'DomainTitleMatchScore': domain_title_match,
-            'URLTitleMatchScore': url_title_match,
-            'HasFavicon': has_favicon,
-            'Robots': robots_meta,
-            'IsResponsive': is_responsive,
-            'NoOfURLRedirect': 0,  # Would need to track redirects during fetch
-            'NoOfSelfRedirect': 0,  # Would need to analyze redirect chain
-            'HasDescription': has_description,
-            'NoOfPopup': popup_count,
-            'NoOfiFrame': iframes,
-            'HasExternalFormSubmit': external_form_submit,
-            'HasSubmitButton': has_submit_button,
-            'HasHiddenFields': has_hidden_fields,
-            'HasPasswordField': has_password_field,
-            'NoOfCSS': css_links,
-            'NoOfJS': js_scripts,
-            'NoOfSelfRef': self_refs,
-            'NoOfEmptyRef': empty_refs,
-            'NoOfExternalRef': external_refs
-        }
-
+        return {'LineOfCode': line_count,'LargestLineLength': largest_line,'HasTitle': has_title,'DomainTitleMatchScore': domain_title_match,'URLTitleMatchScore': url_title_match,'HasFavicon': has_favicon,'Robots': robots_meta,'IsResponsive': is_responsive,'NoOfURLRedirect': 0,'NoOfSelfRedirect': 0,'HasDescription': has_description,'NoOfPopup': popup_count,'NoOfiFrame': iframes,'HasExternalFormSubmit': external_form_submit,'HasSubmitButton': has_submit_button,'HasHiddenFields': has_hidden_fields,'HasPasswordField': has_password_field,'NoOfCSS': css_links,'NoOfJS': js_scripts,'NoOfSelfRef': self_refs,'NoOfEmptyRef': empty_refs,'NoOfExternalRef': external_refs}
     except Exception as e:
-        print(f"❌ Error extracting HTML features: {str(e)}")
-        return {
-            'LineOfCode': 0, 'LargestLineLength': 0, 'HasTitle': 0,
-            'DomainTitleMatchScore': 0, 'URLTitleMatchScore': 0, 'HasFavicon': 0,
-            'Robots': 0, 'IsResponsive': 0, 'NoOfURLRedirect': 0,
-            'NoOfSelfRedirect': 0, 'HasDescription': 0, 'NoOfPopup': 0,
-            'NoOfiFrame': 0, 'HasExternalFormSubmit': 0, 'HasSubmitButton': 0,
-            'HasHiddenFields': 0, 'HasPasswordField': 0, 'NoOfImage': 0,
-            'NoOfCSS': 0, 'NoOfJS': 0, 'NoOfSelfRef': 0,
-            'NoOfEmptyRef': 0, 'NoOfExternalRef': 0
-        }
+        print(f"[DEBUG] Error extracting HTML features: {str(e)}")
+        return {'LineOfCode': 0,'LargestLineLength': 0,'HasTitle': 0,'DomainTitleMatchScore': 0,'URLTitleMatchScore': 0,
+                'HasFavicon': 0,'Robots': 0,'IsResponsive':0,'NoOfURLRedirect':0,'NoOfSelfRedirect':0,'HasDescription':0,
+                'NoOfPopup':0,'NoOfiFrame':0,'HasExternalFormSubmit':0,'HasSubmitButton':0,'HasHiddenFields':0,
+                'HasPasswordField':0,'NoOfImage':0,'NoOfCSS':0,'NoOfJS':0,'NoOfSelfRef':0,'NoOfEmptyRef':0,
+                'NoOfExternalRef':0}
 
 def extract_url_features(input_url):
-    """Extract features from URL only"""
+    print(f"[DEBUG] Extracting URL features for: {input_url}")
     normalized_url = input_url if input_url.startswith(('http://', 'https://')) else 'http://' + input_url
     parsed = urlparse(normalized_url)
     domain = parsed.netloc
     full_url = parsed.geturl().lower()
     url_length = len(full_url)
-
     digit_count = sum(c.isdigit() for c in full_url)
     letter_count = sum(c.isalpha() for c in full_url)
     special_char_count = len(re.findall(r'[^a-zA-Z0-9\-._~:/?#[\]@!$&\'()*+,;=]', full_url))
-
     domain_parts = domain.split('.')
     tld = domain_parts[-1] if domain_parts else ""
     tld_length = len(tld)
-
     valid_chars = re.findall(r'[a-zA-Z0-9\-._~:/?#[\]@!$&\'()*+,;=]', full_url)
     url_char_prob = len(valid_chars) / max(url_length, 1)
-
     tld_with_dot = f".{tld}"
     if tld_with_dot in LEGIT_TLDS:
         tld_legitimate_prob = 1.0
@@ -479,8 +290,7 @@ def extract_url_features(input_url):
         tld_legitimate_prob = 0.1
     else:
         tld_legitimate_prob = 0.5
-
-    return {
+    feature_dict = {
         'URLLength': url_length,
         'DomainLength': len(domain),
         'IsDomainIP': 1 if is_ip_address(domain) else 0,
@@ -506,273 +316,196 @@ def extract_url_features(input_url):
         'Pay': 1 if 'pay' in full_url else 0,
         'Crypto': 1 if 'crypto' in full_url else 0,
     }
+    print(f"[DEBUG] Extracted URL features: {feature_dict}")
+    return feature_dict
 
 def analyze_url_comprehensive(input_url, fetch_html=True):
-    """Comprehensive URL analysis with optional HTML parsing"""
-    print(f"Starting comprehensive analysis of: {input_url}")
-    
-    # Extract URL-based features
+    print(f"[DEBUG] Starting comprehensive analysis for: {input_url}")
     url_features = extract_url_features(input_url)
-    
-    # Initialize HTML features with defaults
-    html_features = {
-        'LineOfCode': 0, 'LargestLineLength': 0, 'HasTitle': 0,
-        'DomainTitleMatchScore': 0, 'URLTitleMatchScore': 0, 'HasFavicon': 0,
-        'Robots': 0, 'IsResponsive': 0, 'NoOfURLRedirect': 0,
-        'NoOfSelfRedirect': 0, 'HasDescription': 0, 'NoOfPopup': 0,
-        'NoOfiFrame': 0, 'HasExternalFormSubmit': 0, 'HasSubmitButton': 0,
-        'HasHiddenFields': 0, 'HasPasswordField': 0, 'NoOfImage': 0,
-        'NoOfCSS': 0, 'NoOfJS': 0, 'NoOfSelfRef': 0,
-        'NoOfEmptyRef': 0, 'NoOfExternalRef': 0
-    }
-    
+    html_features = {'LineOfCode': 0,'LargestLineLength': 0,'HasTitle': 0,'DomainTitleMatchScore': 0,'URLTitleMatchScore': 0,'HasFavicon': 0,'Robots': 0,'IsResponsive': 0,'NoOfURLRedirect': 0,'NoOfSelfRedirect': 0,'HasDescription': 0,'NoOfPopup': 0,'NoOfiFrame': 0,'HasExternalFormSubmit': 0,'HasSubmitButton': 0,'HasHiddenFields': 0,'HasPasswordField': 0,'NoOfImage': 0,'NoOfCSS': 0,'NoOfJS': 0,'NoOfSelfRef': 0,'NoOfEmptyRef': 0,'NoOfExternalRef': 0}
     image_stats = None
-    
     if fetch_html:
-        # Initialize HTML parser
+        print(f"[DEBUG] Attempting HTML fetch/parse: fetch_html={fetch_html}")
         parser = HTMLImageParser()
-        
-        # Fetch HTML content
         html_content, final_url = parser.fetch_html_content(input_url)
-        
         if html_content:
-            print("✅ Successfully fetched HTML content")
-            
-            # Extract HTML features
+            print("[DEBUG] HTML fetched, extracting HTML features.")
             html_features = extract_html_features(html_content, final_url or input_url)
-            
-            # Parse images
             image_stats = parser.parse_images_from_html(html_content, final_url or input_url)
             html_features['NoOfImage'] = image_stats['NoOfImage']
-            
-            print(f"HTML Analysis Complete:")
-            print(f"   - Lines of code: {html_features['LineOfCode']}")
-            print(f"   - Images found: {html_features['NoOfImage']}")
-            print(f"   - External images: {image_stats['external_images']}")
-            print(f"   - Suspicious images: {image_stats['suspicious_images']}")
-            print(f"   - CSS files: {html_features['NoOfCSS']}")
-            print(f"   - JS files: {html_features['NoOfJS']}")
         else:
-            print("⚠️ Could not fetch HTML content, using URL-only analysis")
-
-    # Combine all features
+            print("[DEBUG] Unable to fetch HTML, falling back to URL-only features.")
     features = {**url_features, **html_features}
     features['IsTrustedDomain'] = 1 if is_trusted_domain(input_url) else 0
-    
-    # Create feature DataFrame in exact order
-    feature_columns = [
-        'URLLength', 'DomainLength', 'IsDomainIP', 'CharContinuationRate',
-        'TLDLegitimateProb', 'URLCharProb', 'TLDLength', 'NoOfSubDomain',
-        'HasObfuscation', 'NoOfObfuscatedChar', 'ObfuscationRatio',
-        'NoOfLettersInURL', 'LetterRatioInURL', 'NoOfDegitsInURL',
-        'DegitRatioInURL', 'NoOfEqualsInURL', 'NoOfQMarkInURL',
-        'NoOfAmpersandInURL', 'NoOfOtherSpecialCharsInURL', 'SpacialCharRatioInURL',
-        'IsHTTPS', 'LineOfCode', 'LargestLineLength', 'HasTitle',
-        'DomainTitleMatchScore', 'URLTitleMatchScore', 'HasFavicon', 'Robots',
-        'IsResponsive', 'NoOfURLRedirect', 'NoOfSelfRedirect', 'HasDescription',
-        'NoOfPopup', 'NoOfiFrame', 'HasExternalFormSubmit', 'HasSubmitButton',
-        'HasHiddenFields', 'HasPasswordField', 'Bank', 'Pay', 'Crypto',
-        'NoOfImage', 'NoOfCSS', 'NoOfJS', 'NoOfSelfRef', 'NoOfEmptyRef',
-        'NoOfExternalRef'
-    ]
-    
-    feature_df = pd.DataFrame([features])[feature_columns]
-    
-    # Make prediction
-    if model_loaded:
-        try:
-            prediction = model.predict(feature_df)[0]
-            probability = model.predict_proba(feature_df)[0][1]
-            is_phishing = bool(prediction)
-            risk_score = int(probability * 100)
-            print(f"ML Model Prediction: {probability*100:.1f}% confident of phishing")
-        except Exception as exc:
-            risk_score = calculate_fallback_score(features)
-            is_phishing = risk_score >= 50
-            print(f"Model error: {exc}. Using fallback scoring. Risk: {risk_score}%")
-    else:
-        risk_score = calculate_fallback_score(features)
-        is_phishing = risk_score >= 50
-        print(f"Model not loaded. Using fallback scoring. Risk: {risk_score}%")
-
-    # Apply HTTPS bonus to risk score
-    if features['IsHTTPS']:
-        risk_score = max(0, risk_score - 20)  # Reduce risk by 20 points for HTTPS
-        print(f"HTTPS detected: Reduced risk score to {risk_score}%")
-    
-    # Apply trusted domain bonus
-    if features['IsTrustedDomain']:
-        risk_score = max(0, risk_score - 30)  # Reduce risk by 30 points for trusted domains
-        print(f"Trusted domain detected: Reduced risk score to {risk_score}%")
-
-    risk_level = "LOW" if risk_score <= 30 else "MEDIUM" if risk_score <= 60 else "HIGH"
-
+    print(f"[DEBUG] Combined features for prediction: {features}")
     result = {
         'url': input_url,
-        'is_phishing': is_phishing,
-        'risk_score': risk_score,
-        'risk_level': risk_level,
         'features': features,
         'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        'html_analyzed': fetch_html and html_content is not None
+        'html_analyzed': fetch_html and image_stats is not None
     }
-    
     if image_stats:
+        print("[DEBUG] Including image analysis in result.")
         result['image_analysis'] = image_stats
-    
     return result
 
+def preprocess_features_for_prediction(features_dict):
+    print("[DEBUG] Preprocessing features for model input...")
+    print(f"[DEBUG] Input features dict keys: {list(features_dict.keys())}")
+    df = pd.DataFrame([features_dict])
+    print(f"[DEBUG] Initial DataFrame columns: {list(df.columns)}")
+    if training_columns is not None:
+        for col in training_columns:
+            if col not in df.columns:
+                print(f"[DEBUG] Missing column '{col}'. Filling with 0.")
+                df[col] = 0
+        df = df[training_columns]
+        print(f"[DEBUG] DataFrame after column alignment: {list(df.columns)}")
+    else:
+        print("[DEBUG] No training_columns loaded!")
+    if scaler is not None:
+        print("[DEBUG] Scaling DataFrame features.")
+        scaled_data = scaler.transform(df)
+        df_scaled = pd.DataFrame(scaled_data, columns=training_columns)
+        print(f"[DEBUG] Scaled DataFrame:\n{df_scaled}")
+    else:
+        print("[DEBUG] No scaler loaded, skipping scaling.")
+        df_scaled = df
+    if top_k_features is not None:
+        print(f"[DEBUG] Selecting top_k_features: {top_k_features}")
+        df_scaled = df_scaled[top_k_features]
+        print(f"[DEBUG] DataFrame for model input:\n{df_scaled}")
+    else:
+        print("[DEBUG] No top_k_features loaded! Using all columns.")
+    return df_scaled
+
 def calculate_fallback_score(features):
-    """Calculate fallback risk score with enhanced HTTPS handling"""
+    print(f"[DEBUG] Running fallback scoring for features: {features}")
     score = 0
-    
-    # URL-based scoring
     score += min(features['URLLength'] / 100, 0.3) * 20
     score += features['IsDomainIP'] * 25
     score += min(features['NoOfSubDomain'] / 5, 0.2) * 15
-    
-    # Enhanced HTTPS handling - reward HTTPS more
     if features['IsHTTPS']:
-        score -= 15  # HTTPS gets significant risk reduction
+        score -= 15
     else:
-        score += 20  # HTTP gets significant penalty
-    
+        score += 20
     score += features['HasObfuscation'] * 15
-    
-    # Trusted domains get risk reduction
     if features.get('IsTrustedDomain', 0) == 1:
         score -= 30
-    
-    # HTML-based scoring
-    if features['LineOfCode'] > 0:  # HTML was analyzed
+    if features['LineOfCode'] > 0:
         score += (1 - features['HasTitle']) * 10
         score += features['HasExternalFormSubmit'] * 20
         score += min(features['NoOfPopup'] / 3, 1) * 15
         score += min(features['NoOfiFrame'] / 2, 1) * 10
         score += (1 - features['HasFavicon']) * 5
-        
-        # Image-based scoring
         if features['NoOfImage'] == 0:
-            score += 10  # No images might be suspicious
+            score += 10
         elif features['NoOfImage'] > 50:
-            score += 15  # Too many images might be suspicious
-    
-    # Ensure score stays within 0-100 range
+            score += 15
+    print(f"[DEBUG] Fallback score: {score}")
     return max(0, min(int(score), 100))
 
 @app.route('/api/predict', methods=['POST'])
 def predict():
+    print("[DEBUG] /api/predict route entered")
     data = request.get_json()
+    print("[DEBUG] Received request: {}".format(data))
     if not data or 'url' not in data:
+        print("[DEBUG] Missing URL in request data.")
         return jsonify({'error': 'URL is required'}), 400
-
-    url = data['url'].strip()
-    if not url:
+    url_in = data['url'].strip()
+    print(f"[DEBUG] User input URL: {url_in}")
+    if not url_in:
+        print("[DEBUG] Input URL is blank.")
         return jsonify({'error': 'URL is required'}), 400
-
-    # Option to disable HTML fetching for faster analysis
     fetch_html = data.get('fetch_html', True)
-
+    print(f"[DEBUG] fetch_html param: {fetch_html}")
     try:
-        result = analyze_url_comprehensive(url, fetch_html=fetch_html)
-        
+        result = analyze_url_comprehensive(url_in, fetch_html=fetch_html)
+        features = result['features']
+        print(f"[DEBUG] Features extracted for prediction: {features}")
+        if model_loaded:
+            print("[DEBUG] ML model loaded. Preparing features for prediction.")
+            try:
+                processed_features = preprocess_features_for_prediction(features)
+                print(f"[DEBUG] Model input DataFrame:\n{processed_features}")
+                prediction = int(model.predict(processed_features)[0])
+                print(f"[DEBUG] ML prediction: {prediction}")
+                probability = float(model.predict_proba(processed_features)[0][1])
+                print(f"[DEBUG] ML probability (legitimate): {probability}")
+                risk_score = int(probability * 100)
+                print(f"[DEBUG] Risk score from model: {risk_score}")
+            except Exception as exc:
+                print(f"[DEBUG] Error during model prediction: {exc}")
+                print("[DEBUG] Using fallback scoring instead.")
+                risk_score = calculate_fallback_score(features)
+                prediction = 0 if risk_score >= 50 else 1
+        else:
+            print("[DEBUG] ML model NOT loaded. Using fallback scoring.")
+            risk_score = calculate_fallback_score(features)
+            prediction = 0 if risk_score >= 50 else 1
+        risk_level = "LOW" if risk_score <= 30 else "MEDIUM" if risk_score <= 60 else "HIGH"
+        print(f"[DEBUG] Final prediction: {prediction} | risk_level: {risk_level}")
         response_data = {
-            'prediction': 1 if result['is_phishing'] else 0,
-            'risk_score': result['risk_score'],
-            'risk_level': result['risk_level'],
-            'features': result['features'],
+            'prediction': prediction,
+            'risk_score': risk_score,
+            'risk_level': risk_level,
+            'features': features,
             'url': result['url'],
             'timestamp': result['timestamp'],
             'model_loaded': model_loaded,
             'html_analyzed': result['html_analyzed']
         }
-        
         if 'image_analysis' in result:
+            print("[DEBUG] Adding image analysis to API response.")
             response_data['image_analysis'] = result['image_analysis']
-        
+        print(f"[DEBUG] Returning response: {response_data}")
         return jsonify(response_data)
-
     except Exception as e:
-        print(f"Analysis failed for URL: {url}. Error: {str(e)}")
+        print(f"[DEBUG] Top-level error in prediction endpoint: {str(e)}")
         return jsonify({'error': f'Analysis failed: {str(e)}'}), 500
 
 @app.route('/api/analyze-images', methods=['POST'])
 def analyze_images_only():
-    """Endpoint specifically for image analysis"""
+    print("[DEBUG] /api/analyze-images route entered")
     data = request.get_json()
+    print(f"[DEBUG] Request data: {data}")
     if not data or 'url' not in data:
+        print("[DEBUG] Missing URL in image analysis request.")
         return jsonify({'error': 'URL is required'}), 400
-
-    url = data['url'].strip()
-    if not url:
+    url_in = data['url'].strip()
+    print(f"[DEBUG] User input URL: {url_in}")
+    if not url_in:
+        print("[DEBUG] Input URL is blank.")
         return jsonify({'error': 'URL is required'}), 400
-
     try:
         parser = HTMLImageParser()
-        html_content, final_url = parser.fetch_html_content(url)
-        
+        print("[DEBUG] Fetching HTML for image analysis...")
+        html_content, final_url = parser.fetch_html_content(url_in)
         if not html_content:
+            print("[DEBUG] Could not fetch HTML for image analysis.")
             return jsonify({'error': 'Could not fetch HTML content'}), 400
-        
-        image_stats = parser.parse_images_from_html(html_content, final_url or url)
-        
+        print("[DEBUG] Parsing images in HTML...")
+        image_stats = parser.parse_images_from_html(html_content, final_url or url_in)
+        print(f"[DEBUG] Returning image analysis: {image_stats}")
         return jsonify({
-            'url': url,
+            'url': url_in,
             'final_url': final_url,
             'image_analysis': image_stats,
             'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         })
-
     except Exception as e:
+        print(f"[DEBUG] Error in analyze-images endpoint: {str(e)}")
         return jsonify({'error': f'Image analysis failed: {str(e)}'}), 500
 
 @app.route('/')
 def index():
+    print("[DEBUG] index route called")
     current_dir = os.path.abspath(os.path.dirname(__file__))
+    print(f"[DEBUG] Serving index.html from {current_dir}")
     return send_from_directory(current_dir, 'index.html')
 
-def test_comprehensive_analysis():
-    """Test function with comprehensive analysis"""
-    test_urls = [
-        "http://www.campbellsautosport.com/InventoryDetails.aspx?id=3590&egSet=3584%7C3600%7C3603%7C3532%7C3589%7C3535%7C3570%7C3599%7C3594%7C3590%7C3602%7C3593%7C3577%7C3561%7C3512%7C3562%7C3598%7C3566%7C3568%7C3605%7C3592%7C3604%7C3596%7C3572%7C3575",
-        "https://www.google.com",
-        "https://github.com"
-    ]
-    
-    for test_url in test_urls:
-        print(f"\n{'='*80}")
-        print(f"TESTING: {test_url}")
-        print(f"{'='*80}")
-        
-        result = analyze_url_comprehensive(test_url, fetch_html=True)
-        
-        print(f"\nANALYSIS RESULTS:")
-        print(f"   URL: {result['url']}")
-        print(f"   Phishing: {result['is_phishing']}")
-        print(f"   Risk Score: {result['risk_score']}%")
-        print(f"   Risk Level: {result['risk_level']}")
-        print(f"   HTML Analyzed: {result['html_analyzed']}")
-        
-        if 'image_analysis' in result:
-            img_stats = result['image_analysis']
-            print(f"\nIMAGE ANALYSIS:")
-            print(f"   Total Images: {img_stats['NoOfImage']}")
-            print(f"   External Images: {img_stats['external_images']}")
-            print(f"   Broken Images: {img_stats['broken_images']}")
-            print(f"   Suspicious Images: {img_stats['suspicious_images']}")
-            print(f"   Total Size: {img_stats['total_image_size']} bytes")
-            
-            if img_stats['image_details']:
-                print(f"\n Image Details:")
-                for img in img_stats['image_details'][:5]:  # Show first 5 images
-                    print(f"      {img['index']}: {img['src'][:50]}...")
-                    print(f"         External: {img['is_external']}, Suspicious: {img['is_suspicious']}")
-                    if img['size']:
-                        print(f"         Size: {img['size']} bytes, Format: {img['format']}")
-
 if __name__ == '__main__':
-    print("Starting Phishing Detector")
-    # test_comprehensive_analysis()
-    
-    print("\n🌐 Starting Flask server...")
+    print("[DEBUG] Starting Phishing Detector")
+    print("[DEBUG] 🌐 Starting Flask server...")
     app.run(host='0.0.0.0', port=5000, debug=True)
