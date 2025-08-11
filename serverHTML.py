@@ -554,6 +554,5 @@ def index():
     return send_from_directory(current_dir, 'index.html')
 
 if __name__ == '__main__':
-    print("[DEBUG] Starting Phishing Detector")
     print("[DEBUG] 🌐 Starting Flask server...")
     app.run(host='0.0.0.0', port=5000, debug=True)
