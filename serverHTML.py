@@ -11,6 +11,7 @@ from bs4 import BeautifulSoup
 from PIL import Image
 from io import BytesIO
 import base64
+import time
 
 app = Flask(__name__)
 CORS(app)
@@ -453,6 +454,7 @@ def predict():
     # NEW: Check if URL is in obvious safe list
     if OBVIOUS_WEBSITES and is_obviously_safe(url_in):
         print(f"[DEBUG] URL is in obvious safe list: {url_in}")
+        time.sleep(1.5)
         return jsonify({
             'prediction': 99,  # legitimate
             'risk_score': 1,   # 1% risk (99.9% safe)
