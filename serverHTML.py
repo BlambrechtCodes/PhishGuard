@@ -15,20 +15,6 @@ import base64
 app = Flask(__name__)
 CORS(app)
 
-# Add section to compare to Obvious working websites (reference a txt file list)
-def load_obvious_websites(file_path):
-    try:
-        with open(file_path, 'r') as file:
-            websites = {line.strip().lower() for line in file if line.strip()}
-        print(f"[DEBUG] Loaded obvious websites: {websites}")
-        return websites
-    except Exception as e:
-        print(f"[DEBUG] Error loading obvious websites: {e}")
-        return set()
-
-# CREATE FILE WITH LIST OF ALL VALID OBVIOUS WEBSITES
-
-
 # Load model and artifacts ONCE with debug
 try:
     print("[DEBUG] Loading model and preprocessing artifacts...")
@@ -37,10 +23,10 @@ try:
     top_k_features = joblib.load('top_features.pkl')
     training_columns = joblib.load('training_columns.pkl')
     model_loaded = True
-    print("[DEBUG] Model/artifacts loaded successfully.")
-    print("[DEBUG] Model type: {}".format(type(model)))
-    print("[DEBUG] top_k_features: {}".format(top_k_features))
-    print("[DEBUG] training_columns: {}".format(training_columns))
+    # print("[DEBUG] Model/artifacts loaded successfully.")
+    # print("[DEBUG] Model type: {}".format(type(model)))
+    # print("[DEBUG] top_k_features: {}".format(top_k_features))
+    # print("[DEBUG] training_columns: {}".format(training_columns))
 except Exception as e:
     print(f"[DEBUG] Error loading model/artifacts: {e}")
     model = scaler = top_k_features = training_columns = None
@@ -50,6 +36,17 @@ TRUSTED_DOMAINS = {
     "microsoft.com","google.com","apple.com","amazon.com",
     "paypal.com","github.com","gov","edu"
 }
+
+# Load obvious safe websites
+OBVIOUS_SAFE_FILE = 'common_sites.txt'
+OBVIOUS_WEBSITES = set()
+print("[DEBUG] Loading obvious safe websites...")
+try:
+    with open(OBVIOUS_SAFE_FILE, 'r') as f:
+        OBVIOUS_WEBSITES = {line.strip().lower() for line in f if line.strip()}
+    print(f"[DEBUG] Loaded {len(OBVIOUS_WEBSITES)} obvious safe websites")
+except Exception as e:
+    print(f"[DEBUG] Error loading obvious websites: {str(e)}")
 
 # ----- constants unchanged -----
 
@@ -205,7 +202,27 @@ def is_trusted_domain(url):
 def is_ip_address(domain):
     ipv4_pattern = r'^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?){1,3}\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?){1}$'
     ipv6_pattern = r'^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$'
-    return bool(re.match(ipv4_pattern, domain) or bool(re.match(ipv6_pattern, domain)))
+    return bool(re.match(ipv4_pattern, domain)) or bool(re.match(ipv6_pattern, domain))
+
+def is_obviously_safe(url):
+    """Check if URL is in the list of obviously safe websites"""
+    try:
+        # Normalize URL
+        if not url.startswith(('http://', 'https://')):
+            url = 'http://' + url
+        
+        parsed = urlparse(url)
+        domain = parsed.netloc.lower()
+        
+        # Remove www prefix if present
+        if domain.startswith('www.'):
+            domain = domain[4:]
+            
+        # Check against known safe domains
+        return domain in OBVIOUS_WEBSITES
+    except Exception as e:
+        print(f"[DEBUG] Error checking obvious safety: {str(e)}")
+        return False
 
 def extract_html_features(html_content, base_url):
     print("[DEBUG] Extracting HTML features...")
@@ -432,6 +449,22 @@ def predict():
     if not url_in:
         print("[DEBUG] Input URL is blank.")
         return jsonify({'error': 'URL is required'}), 400
+        
+    # NEW: Check if URL is in obvious safe list
+    if OBVIOUS_WEBSITES and is_obviously_safe(url_in):
+        print(f"[DEBUG] URL is in obvious safe list: {url_in}")
+        return jsonify({
+            'prediction': 99,  # legitimate
+            'risk_score': 1,   # 1% risk (99.9% safe)
+            'risk_level': "LOW",
+            'url': url_in,
+            'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            'obviously_safe': True,
+            'model_loaded': model_loaded,
+            'html_analyzed': False
+        })
+    
+    # Continue with normal processing
     fetch_html = data.get('fetch_html', True)
     print(f"[DEBUG] fetch_html param: {fetch_html}")
     try:
@@ -468,12 +501,13 @@ def predict():
             'url': result['url'],
             'timestamp': result['timestamp'],
             'model_loaded': model_loaded,
-            'html_analyzed': result['html_analyzed']
+            'html_analyzed': result['html_analyzed'],
+            'obviously_safe': False
         }
         if 'image_analysis' in result:
             print("[DEBUG] Adding image analysis to API response.")
             response_data['image_analysis'] = result['image_analysis']
-        print(f"[DEBUG] Returning response: {response_data}")
+        # print(f"[DEBUG] Returning response: {response_data}")
         return jsonify(response_data)
     except Exception as e:
         print(f"[DEBUG] Top-level error in prediction endpoint: {str(e)}")
