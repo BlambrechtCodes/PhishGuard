@@ -104,20 +104,6 @@ curl -X POST -H "Content-Type: application/json" \
 ## 📄 License
 
 - MIT License
-
-
-  
   
   Stay safe online!
 
-
-[1] https://img.icons8.com/ios-filled/100/000000/phishing.png
-[2] https://github.com/phishdetect/phishdetect
-[3] https://github.com/itxtalal/phishdetector-fyp
-[4] https://github.com/moghimi/phishdetector
-[5] https://github.com/topics/phishing-detection
-[6] https://github.com/MaulikxLakhani/PhishDetect
-[7] https://github.com/phishdetect
-[8] https://github.com/asrith-reddy/Phishing-detector
-[9] https://github.com/Nirzak/PhishDetector
-[10] https://github.com/rachung304/PhishDetector
