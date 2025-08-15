@@ -599,6 +599,35 @@ h1 {
   font-size: 1rem;
 }
 
+#url-input.pasted {
+  box-shadow: 0 0 8px var(--accent-color);
+  border-color: var(--accent-color);
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+
+.paste-btn {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--accent-bg);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.paste-btn:hover,
+.paste-btn:focus-visible {
+  background: var(--border-color);
+  color: var(--text-primary);
+  outline: none;
+}
+
 .image-src {
   font-family: var(--font-mono);
   font-size: 0.75rem;
